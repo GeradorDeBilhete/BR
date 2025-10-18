@@ -14,14 +14,7 @@
 
 <!-- CSS -->
 <style>
-body {
-  margin:0;
-  font-family:'Poppins', sans-serif;
-  background:#0e0e0e;
-  color:#f1f1f1;
-  text-align:center;
-  overflow-x:hidden;
-}
+body { margin:0; font-family:'Poppins', sans-serif; background:#0e0e0e; color:#f1f1f1; text-align:center; overflow-x:hidden; }
 header h1 { color:#00ff99; margin-top:30px; text-shadow:0 0 5px #00ff99; }
 .container { background:#1b1b1b; padding:25px; border-radius:12px; width:90%; max-width:700px; margin:30px auto; box-shadow:0 0 25px rgba(0,255,153,0.2); }
 label { display:block; margin:10px auto; width:80%; text-align:left; color:#ddd; }
@@ -91,14 +84,16 @@ button#gerar:hover, button#copiar:hover, button#baixar:hover, button#estatistica
 <div id="totalOdd" class="totalOdd"></div>
 
 <p class="legend">
-🔹 JC: Jogos do time da casa | 🔹 JF: Jogos do time visitante | 🔹 CD: Confrontos diretos
+🔹 JC = Jogos do time da casa acertando este mercado<br>
+🔹 JF = Jogos do time visitante acertando este mercado<br>
+🔹 CD = Confrontos diretos acertando este mercado
 </p>
 
 </div>
 
 <div id="estatisticasModal">
 <button id="closeEstatisticas">Fechar</button>
-<h2>📊 Estatísticas</h2>
+<h2>📊 Estatísticas do Gerador</h2>
 <div id="estatisticasConteudo"></div>
 </div>
 
@@ -121,6 +116,7 @@ const totalOddEl=document.getElementById("totalOdd");
 // Toggle mercados
 marketBtns.forEach(btn=>{btn.addEventListener("click",()=>{btn.classList.toggle("active");});});
 
+// Função para cor dos stats
 function getColor(stat){
   if(stat.includes("V")||parseInt(stat.split("/")[0])/parseInt(stat.split("/")[1])>=0.7) return "stat-green";
   if(stat.includes("E")||parseInt(stat.split("/")[0])/parseInt(stat.split("/")[1])>=0.5) return "stat-yellow";
@@ -132,6 +128,10 @@ function salvarHistorico(sorteados){
   const historico=JSON.parse(localStorage.getItem('historicoBilhetes')||'[]');
   const timestamp=new Date().toLocaleString();
   sorteados.forEach(p=>{
+    const jcPercent=Math.round(parseInt(p.jc.split("/")[0])/parseInt(p.jc.split("/")[1])*100);
+    const jfPercent=Math.round(parseInt(p.jf.split("/")[0])/parseInt(p.jf.split("/")[1])*100);
+    const cdPercent=Math.round(parseInt(p.cd.split("/")[0])/parseInt(p.cd.split("/")[1])*100);
+    const chanceGreen=Math.round((jcPercent+jfPercent+cdPercent)/3);
     historico.push({
       jogo:p.jogo,
       mercado:p.mercado,
@@ -139,6 +139,7 @@ function salvarHistorico(sorteados){
       jc:p.jc,
       jf:p.jf,
       cd:p.cd,
+      green: chanceGreen,
       horario:timestamp
     });
   });
@@ -159,71 +160,57 @@ function gerarBilhete(){
   sorteados.forEach((p,i)=>{
     totalOdd*=p.odd;
     const jcC=getColor(p.jc), jfC=getColor(p.jf), cdC=getColor(p.cd);
+    const jcPercent=Math.round(parseInt(p.jc.split("/")[0])/parseInt(p.jc.split("/")[1])*100);
+    const jfPercent=Math.round(parseInt(p.jf.split("/")[0])/parseInt(p.jf.split("/")[1])*100);
+    const cdPercent=Math.round(parseInt(p.cd.split("/")[0])/parseInt(p.cd.split("/")[1])*100);
+    const chanceGreen=Math.round((jcPercent+jfPercent+cdPercent)/3);
     const card=document.createElement("div");
-    card.className="bilhete-card";
-    card.innerHTML=`🏆 ${i+1}. ${p.jogo}<br>
+    card.className="bilhete-card show";
+    card.innerHTML=`<strong>🏆 ${i+1}. ${p.jogo}</strong><br>
     Mercado: ${p.mercado} | Odd: ${p.odd}<br>
-    JC: <span class="${jcC}">${p.jc}</span> | JF: <span class="${jfC}">${p.jf}</span> | CD: <span class="${cdC}">${p.cd}</span>`;
+    JC: <span class="${jcC}">${p.jc} (${jcPercent}%)</span> | 
+    JF: <span class="${jfC}">${p.jf} (${jfPercent}%)</span> | 
+    CD: <span class="${cdC}">${p.cd} (${cdPercent}%)</span><br>
+    🔹 Chance de green: ${chanceGreen}% ✅`;
     container.appendChild(card);
-    setTimeout(()=>{card.classList.add("show"); const audio=new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"); audio.volume=0.15; audio.play();}, i*400);
   });
-  setTimeout(()=>{totalOddEl.textContent=`💰 Odd total: ${totalOdd.toFixed(2)}`;}, sorteados.length*400);
-  localStorage.setItem("ultimoBilhete", JSON.stringify(sorteados));
+  totalOddEl.textContent=`💰 Odd Total: ${totalOdd.toFixed(2)}`;
   salvarHistorico(sorteados);
 }
 
 // Copiar bilhete
-document.getElementById("copiar").addEventListener("click", ()=>{
-  const cards=Array.from(document.querySelectorAll(".bilhete-card"));
-  const texto=cards.map(c=>c.innerText).join("\n\n") + "\n\n" + totalOddEl.textContent;
+document.getElementById("copiar").addEventListener("click",()=>{
+  let texto="";
+  document.querySelectorAll(".bilhete-card").forEach(c=>texto+=c.innerText+"\n-----------------------------------\n");
   navigator.clipboard.writeText(texto);
   alert("Bilhete copiado!");
 });
 
 // Baixar PDF
-document.getElementById("baixar").addEventListener("click", ()=>{
-  const { jsPDF }=window.jspdf;
+document.getElementById("baixar").addEventListener("click",()=>{
+  const {jsPDF}=window.jspdf;
   const doc=new jsPDF();
-  const cards=Array.from(document.querySelectorAll(".bilhete-card"));
-  const texto=cards.map(c=>c.innerText).join("\n\n") + "\n\n" + totalOddEl.textContent;
-  doc.setFontSize(12);
-  doc.text(texto,10,10);
-  const data=new Date();
-  doc.save(`bilhete-${data.getDate()}-${data.getMonth()+1}-${data.getFullYear()}.pdf`);
+  let y=10;
+  document.querySelectorAll(".bilhete-card").forEach(c=>{
+    const lines=c.innerText.split("\n");
+    lines.forEach(l=>{doc.text(l,10,y); y+=7;});
+    y+=5;
+  });
+  doc.save(`bilhete-${Date.now()}.pdf`);
 });
 
-document.getElementById("gerar").addEventListener("click", gerarBilhete);
-
-// Estatísticas
-document.getElementById('estatisticasBtn').addEventListener('click',()=>{
+// Estatísticas detalhadas
+document.getElementById("estatisticasBtn").addEventListener("click",()=>{
+  const modal=document.getElementById("estatisticasModal");
+  const conteudo=document.getElementById("estatisticasConteudo");
   const historico=JSON.parse(localStorage.getItem('historicoBilhetes')||'[]');
-  if(historico.length===0){
-    document.getElementById('estatisticasConteudo').innerHTML='Nenhum bilhete gerado ainda.';
-  } else {
-    const ligas = [...new Set(historico.map(h=>h.jogo.split(" x ")[0].trim() + " / " + h.jogo.split(" x ")[1].trim()))];
-    const mercados = [...new Set(historico.map(h=>h.mercado))];
-    const times = [...new Set(historico.flatMap(h=>h.jogo.split(" x ")))];
-    let statsHTML=`<p>Total de palpites gerados: ${historico.length}</p>`;
-    statsHTML+=`<p>Times: ${times.join(", ")}</p>`;
-    statsHTML+=`<p>Ligas/Confrontos: ${ligas.join(", ")}</p>`;
-    statsHTML+=`<p>Mercados usados: ${mercados.join(", ")}</p>`;
-    statsHTML+=`<h3>Horários:</h3><ul>${historico.map(h=>`<li>${h.jogo} - ${h.horario}</li>`).join("")}</ul>`;
-    document.getElementById('estatisticasConteudo').innerHTML=statsHTML;
-  }
-  document.getElementById('estatisticasModal').style.display='block';
-});
-
-document.getElementById('closeEstatisticas').addEventListener('click',()=>{
-  document.getElementById('estatisticasModal').style.display='none';
-});
-
-// Service Worker
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./sw.js')
-  .then(()=>console.log('SW registrado'))
-  .catch(err=>console.log('Erro SW:',err));
-}
-</script>
-
-</body>
-</html>
+  if(historico.length===0){conteudo.innerHTML="Nenhum bilhete gerado ainda."; modal.style.display="block"; return;}
+  
+  // Bilhetes gerados
+  const bilhetesGerados=new Set(historico.map(h=>h.horario)).size;
+  
+  // Palpites gerados
+  const palpitesGerados=historico.length;
+  
+  // Times diferentes
+  const times=[];
