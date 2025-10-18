@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎯 Gerador de Bilhete Premium App</title>
+<title>🎯Gerador De Bilhete🎟️</title>
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
@@ -55,7 +55,7 @@ button#gerar:hover, button#copiar:hover, button#baixar:hover { background:#00cc7
 <body>
 
 <header>
-<h1>🎯 Gerador de Bilhete Premium App</h1>
+<h1>🎯Gerador De Bilhete🎟️</h1>
 </header>
 
 <div class="container">
@@ -96,7 +96,6 @@ button#gerar:hover, button#copiar:hover, button#baixar:hover { background:#00cc7
 
 <div class="footer">Desenvolvido por Kawan • Estatísticas coloridas</div>
 
-<!-- JS -->
 <script>
 const palpites=[
 {jogo:"Flamengo x Palmeiras", mercado:"+1.5 gols", odd:1.45, jc:"3/5", jf:"3/5", cd:"3/5"},
@@ -111,7 +110,6 @@ const container=document.getElementById("bilheteContainer");
 const marketBtns=document.querySelectorAll(".market-btn");
 const totalOddEl=document.getElementById("totalOdd");
 
-// toggle mercados
 marketBtns.forEach(btn=>{btn.addEventListener("click",()=>{btn.classList.toggle("active");});});
 
 function getColor(stat){
@@ -130,7 +128,6 @@ function gerarBilhete(){
   const sorteados=filtrados.sort(()=>0.5-Math.random()).slice(0,qtd);
   container.innerHTML=""; totalOddEl.textContent="";
   let totalOdd=1;
-  // animação sequencial com som
   sorteados.forEach((p,i)=>{
     totalOdd*=p.odd;
     const jcC=getColor(p.jc), jfC=getColor(p.jf), cdC=getColor(p.cd);
@@ -142,13 +139,11 @@ function gerarBilhete(){
     container.appendChild(card);
     setTimeout(()=>{
       card.classList.add("show");
-      // efeito sonoro
       const audio=new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
       audio.volume=0.15;
       audio.play();
     }, i*400);
   });
-  // mostrar totalOdd animado depois de todos
   setTimeout(()=>{totalOddEl.textContent=`💰 Odd total: ${totalOdd.toFixed(2)}`;}, sorteados.length*400);
   localStorage.setItem("ultimoBilhete", JSON.stringify(sorteados));
 }
