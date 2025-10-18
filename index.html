@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BeBel Bet — Gerador de Bilhete</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body {margin:0; font-family:'Roboto',sans-serif; background:#121212; color:#fff;}
+header{padding:20px; text-align:center; font-size:26px; background-color:#111; box-shadow:0 2px 5px #000;}
+nav{display:flex; justify-content: space-around; background:#111; position: sticky; top:0; z-index:10;}
+nav button{background:none; border:none; color:#bbb; font-size:16px; padding:15px; cursor:pointer; transition:0.3s; border-radius:8px;}
+nav button.active{color:#4caf50; border-bottom:3px solid #4caf50; background:#1a1a1a;}
+.tab{display:none; padding:20px;}
+.tab.active{display:block;}
+.match-card{padding:15px; margin-bottom:15px; border-radius:12px; display:flex; align-items:center; transition: transform 0.3s, box-shadow 0.3s; background: linear-gradient(90deg,#222,#333);}
+.match-card:hover{transform:translateY(-5px); box-shadow:0 5px 15px rgba(0,255,0,0.3);}
+.team-logo{width:50px; height:50px; margin-right:10px; border-radius:50%; object-fit:cover;}
+.match-info{flex:1;}
+.teams{font-size:18px; font-weight:bold;}
+.tip{margin-top:4px; color:#ccc;}
+.date-time{font-size:14px; color:#bbb; margin-top:2px;}
+.odd{font-size:14px; color:#4caf50; font-weight:bold;}
+.explanation{font-size:13px; color:#aaa; margin-top:4px;}
+.generate-btn{padding:12px 25px; margin:20px 0; border:none; border-radius:12px; background:#4caf50; color:#fff; cursor:pointer; font-size:18px; transition:0.3s;}
+.generate-btn:hover{background:#45a049; transform:scale(1.05);}
+.inputs-container{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px;}
+.inputs-container input{padding:10px; border-radius:8px; border:none; width:100%; max-width:120px; text-align:center;}
+#bilhete-result{margin-top:15px; padding:10px; background:#1e1e1e; border-radius:12px;}
+@media(max-width:600px){.teams{font-size:16px;} nav button{font-size:14px; padding:10px;}}
+</style>
+</head>
+<body>
+
+<header>BeBel Bet — Gerador de Bilhete</header>
+
+<nav>
+<button id="tab1-btn" class="active">+1.5 Gols</button>
+<button id="tab2-btn">Ambas Marcam</button>
+<button id="tab3-btn">Vitória</button>
+<button id="tab4-btn">Placar Exato</button>
+</nav>
+
+<div id="tab1" class="tab tab1 active">
+  <div class="inputs-container">
+    <input type="number" id="num-jogos" placeholder="Nº de jogos" min="1" max="10">
+    <input type="number" id="odd" placeholder="Odd mínima" step="0.1" min="1">
+  </div>
+  <button class="generate-btn" onclick="gerarBilhete()">Gerar Bilhete</button>
+  <div id="bilhete-result"></div>
+  <div id="tab1-cards"></div>
+</div>
+
+<div id="tab2" class="tab tab2"><div id="tab2-cards"></div></div>
+<div id="tab3" class="tab tab3"><div id="tab3-cards"></div></div>
+<div id="tab4" class="tab tab4"><div id="tab4-cards"></div></div>
+
+<script>
+// Abas
+const tabs=["tab1","tab2","tab3","tab4"];
+tabs.forEach((t,i)=>{
+  document.getElementById(`tab${i+1}-btn`).addEventListener("click",()=>{
+    tabs.forEach((u,j)=>{
+      document.getElementById(`tab${j+1}-btn`).classList.remove("active");
+      document.getElementById(u).classList.remove("active");
+    });
+    document.getElementById(`tab${i+1}-btn`).classList.add("active");
+    document.getElementById(t).classList.add("active");
+  });
+});
+
+// Dados de Jogos
+const jogosPlus1_5=[
+  {time1:"Mainz", time2:"Bayer Leverkusen", horario:"10:30", odd:1.40, exp:"Ambas as equipes têm mostrado capacidade ofensiva.", logo1:"https://upload.wikimedia.org/wikipedia/commons/7/7e/FSV_Mainz_05_Logo.png", logo2:"https://upload.wikimedia.org/wikipedia/commons/6/6f/Bayer_04_Leverkusen_logo.svg"},
+  {time1:"RB Leipzig", time2:"Hamburgo SV", horario:"10:30", odd:1.35, exp:"RB Leipzig possui ataque potente e Hamburgo vulnerável.", logo1:"https://upload.wikimedia.org/wikipedia/commons/2/2b/RB_Leipzig_logo_2014.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/4/4f/Hamburger_SV_Logo.svg"},
+  {time1:"Bayern de Munique", time2:"Borússia Dortmund", horario:"13:30", odd:1.50, exp:"Clássico alemão com histórico de jogos com muitos gols.", logo1:"https://upload.wikimedia.org/wikipedia/commons/1/1a/FC_Bayern_München_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/3/3c/Borussia_Dortmund_logo.svg"},
+  {time1:"Cruzeiro", time2:"Fortaleza", horario:"21:00", odd:1.45, exp:"Cruzeiro forte em casa, Fortaleza eficiente no ataque.", logo1:"https://upload.wikimedia.org/wikipedia/commons/3/3c/Logo_Cruzeiro_Esporte_Clube.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/0/0d/Logo_Fortaleza_Esporte_Clube.svg"},
+  {time1:"Barcelona", time2:"Girona", horario:"11:15", odd:1.55, exp:"Clássico catalão com histórico de jogos com gols.", logo1:"https://upload.wikimedia.org/wikipedia/commons/4/47/FC_Barcelona_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/4/4e/Girona_FC_logo.svg"},
+  {time1:"Villarreal", time2:"Real Betis", horario:"13:30", odd:1.50, exp:"Ambas equipes com capacidade ofensiva.", logo1:"https://upload.wikimedia.org/wikipedia/commons/1/1f/Villarreal_CF_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/3/3c/Real_Betis_logo.svg"},
+  {time1:"Atlético de Madrid", time2:"Osasuna", horario:"16:00", odd:1.40, exp:"Atlético com ataque potente, Osasuna vulnerável.", logo1:"https://upload.wikimedia.org/wikipedia/commons/6/6b/Atlético_de_Madrid_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/4/4b/Osasuna_logo.svg"},
+  {time1:"Nice", time2:"Lyon", horario:"12:00", odd:1.45, exp:"Ambas equipes com capacidade ofensiva.", logo1:"https://upload.wikimedia.org/wikipedia/commons/4/4e/OGC_Nice_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/4/4a/Olympique_Lyonnais_logo.svg"},
+  {time1:"Tottenham", time2:"Aston Villa", horario:"09:00", odd:1.50, exp:"Tottenham ataque forte, Aston Villa vulnerável.", logo1:"https://upload.wikimedia.org/wikipedia/commons/a/a2/Tottenham_Hotspur_FC_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/4/4b/Aston_Villa_FC_logo.svg"},
+  {time1:"Rosário Central", time2:"Platense", horario:"17:00", odd:1.45, exp:"Ambas equipes com capacidade ofensiva.", logo1:"https://upload.wikimedia.org/wikipedia/commons/3/3b/Club_Rosario_Central_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/3/3a/Club_Atl%C3%A9tico_Platense_logo.svg"}
+];
+
+// Você pode adicionar as listas de BTTS, Vitória e Placar Exato da mesma forma
+// Exemplo simples para a demo:
+const jogosBTTS = [...jogosPlus1_5];
+const jogosVitoria = [...jogosPlus1_5];
+const jogosPlacar = [...jogosPlus1_5];
+
+function mostrarJogos(lista, containerId){
+  const container=document.getElementById(containerId);
+  container.innerHTML="";
+  lista.forEach(j=>{
+    const card=document.createElement("div");
+    card.className="match-card";
+    card.innerHTML=`<img class="team-logo" src="${j.logo1}" alt="${j.time1}">
+      <div class="match-info">
+      <span class="teams">${j.time1} vs ${j.time2}</span>
+      <span class="date-time">${j.horario}</span>
+      <span class="odd">Odd média: ${j.odd}</span>
+      <span class="explanation">${j.exp}</span>
+      </div>
+      <img class="team-logo" src="${j.logo2}" alt="${j.time2}">`;
+    container.appendChild(card);
+  });
+}
+
+mostrarJogos(jogosPlus1_5,"tab1-cards");
+mostrarJogos(jogosBTTS,"tab2-cards");
+mostrarJogos(jogosVitoria,"tab3-cards");
+mostrarJogos(jogosPlacar,"tab4-cards");
+
+function gerarBilhete(){
+  const nJogos=parseInt(document.getElementById("num-jogos").value)||3;
+  const odd=parseFloat(document.getElementById("odd").value)||1.5;
+  const shuffled=[...jogosPlus1_5].sort(()=>0.5-Math.random());
+  const bilhete=shuffled.slice(0,nJogos);
+  const totalOdd=(bilhete.reduce((acc,j)=>acc*j.odd,1)).toFixed(2);
+  document.getElementById("bilhete-result").innerHTML=
+    `<h3>Seu Bilhete:</h3><ul>${bilhete.map(b=>`<li>${b.time1} vs ${b.time2} - Odd: ${b.odd}</li>`).join("")}</ul>
+     <p>Odd total estimada: ${totalOdd}</p>`;
+}
+</script>
+
+</body>
+</html>
