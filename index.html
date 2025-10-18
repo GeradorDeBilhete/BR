@@ -3,12 +3,28 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>🎯 Gerador de Bilhete 🎟️ Beta</title>
+<title>🎯 Gerador de Bilhete 🎟️ <small>Beta</small></title>
+
+<!-- Fonte -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
-:root{--bg:#000;--panel:#0b0b0b;--muted:#bfbfbf;--accent:#00ff88;--card:#0f0f0f;}
-*{box-sizing:border-box}body{margin:0;font-family:"Montserrat",system-ui,Arial,sans-serif;background:var(--bg);color:#f2f2f2;-webkit-font-smoothing:antialiased;}
+:root{
+    --bg:#000;
+    --panel:#0b0b0b;
+    --muted:#bfbfbf;
+    --accent:#00ff88;
+    --accent-2:#00cc66;
+    --card:#0f0f0f;
+}
+*{box-sizing:border-box;}
+body{
+    margin:0;font-family:"Montserrat",system-ui,Arial,sans-serif;background:var(--bg);color:#f2f2f2;
+    -webkit-font-smoothing:antialiased;
+}
 header{text-align:center;padding:28px 16px 8px;}
 h1{margin:0;color:var(--accent);font-size:20px;font-weight:700;letter-spacing:0.6px;text-shadow:0 0 8px rgba(0,255,136,0.08);}
 .wrap{max-width:900px;margin:18px auto;padding:18px;background:var(--panel);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
@@ -23,9 +39,9 @@ select,input[type=number], .select-like{background:#0c0c0c;border:1px solid #171
 .actions{display:flex;gap:10px;flex-wrap:wrap;}
 button.btn{background:var(--accent);color:#000;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(0,255,136,0.06);}
 button.ghost{background:transparent;border:1px solid #222;color:var(--muted);}
-#bilheteContainer{margin-top:14px;display:flex;flex-direction:column;gap:12px;align-items:center;}
-.card{background:var(--card);border:1px solid rgba(0,255,136,0.08);padding:12px;border-radius:10px;opacity:0;transform:translateY(14px);transition:all .35s cubic-bezier(.2,.9,.3,1);width:80%;}
-.card.show{opacity:1;transform:none;}
+#bilheteContainer{margin-top:14px;display:flex;flex-direction:column;gap:12px;position:relative;}
+.card{background:var(--card);border:1px solid rgba(0,255,136,0.08);padding:12px;border-radius:10px;opacity:0;transform:translateY(14px);transition:all .35s cubic-bezier(.2,.9,.3,1);position:relative;z-index:1;}
+.card.show{opacity:1;transform:none;animation:highlight 0.6s ease forwards;}
 .card h3{margin:0;font-size:15px;color:#fff;}
 .meta{font-size:13px;color:var(--muted);margin-top:6px;}
 .stats-line{margin-top:8px;font-size:13px;}
@@ -33,197 +49,230 @@ button.ghost{background:transparent;border:1px solid #222;color:var(--muted);}
 .stat-yellow{color:#ffcc00;}
 .stat-red{color:#ff4d4d;}
 .foot{margin-top:18px;color:#7a7a7a;font-size:13px;text-align:center;}
-.pix-btn{background:#ffcc00;color:#000;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer;border:none;box-shadow:0 6px 18px rgba(0,0,0,0.2);margin-top:12px;width:100%;}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:60;padding:28px;overflow:auto;}
-.modal .panel{max-width:900px;margin:20px auto;background:#070707;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
-.modal h2{margin:0 0 8px;color:var(--accent)}
-table.stats{width:100%;border-collapse:collapse;margin-top:10px;color:var(--muted);font-size:14px}
-table.stats th, table.stats td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.02);text-align:left}
-.small{font-size:13px;color:var(--muted)}
-@media(max-width:720px){ .row{flex-direction:column;align-items:stretch} .field{flex-direction:column;align-items:stretch} .markets,.sports,.days{justify-content:flex-start} }
+#pixBtn{margin-top:12px;}
+@keyframes highlight{
+  0%{transform:scale(0.5) translateY(-50%);opacity:0;}
+  50%{transform:scale(1.1) translateY(-20%);opacity:1;}
+  100%{transform:scale(1) translateY(0);}
+}
+@media(max-width:720px){.row{flex-direction:column;align-items:stretch}.field{flex-direction:column;align-items:stretch}.markets,.sports,.days{justify-content:flex-start}}
 </style>
 </head>
 <body>
+
 <header>
-  <h1>🎯 Gerador de Bilhete 🎟️ <small style="font-size:12px;color:#fff;">Beta</small></h1>
+  <h1>🎯 Gerador de Bilhete 🎟️ <small style="font-size:12px;">Beta</small></h1>
 </header>
 
 <div class="wrap" role="main">
+
   <div class="controls">
-    <div style="margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+
+    <div class="row" style="justify-content:center;gap:20px;flex-wrap:wrap;">
       <label class="small">Quantidade de jogos</label>
       <input id="qtd" type="number" min="1" value="3" style="width:84px">
-      <div style="display:flex;flex-direction:column;gap:4px;">
+      
+      <div style="display:flex;flex-direction:column;gap:6px;">
         <label class="small">Odd mínima</label>
         <input id="minOdd" type="number" step="0.01" value="1.20" style="width:96px">
         <label class="small">Odd máxima</label>
         <input id="maxOdd" type="number" step="0.01" value="2.50" style="width:96px">
       </div>
-      <div style="display:flex;flex-direction:column;gap:4px;">
-        <label class="small">% mínimo do bilhete</label>
-        <input id="minPercent" type="number" step="1" value="50" style="width:96px">
+
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <label class="small">% acerto do bilhete</label>
+        <input id="minPerc" type="number" min="0" max="100" value="50" style="width:84px">
       </div>
     </div>
 
-    <div class="actions">
-      <button id="estatBtn" class="btn">📊 Estatísticas Gerador</button>
-      <button id="userEstatBtn" class="btn">📊 Estatísticas Usuário</button>
+    <div class="actions" style="justify-content:center;margin-top:10px;">
+      <button id="generateBtn" class="btn" style="padding:12px 18px;font-size:16px;">🎲 Gerar Bilhete</button>
+      <button id="estatBtn" class="btn">📊 Estatísticas</button>
       <button id="copiarBtn" class="btn">📋 Copiar</button>
       <button id="pdfBtn" class="btn">💾 PDF</button>
     </div>
 
-    <div style="margin-top:12px;text-align:center;">
-      <button id="generateBtn" class="btn" style="width:100%;font-size:18px;padding:14px;">🎲 Gerar Bilhete</button>
+    <div class="field">
+      <div>
+        <div style="color:var(--muted);margin-bottom:6px">Escolher esporte</div>
+        <div class="sports" id="sportsWrap">
+          <!-- chips via JS -->
+        </div>
+      </div>
+      <div>
+        <label class="small">Filtro de dia</label>
+        <div class="days" id="daysWrap" style="margin-top:6px"></div>
+      </div>
     </div>
+
+    <div>
+      <div style="color:var(--muted);margin-bottom:6px">Mercados (selecionáveis)</div>
+      <div class="markets" id="marketsWrap"></div>
+    </div>
+
   </div>
 
   <div id="bilheteContainer"></div>
-  <button class="pix-btn" id="pixBtn">Pix e-mail: geradordebilhete@gmail.com - Ajude um pobre (dono do app) - Clique para copiar</button>
-  <div class="foot"></div>
+
+  <button id="pixBtn" class="btn" style="width:100%;">📨 PIX E-MAIL: geradordebilhete@gmail.com (ajude um pobre dono do app)</button>
+
+  <div class="foot">Desenvolvido por Kawan</div>
 </div>
 
-<div id="estatModal" class="modal" aria-hidden="true">
-  <div class="panel">
-    <button id="closeEstat" style="float:right;background:none;border:none;color:#fff;font-size:20px;cursor:pointer">×</button>
-    <h2>Estatísticas do Gerador</h2>
-    <table class="stats" id="estatTable"></table>
+<!-- Estatísticas Modal -->
+<div id="estatModal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:60;padding:28px;overflow:auto;">
+  <div class="panel" style="max-width:900px;margin:20px auto;background:#070707;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)">
+    <button id="closeEstat" style="float:right;background:var(--accent);border:none;padding:8px 10px;border-radius:8px;cursor:pointer">Fechar</button>
+    <h2>📊 Estatísticas do Gerador</h2>
+    <div id="estatContent" style="margin-top:8px"></div>
   </div>
 </div>
 
 <script>
-// === CÓDIGOS PRE-CADASTRADOS ===
-const codigos = [
-  {codigo:"082111", tipo:"admin", duracao:0, usado:false},
-  {codigo:"100001", tipo:"teste", duracao:1, usado:false},{codigo:"100002", tipo:"teste", duracao:1, usado:false},
-  {codigo:"100003", tipo:"teste", duracao:1, usado:false},{codigo:"100004", tipo:"teste", duracao:1, usado:false},
-  {codigo:"100005", tipo:"teste", duracao:1, usado:false},{codigo:"100006", tipo:"teste", duracao:1, usado:false},
-  {codigo:"200001", tipo:"30dias", duracao:30, usado:false},{codigo:"200002", tipo:"30dias", duracao:30, usado:false},
-  {codigo:"200003", tipo:"30dias", duracao:30, usado:false},{codigo:"200004", tipo:"30dias", duracao:30, usado:false},
-  {codigo:"200005", tipo:"30dias", duracao:30, usado:false},{codigo:"200006", tipo:"30dias", duracao:30, usado:false},
-  {codigo:"200007", tipo:"30dias", duracao:30, usado:false},{codigo:"200008", tipo:"30dias", duracao:30, usado:false},
-  {codigo:"200009", tipo:"30dias", duracao:30, usado:false},{codigo:"200010", tipo:"30dias", duracao:30, usado:false},
-  {codigo:"200011", tipo:"30dias", duracao:30, usado:false},{codigo:"200012", tipo:"30dias", duracao:30, usado:false},
-  {codigo:"200013", tipo:"30dias", duracao:30, usado:false},{codigo:"200014", tipo:"30dias", duracao:30, usado:false},
-  {codigo:"200015", tipo:"30dias", duracao:30, usado:false},{codigo:"200016", tipo:"30dias", duracao:30, usado:false},
-  {codigo:"200017", tipo:"30dias", duracao:30, usado:false},{codigo:"200018", tipo:"30dias", duracao:30, usado:false},
-  {codigo:"200019", tipo:"30dias", duracao:30, usado:false},{codigo:"200020", tipo:"30dias", duracao:30, usado:false},
-  {codigo:"200021", tipo:"30dias", duracao:30, usado:false},{codigo:"200022", tipo:"30dias", duracao:30, usado:false},
-  {codigo:"200023", tipo:"30dias", duracao:30, usado:false},{codigo:"200024", tipo:"30dias", duracao:30, usado:false},
-  {codigo:"200025", tipo:"30dias", duracao:30, usado:false},{codigo:"200026", tipo:"30dias", duracao:30, usado:false},
-  {codigo:"200027", tipo:"30dias", duracao:30, usado:false},{codigo:"200028", tipo:"30dias", duracao:30, usado:false},
-  {codigo:"200029", tipo:"30dias", duracao:30, usado:false},{codigo:"200030", tipo:"30dias", duracao:30, usado:false},
-  {codigo:"200031", tipo:"30dias", duracao:30, usado:false},{codigo:"200032", tipo:"30dias", duracao:30, usado:false},
-  {codigo:"200033", tipo:"30dias", duracao:30, usado:false},{codigo:"200034", tipo:"30dias", duracao:30, usado:false},
-  {codigo:"200035", tipo:"30dias", duracao:30, usado:false},{codigo:"200036", tipo:"30dias", duracao:30, usado:false},
-  {codigo:"200037", tipo:"30dias", duracao:30, usado:false},{codigo:"200038", tipo:"30dias", duracao:30, usado:false},
-  {codigo:"200039", tipo:"30dias", duracao:30, usado:false},{codigo:"200040", tipo:"30dias", duracao:30, usado:false},
-];
-
-// === PALPITES ===
+// ============== DADOS INICIAIS ==============
 const palpites = [
-  // Domingo - Futebol
-  {esporte:"Futebol", dia:"domingo", jogo:"Liverpool x Manchester United", mercado:"Dupla Chance Casa", odd:1.16, green:79},
-  {esporte:"Futebol", dia:"domingo", jogo:"Celta x Real Sociedad", mercado:"+1.5 Gols", odd:1.30, green:80},
-  {esporte:"Futebol", dia:"domingo", jogo:"Celta x Real Sociedad", mercado:"+0.5 Gols Casa", odd:1.20, green:90},
-  {esporte:"Futebol", dia:"domingo", jogo:"Getafe x Real Madrid", mercado:"Vitória Fora", odd:1.42, green:62},
-  {esporte:"Futebol", dia:"domingo", jogo:"Getafe x Real Madrid", mercado:"Real Ganhar 1T", odd:1.90, green:25},
-  {esporte:"Futebol", dia:"domingo", jogo:"Getafe x Real Madrid", mercado:"+1.5 Gols Fora", odd:1.57, green:60},
-  {esporte:"Futebol", dia:"domingo", jogo:"Getafe x Real Madrid", mercado:"+0.5 Gols Fora", odd:1.11, green:95},
-  {esporte:"Futebol", dia:"domingo", jogo:"Freiburg x Frankfurt", mercado:"+1.5 Gols", odd:1.20, green:90},
-  {esporte:"Futebol", dia:"domingo", jogo:"St Pauli x Hoffenheim", mercado:"+1.5 Gols", odd:1.25, green:80},
-  {esporte:"Futebol", dia:"domingo", jogo:"Cagliari x Bologna", mercado:"-3.5 Gols", odd:1.22, green:90},
-  {esporte:"Futebol", dia:"domingo", jogo:"Cagliari x Bologna", mercado:"Dupla Chance Fora", odd:1.28, green:80},
-  {esporte:"Futebol", dia:"domingo", jogo:"Cagliari x Bologna", mercado:"+0.5 Gols Fora", odd:1.28, green:80},
-  {esporte:"Futebol", dia:"domingo", jogo:"Lazio x Atalanta", mercado:"+1.5 Gols", odd:1.25, green:80},
-  {esporte:"Futebol", dia:"domingo", jogo:"Milan x Fiorentina", mercado:"+1.5 Gols", odd:1.28, green:80},
-  {esporte:"Futebol", dia:"domingo", jogo:"Milan x Fiorentina", mercado:"Dupla Chance Casa", odd:1.14, green:95},
-  {esporte:"Futebol", dia:"domingo", jogo:"Milan x Fiorentina", mercado:"Ambas Marcam", odd:1.95, green:25},
-  {esporte:"Futebol", dia:"domingo", jogo:"Milan x Fiorentina", mercado:"+2.5 Gols", odd:1.90, green:25},
-  {esporte:"Futebol", dia:"domingo", jogo:"Lens x Paris", mercado:"+1.5 Gols", odd:1.20, green:90},
-  {esporte:"Futebol", dia:"domingo", jogo:"Lens x Paris", mercado:"Ambas Marcam", odd:1.60, green:50},
-  {esporte:"Futebol", dia:"domingo", jogo:"Lens x Paris", mercado:"+0.5 Gols 1T", odd:1.30, green:80},
-  {esporte:"Futebol", dia:"domingo", jogo:"Lens x Paris", mercado:"Casa ou Empate", odd:1.22, green:90},
-  {esporte:"Futebol", dia:"domingo", jogo:"Lens x Paris", mercado:"+0.5 Gols Casa", odd:1.14, green:95},
-  {esporte:"Futebol", dia:"domingo", jogo:"Nantes x Lille", mercado:"0.5 Gols 1T", odd:1.36, green:60},
-  {esporte:"Futebol", dia:"domingo", jogo:"Nantes x Lille", mercado:"Ambas Marcam", odd:1.75, green:40},
-  {esporte:"Futebol", dia:"domingo", jogo:"Nantes x Lille", mercado:"0.5 Gols Fora", odd:1.18, green:90},
-  {esporte:"Futebol", dia:"domingo", jogo:"Nantes x Lille", mercado:"Fora ou Empate", odd:1.22, green:90},
-  {esporte:"Futebol", dia:"domingo", jogo:"Nantes x Lille", mercado:"+1.5 Gols", odd:1.28, green:80},
-  {esporte:"Futebol", dia:"domingo", jogo:"Nantes x Lille", mercado:"+2.5 Gols", odd:1.90, green:25},
-  {esporte:"Futebol", dia:"domingo", jogo:"San Martin San Juan x Independiente", mercado:"-3.5 Gols", odd:1.11, green:95},
-  {esporte:"Futebol", dia:"domingo", jogo:"San Martin San Juan x Independiente", mercado:"-1.5 Gols 1T", odd:1.20, green:90},
-  {esporte:"Futebol", dia:"domingo", jogo:"San Martin San Juan x Independiente", mercado:"-0.5 Gols 1T", odd:2.10, green:20},
-  {esporte:"Futebol", dia:"domingo", jogo:"Empoli x Venezia", mercado:"-3.5 Gols", odd:1.22, green:80},
-  {esporte:"Futebol", dia:"domingo", jogo:"Empoli x Venezia", mercado:"-1.5 Gols 1T", odd:1.33, green:70},
-  {esporte:"Futebol", dia:"domingo", jogo:"Rosário Central x Plantense", mercado:"-3.5 Gols", odd:1.14, green:95},
-  {esporte:"Futebol", dia:"domingo", jogo:"Rosário Central x Plantense", mercado:"Casa ou Empate", odd:1.11, green:95},
-  {esporte:"Futebol", dia:"domingo", jogo:"Rosário Central x Plantense", mercado:"Vitória Casa", odd:1.72, green:50},
-  {esporte:"Futebol", dia:"domingo", jogo:"Botafogo SP x Cuiabá", mercado:"+0.5 Gols Fora", odd:1.38, green:60},
-  {esporte:"Futebol", dia:"domingo", jogo:"Botafogo SP x Cuiabá", mercado:"-3.5 Gols", odd:1.18, green:90},
-  {esporte:"Futebol", dia:"domingo", jogo:"Lech Poznań x Pogoń Szczecin", mercado:"Casa ou Empate", odd:1.22, green:90},
-  {esporte:"Futebol", dia:"domingo", jogo:"Lech Poznań x Pogoń Szczecin", mercado:"+1.5 Gols", odd:1.14, green:95},
-  {esporte:"Futebol", dia:"domingo", jogo:"Lech Poznań x Pogoń Szczecin", mercado:"Ambas Marcam", odd:1.50, green:60},
-  {esporte:"Futebol", dia:"domingo", jogo:"Lech Poznań x Pogoń Szczecin", mercado:"Vitória Casa", odd:1.72, green:50},
-  {esporte:"Futebol", dia:"domingo", jogo:"Bahia x Grêmio", mercado:"Casa ou Empate", odd:1.18, green:90},
-  {esporte:"Futebol", dia:"domingo", jogo:"Bahia x Grêmio", mercado:"+0.5 Gol Cada", odd:1.18, green:90},
-  {esporte:"Futebol", dia:"domingo", jogo:"Bahia x Grêmio", mercado:"+1.5 Gols", odd:1.36, green:60},
-  {esporte:"Futebol", dia:"domingo", jogo:"Nürnberg x Holstein Kiel", mercado:"+1.5 Gols", odd:1.20, green:90},
-  {esporte:"Futebol", dia:"domingo", jogo:"Tottenham x Aston Villa", mercado:"Dupla Chance Casa", odd:1.28, green:80},
-  {esporte:"Futebol", dia:"domingo", jogo:"Tottenham x Aston Villa", mercado:"Ambas Marcam", odd:1.70, green:40},
-  {esporte:"Futebol", dia:"domingo", jogo:"Tottenham x Aston Villa", mercado:"+2.5 Gols", odd:1.90, green:25},
-  {esporte:"Futebol", dia:"domingo", jogo:"Tottenham x Aston Villa", mercado:"+1.5 Gols", odd:1.28, green:80},
-  {esporte:"Futebol", dia:"domingo", jogo:"Liverpool x Manchester United", mercado:"Ambas Marcam", odd:1.50, green:60},
-  {esporte:"Futebol", dia:"domingo", jogo:"Liverpool x Manchester United", mercado:"Vitória Casa", odd:1.60, green:50},
-  {esporte:"Futebol", dia:"domingo", jogo:"Liverpool x Manchester United", mercado:"+0.5 Gols 1T", odd:1.22, green:90},
-  {esporte:"Futebol", dia:"domingo", jogo:"Liverpool x Manchester United", mercado:"+1.5 Gols", odd:1.14, green:95},
-  {esporte:"Futebol", dia:"domingo", jogo:"Liverpool x Manchester United", mercado:"+2.5 Gols", odd:1.44, green:60}
-];
+{esporte:"Futebol", dia:"domingo", jogo:"Liverpool x Manchester United", mercado:"Dupla Chance Casa", odd:1.16, green:79},
+{esporte:"Futebol", dia:"domingo", jogo:"Celta x Real Sociedad", mercado:"+1.5 Gols", odd:1.30, green:75},
+{esporte:"Futebol", dia:"domingo", jogo:"Celta x Real Sociedad", mercado:"+0.5 Gols Casa", odd:1.20, green:90},
+{esporte:"Futebol", dia:"domingo", jogo:"Getafe x Real Madrid", mercado:"Vitória Fora", odd:1.42, green:62},
+{esporte:"Futebol", dia:"domingo", jogo:"Getafe x Real Madrid", mercado:"Real Ganhar 1T", odd:1.90, green:40},
+{esporte:"Futebol", dia:"domingo", jogo:"Getafe x Real Madrid", mercado:"+1.5 Gols Fora", odd:1.57, green:60},
+{esporte:"Futebol", dia:"domingo", jogo:"Getafe x Real Madrid", mercado:"+0.5 Gols Fora", odd:1.11, green:95},
+{esporte:"Futebol", dia:"domingo", jogo:"Freiburg x Frankfurt", mercado:"+1.5 Gols", odd:1.20, green:70},
+{esporte:"Futebol", dia:"domingo", jogo:"St Pauli x Hoffenheim", mercado:"+1.5 Gols", odd:1.25, green:75},
+{esporte:"Futebol", dia:"domingo", jogo:"Cagliari x Bologna", mercado:"-3.5 Gols", odd:1.22, green:90},
+{esporte:"Futebol", dia:"domingo", jogo:"Cagliari x Bologna", mercado:"Dupla Chance Fora", odd:1.28, green:80},
+{esporte:"Futebol", dia:"domingo", jogo:"Cagliari x Bologna", mercado:"+0.5 Gols Fora", odd:1.28, green:80},
+{esporte:"Futebol", dia:"domingo", jogo:"Lazio x Atalanta", mercado:"+1.5 Gols", odd:1.25, green:75},
+{esporte:"Futebol", dia:"domingo", jogo:"Milan x Fiorentina", mercado:"+1.5 Gols", odd:1.28, green:80},
+{esporte:"Futebol", dia:"domingo", jogo:"Milan x Fiorentina", mercado:"Dupla Chance Casa", odd:1.14, green:95},
+{esporte:"Futebol", dia:"domingo", jogo:"Milan x Fiorentina", mercado:"Ambas Marcam", odd:1.95, green:30},
+{esporte:"Futebol", dia:"domingo", jogo:"Milan x Fiorentina", mercado:"+2.5 Gols", odd:1.90, green:40},
+{esporte:"Futebol", dia:"domingo", jogo:"Lens x Paris", mercado:"+1.5 Gols", odd:1.20, green:90},
+{esporte:"Futebol", dia:"domingo", jogo:"Lens x Paris", mercado:"Ambas Marcam", odd:1.60, green:50},
+{esporte:"Futebol", dia:"domingo", jogo:"Lens x Paris", mercado:"+0.5 Gols 1T", odd:1.30, green:80},
+{esporte:"Futebol", dia:"domingo", jogo:"Lens x Paris", mercado:"Casa ou Empate", odd:1.22, green:85},
+{esporte:"Futebol", dia:"domingo", jogo:"Lens x Paris", mercado:"+0.5 Gols Casa", odd:1.14, green:95},
+{esporte:"Futebol", dia:"domingo", jogo:"Nantes x Lille", mercado:"0.5 Gols 1T", odd:1.36, green:75},
+{esporte:"Futebol", dia:"domingo", jogo:"Nantes x Lille", mercado:"Ambas Marcam", odd:1.75, green:50},
+{esporte:"Futebol", dia:"domingo", jogo:"Nantes x Lille", mercado:"0.5 Gols Fora", odd:1.18, green:95},
+{esporte:"Futebol", dia:"domingo", jogo:"Nantes x Lille", mercado:"Fora ou Empate", odd:1.22, green:85},
+{esporte:"Futebol", dia:"domingo", jogo:"Nantes x Lille", mercado:"+1.5 Gols", odd:1.28, green:80},
+{esporte:"Futebol", dia:"domingo", jogo:"Nantes x Lille", mercado:"+2.5 Gols", odd:1.90, green:40},
+{esporte:"Futebol", dia:"domingo", jogo:"San Martin SJ x Independiente", mercado:"-3.5 Gols", odd:1.11, green:95},
+{esporte:"Futebol", dia:"domingo", jogo:"San Martin SJ x Independiente", mercado:"-1.5 Gol 1T", odd:1.20, green:90},
+{esporte:"Futebol", dia:"domingo", jogo:"San Martin SJ x Independiente", mercado:"-0.5 Gol 1T", odd:2.10, green:20},
+{esporte:"Futebol", dia:"domingo", jogo:"Empoli x Venezia", mercado:"-3.5 Gols", odd:1.22, green:80},
+{esporte:"Futebol", dia:"domingo", jogo:"Empoli x Venezia", mercado:"-1.5 Gols 1T", odd:1.33, green:75},
+{esporte:"Futebol", dia:"domingo", jogo:"Rosário Central x Platense", mercado:"-3.5 Gols", odd:1.14, green:95},
+{esporte:"Futebol", dia:"domingo", jogo:"Rosário Central x Platense", mercado:"Casa ou Empate", odd:1.11, green:95},
+{esporte:"Futebol", dia:"domingo", jogo:"Rosário Central x Platense", mercado:"Vitória Casa", odd:1.72, green:60},
+{esporte:"Futebol", dia:"domingo", jogo:"Botafogo SP x Cuiabá", mercado:"+0.5 Gols Fora", odd:1.38, green:60},
+{esporte:"Futebol", dia:"domingo", jogo:"Botafogo SP x Cuiabá", mercado:"-3.5 Gols", odd:1.18, green:90},
+{esporte:"Futebol", dia:"domingo", jogo:"Lech Poznan x Pogon Szczecin", mercado:"Casa ou Empate", odd:1.22, green:85},
+{esporte:"Futebol", dia:"domingo", jogo:"Lech Poznan x Pogon Szczecin", mercado:"+1.5 Gols", odd:1.14, green:95},
+{esporte:"Futebol", dia:"domingo", jogo:"Lech Poznan x Pogon Szczecin", mercado:"Ambas Marcam", odd:1.50, green:60},
+{esporte:"Futebol", dia:"domingo", jogo:"Lech Poznan x Pogon Szczecin", mercado:"Vitória Casa", odd:1.72, green:60},
+{esporte:"Futebol", dia:"domingo", jogo:"Bahia x Grêmio", mercado:"Casa ou Empate", odd:1.18, green:90},
+{esporte:"Futebol", dia:"domingo", jogo:"Bahia x Grêmio", mercado:"+0.5 Gol Cada", odd:1.18, green:90},
+{esporte:"Futebol", dia:"domingo", jogo:"Bahia x Grêmio", mercado:"+1.5 Gols", odd:1.36, green:75},
+{esporte:"Futebol", dia:"domingo", jogo:"Nurnberg x Holstein Kiel", mercado:"+1.5 Gols", odd:1.20, green:70},
+{esporte:"Futebol", dia:"domingo", jogo:"Tottenham x Aston Villa", mercado:"Dupla Chance Casa", odd:1.28, green:80},
+{esporte:"Futebol", dia:"domingo", jogo:"Tottenham x Aston Villa", mercado:"Ambas Marcam", odd:1.70, green:50},
+{esporte:"Futebol", dia:"domingo", jogo:"Tottenham x Aston Villa", mercado:"+2.5 Gols", odd:1.90, green:40},
+{esporte:"Futebol", dia:"domingo", jogo:"Tottenham x Aston Villa", mercado:"+1.5 Gols", odd:1.28, green:80},
+{esporte:"Futebol", dia:"domingo", jogo:"Liverpool x Manchester United", mercado:"Ambas Marcam", odd:1.50, green:60},
+{esporte:"Futebol", dia:"domingo", jogo:"Liverpool x Manchester United", mercado:"Vitória Casa", odd:1.60, green:50},
+{esporte:"Futebol", dia:"domingo", jogo:"Liverpool x Manchester United", mercado:"+0.5 Gol 1T", odd:1.22, green:85},
+{esporte:"Futebol", dia:"domingo", jogo:"Liverpool x Manchester United", mercado:"+1.5 Gols", odd:1.14, green:95},
+{esporte:"Futebol", dia:"domingo", jogo:"Liverpool x Manchester United", mercado:"+2.5 Gols", odd:1.44, green:55},
 ];
 
+// Esportes e mercados extra (sem palpites ainda)
+const sports = ["Futebol","Basquete","Vôlei","Tênis","Fórmula 1"];
+const markets = ["Vitória Casa","Vitória Fora","Empate","Dupla Chance Casa","Dupla Chance Fora","+0.5 Gols","+1.5 Gols","+2.5 Gols","Ambas Marcam","+0.5 Gol 1T","+1.5 Gol 1T"];
+const dias = ["domingo","segunda","terça","quarta","quinta","sexta","sábado"];
+
+// Códigos de login (1 uso apenas)
+const codigos = [
+"082111","100001","100002","100003","100004","100005","100006","100007","100008","100009",
+"100010","100011","100012","100013","100014","100015","100016","100017","100018","100019",
+"100020","100021","100022","100023","100024","100025","200001","200002","200003","200004",
+"200005","200006","200007","200008","200009","200010","200011","200012","200013","200014",
+"200015","200016","200017","200018","200019","200020","200021","200022","200023","200024","200025"
+];
+const codStatus = {}; // usado/expirado
+const codDuracao = {}; // dias
+
+codigos.forEach(c=>{
+  if(c==="082111"){codDuracao[c]="perm"}else if(c.startsWith("1")){codDuracao[c]=1}else{codDuracao[c]=30}
+  codStatus[c]=false;
+});
+
+// ================= FUNÇÕES ==================
 function gerarBilhete(){
-  const qtd = parseInt(document.getElementById('qtd').value);
-  const minOdd = parseFloat(document.getElementById('minOdd').value);
-  const maxOdd = parseFloat(document.getElementById('maxOdd').value);
-  const minPercent = parseFloat(document.getElementById('minPercent').value);
-  const container = document.getElementById('bilheteContainer');
-  container.innerHTML="";
-  
-  const filtro = palpites.filter(p=>p.odd>=minOdd && p.odd<=maxOdd && p.green>=minPercent);
-  const shuffled = filtro.sort(()=>Math.random()-0.5).slice(0,qtd);
-  if(shuffled.length===0){container.innerHTML="<div class='small'>Nenhum palpite atende aos filtros</div>"; return;}
-  
-  let greenTotal = 0;
-  shuffled.forEach(p=>{
-    greenTotal += p.green;
-    const div = document.createElement('div');
-    div.className="card";
-    div.innerHTML=`<h3>${p.jogo} - ${p.mercado}</h3><div class="meta">Odd: ${p.odd} | % Green: ${p.green}%</div>`;
-    container.appendChild(div);
-    setTimeout(()=>div.classList.add("show"),50);
-  });
-  
-  const mediaGreen = (greenTotal/shuffled.length).toFixed(1);
-  const risco = (100-mediaGreen).toFixed(1);
-  const info = document.createElement('div');
-  info.className="stats-line";
-  info.innerHTML=`<strong>% Green do bilhete: ${mediaGreen}%</strong> | Risco: ${risco}%`;
-  container.appendChild(info);
+  const qtd = parseInt(document.getElementById("qtd").value);
+  const minOdd = parseFloat(document.getElementById("minOdd").value);
+  const maxOdd = parseFloat(document.getElementById("maxOdd").value);
+  const minPerc = parseFloat(document.getElementById("minPerc").value);
+
+  // Filtra palpites
+  let filtrados = palpites.filter(p=>p.odd>=minOdd && p.odd<=maxOdd && p.green>=minPerc);
+
+  // Pega aleatório conforme quantidade
+  let bilhete = [];
+  while(bilhete.length<qtd && filtrados.length>0){
+    const idx = Math.floor(Math.random()*filtrados.length);
+    bilhete.push(filtrados[idx]);
+    filtrados.splice(idx,1);
+  }
+
+  mostrarBilhete(bilhete);
 }
 
-document.getElementById("pixBtn").addEventListener("click",()=>{navigator.clipboard.writeText("geradordebilhete@gmail.com");alert("PIX copiado!")});
-document.getElementById("generateBtn").addEventListener("click",gerarBilhete);
-
-document.getElementById("estatBtn").addEventListener("click",()=>{
-  const table = document.getElementById("estatTable");
-  table.innerHTML="<tr><th>Jogo</th><th>Mercado</th><th>Odd</th><th>% Green</th></tr>";
-  palpites.forEach(p=>{
-    const row = document.createElement("tr");
-    row.innerHTML=`<td>${p.jogo}</td><td>${p.mercado}</td><td>${p.odd}</td><td>${p.green}%</td>`;
-    table.appendChild(row);
+function mostrarBilhete(bilhete){
+  const container = document.getElementById("bilheteContainer");
+  container.innerHTML="";
+  bilhete.forEach(b=>{
+    const c=document.createElement("div");
+    c.className="card show";
+    c.innerHTML=`<h3>${b.jogo}</h3><div class="meta">${b.mercado} | Odd: ${b.odd} | Chance: ${b.green}%</div>`;
+    container.appendChild(c);
   });
-  document.getElementById("estatModal").style.display="block";
-});
+}
+
+function mostrarEstatisticas(){
+  const modal=document.getElementById("estatModal");
+  const content=document.getElementById("estatContent");
+  content.innerHTML="Total de palpites: "+palpites.length+"<br>Esportes: "+sports.join(", ");
+  modal.style.display="block";
+}
+
+document.getElementById("generateBtn").addEventListener("click",gerarBilhete);
+document.getElementById("estatBtn").addEventListener("click",mostrarEstatisticas);
 document.getElementById("closeEstat").addEventListener("click",()=>{document.getElementById("estatModal").style.display="none"});
+
+// Inserir chips de esportes e mercados
+const sportsWrap = document.getElementById("sportsWrap");
+sports.forEach(s=>{
+  const d=document.createElement("div");d.className="chip";d.textContent=s;
+  d.addEventListener("click",()=>{d.classList.toggle("active")});
+  sportsWrap.appendChild(d);
+});
+const marketsWrap=document.getElementById("marketsWrap");
+markets.forEach(m=>{
+  const d=document.createElement("div");d.className="chip";d.textContent=m;
+  d.addEventListener("click",()=>{d.classList.toggle("active")});
+  marketsWrap.appendChild(d);
+});
+const daysWrap=document.getElementById("daysWrap");
+dias.forEach(d=>{
+  const dt=document.createElement("div");dt.className="chip";dt.textContent=d;
+  dt.addEventListener("click",()=>{dt.classList.toggle("active")});
+  daysWrap.appendChild(dt);
+});
+
 </script>
+
 </body>
 </html>
