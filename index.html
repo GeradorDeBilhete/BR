@@ -135,14 +135,65 @@ table.stats th, table.stats td{padding:8px;border-bottom:1px solid rgba(255,255,
 </div>
 
 <script>
-// ============ CÓDIGOS DE LOGIN ===========
+	// ============ CÓDIGOS DE LOGIN ===========
 const loginCodes = [
   {code:"082111", tipo:"adm", usado:false, expira:null}, // admin
+  // 25 códigos teste 24h (difíceis)
+  {code:"F7D2G9",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"H3J8K1",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"L9M4N6",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"P5Q7R2",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"S1T9U4",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"V8W3X5",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"Y2Z6A7",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"B3C9D8",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"E5F1G3",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"H7I2J4",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"K1L8M2",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"N3O9P1",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"Q5R2S6",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"T4U8V3",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"W9X1Y2",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"Z3A5B7",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"C6D1E4",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"F2G8H3",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"J1K5L9",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"M3N7O2",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"P1Q4R8",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"S2T5U9",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"V3W6X1",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"Y4Z7A3",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+  {code:"B5C8D2",tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000},
+
+  // 25 códigos prazo 30 dias (difíceis)
+  {code:"G1H9J4",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"K3L7M2",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"N5P1Q8",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"R2S6T4",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"U7V3W1",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"X4Y8Z2",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"A1B6C3",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"D9E2F4",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"G3H5J1",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"K2L4M7",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"N1P8Q5",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"R3S7T2",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"U5V9W3",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"X2Y6Z5",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"A3B7C8",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"D1E6F3",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"G2H8J5",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"K1L9M4",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"N3P7Q1",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"R5S1T6",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"U2V8W5",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"X1Y7Z3",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"A5B2C7",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"D3E8F1",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"G4H1J8",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"K5L2M9",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000},
+  {code:"N2P5Q6",tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000}
 ];
-// Gerar 25 códigos 24h e 25 códigos 30 dias
-for(let i=0;i<25;i++){
-  loginCodes.push({code:Math.floor(Math.random()*900000+100000).toString(),tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000});
-  loginCodes.push({code:Math.floor(Math.random()*900000+100000).toString(),tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000});
 }
 
 // ============ PALPITES ===========
