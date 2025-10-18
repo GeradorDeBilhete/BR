@@ -3,114 +3,187 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>🎟️ Gerador de Bilhete</title>
+<title>🎯 Gerador de Bilhete</title>
 <style>
   body {
-    font-family: Arial, sans-serif;
-    background: #f3f3f3;
-    padding: 20px;
+    font-family: 'Poppins', Arial, sans-serif;
+    background-color: #0e0e0e;
+    color: #f1f1f1;
+    margin: 0;
+    padding: 0;
     text-align: center;
   }
+
   h1 {
-    color: #333;
+    margin-top: 30px;
+    color: #00ff99;
+    letter-spacing: 1px;
   }
-  .box {
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    display: inline-block;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+
+  .container {
+    background-color: #1b1b1b;
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    margin: 30px auto;
+    box-shadow: 0 0 15px rgba(0, 255, 153, 0.15);
   }
-  input, button {
+
+  label, select, input {
+    display: block;
+    margin: 10px auto;
+    text-align: left;
+    width: 80%;
+    color: #ddd;
+  }
+
+  select, input {
+    background: #2a2a2a;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 6px;
     padding: 8px;
-    margin: 5px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
+    width: 100%;
+    box-sizing: border-box;
   }
+
   button {
-    background: #007bff;
-    color: white;
-    cursor: pointer;
+    background-color: #00ff99;
     border: none;
+    color: #000;
+    font-weight: bold;
+    padding: 10px 20px;
+    margin-top: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
   }
+
   button:hover {
-    background: #0056b3;
+    background-color: #00cc7a;
   }
+
   pre {
     text-align: left;
-    background: #f8f8f8;
-    padding: 15px;
+    background: #111;
+    border: 1px solid #333;
     border-radius: 8px;
-    margin-top: 15px;
+    padding: 15px;
+    margin-top: 20px;
     white-space: pre-wrap;
+    color: #d9d9d9;
+  }
+
+  .footer {
+    color: #666;
+    font-size: 13px;
+    margin-top: 40px;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid #333;
+    margin: 15px 0;
   }
 </style>
 </head>
 <body>
-  <div class="box">
-    <h1>🎟️ Gerador de Bilhete</h1>
-    <p>Escolha a quantidade de jogos e o intervalo de odds:</p>
+  <h1>🎯 Gerador de Bilhete</h1>
 
+  <div class="container">
     <label>Quantidade de jogos:
-      <input id="qtd" type="number" min="1" value="5">
-    </label><br>
+      <input id="qtd" type="number" min="1" value="2">
+    </label>
+
     <label>Odd mínima:
-      <input id="min" type="number" step="0.01" value="1.5">
-    </label><br>
+      <input id="min" type="number" step="0.01" value="1.40">
+    </label>
+
     <label>Odd máxima:
-      <input id="max" type="number" step="0.01" value="2.5">
-    </label><br>
+      <input id="max" type="number" step="0.01" value="2.50">
+    </label>
+
+    <label>Mercado:
+      <select id="mercado">
+        <option value="todos">Todos os mercados</option>
+        <option value="+1.5 gols">+1.5 Gols</option>
+        <option value="ambas">Ambas Marcam</option>
+        <option value="vitória casa">Vitória Casa</option>
+        <option value="vitória fora">Vitória Fora</option>
+      </select>
+    </label>
 
     <button onclick="gerarBilhete()">Gerar Bilhete</button>
 
     <pre id="saida">---</pre>
   </div>
 
+  <div class="footer">Desenvolvido por Kawan • ⚽ Estatísticas automáticas</div>
+
 <script>
-  // 🔮 Lista de palpites (pode editar, adicionar ou remover)
+  // 📊 Lista de palpites com estatísticas
   const palpites = [
-    { jogo: "Flamengo x Vasco", odd: 1.75 },
-    { jogo: "Real Madrid x Barcelona", odd: 2.10 },
-    { jogo: "Liverpool x Manchester City", odd: 1.90 },
-    { jogo: "Palmeiras x Santos", odd: 2.30 },
-    { jogo: "PSG x Lyon", odd: 1.60 },
-    { jogo: "Inter de Milão x Milan", odd: 2.50 },
-    { jogo: "Chelsea x Arsenal", odd: 2.20 },
-    { jogo: "Boca Juniors x River Plate", odd: 2.00 },
-    { jogo: "Atlético x Corinthians", odd: 1.80 },
-    { jogo: "Benfica x Porto", odd: 1.95 },
-    { jogo: "Celtic x Rangers", odd: 2.40 },
-    { jogo: "Ajax x PSV", odd: 2.15 },
-    { jogo: "América x Pumas", odd: 1.85 },
-    { jogo: "Grêmio x Internacional", odd: 2.25 },
-    { jogo: "Sporting x Braga", odd: 1.70 }
+    {
+      jogo: "Flamengo x Palmeiras",
+      mercado: "+1.5 gols",
+      odd: 1.45,
+      jc: "3/5",
+      jf: "3/5",
+      cd: "3/5"
+    },
+    {
+      jogo: "Mirassol x São Paulo",
+      mercado: "+1.5 gols",
+      odd: 1.50,
+      jc: "9/10",
+      jf: "3/5",
+      cd: "11/12"
+    },
+    {
+      jogo: "Getafe x Real Madrid",
+      mercado: "vitória fora",
+      odd: 1.40,
+      jc: "4E 1V",
+      jf: "4V 1D",
+      cd: "8/10"
+    }
   ];
 
-  // 🔧 Função principal
+  // 🎯 Função principal
   function gerarBilhete() {
     const qtd = parseInt(document.getElementById("qtd").value);
     const oddMin = parseFloat(document.getElementById("min").value);
     const oddMax = parseFloat(document.getElementById("max").value);
+    const mercado = document.getElementById("mercado").value;
 
-    // Filtra por odds
-    const filtrados = palpites.filter(p => p.odd >= oddMin && p.odd <= oddMax);
+    let filtrados = palpites.filter(p => p.odd >= oddMin && p.odd <= oddMax);
+
+    if (mercado !== "todos") {
+      filtrados = filtrados.filter(p => p.mercado.toLowerCase() === mercado.toLowerCase());
+    }
 
     if (filtrados.length === 0) {
-      document.getElementById("saida").textContent = "Nenhum jogo com essas odds!";
+      document.getElementById("saida").textContent = "❌ Nenhum jogo encontrado com esses filtros.";
       return;
     }
 
-    // Embaralha
+    // Embaralhar e selecionar
     const sorteados = filtrados.sort(() => 0.5 - Math.random()).slice(0, qtd);
 
-    // Monta o bilhete
     let texto = "";
     let totalOdd = 1;
+
     sorteados.forEach((p, i) => {
-      texto += `${i + 1}. ${p.jogo} (odd ${p.odd})\n`;
+      texto += `🏆 ${i + 1}. ${p.jogo}\n`;
+      texto += `   Mercado: ${p.mercado}\n`;
+      texto += `   Odd: ${p.odd}\n`;
+      texto += `   JC: ${p.jc} | JF: ${p.jf} | CD: ${p.cd}\n`;
+      texto += "-----------------------------------\n";
       totalOdd *= p.odd;
     });
-    texto += `\nOdd total: ${totalOdd.toFixed(2)}`;
+
+    texto += `\n💰 Odd total: ${totalOdd.toFixed(2)}`;
 
     document.getElementById("saida").textContent = texto;
   }
