@@ -1,17 +1,36 @@
-const CACHE_NAME = "bilhete-cache-v1";
+const CACHE_NAME = 'bilhete-cache-v1';
 const urlsToCache = [
-  "/index.html",
-  "/style.css",
-  "/script.js",
-  "/manifest.json",
-  "/icon-192.png",
-  "/icon-512.png"
+  './',
+  './index.html',
+  './manifest.json',
+  './service-worker.js',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  'https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap',
+  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
 ];
 
-self.addEventListener("install", event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
+  );
 });
 
-self.addEventListener("fetch", event => {
-  event.respondWith(caches.match(event.request).then(resp => resp || fetch(event.request)));
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => response || fetch(event.request))
+  );
+});
+
+self.addEventListener('activate', event => {
+  const cacheWhitelist = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then(keyList => 
+      Promise.all(keyList.map(key => {
+        if(!cacheWhitelist.includes(key)) return caches.delete(key);
+      }))
+    )
+  );
 });

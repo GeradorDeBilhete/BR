@@ -322,3 +322,10 @@ generateBtn.addEventListener('click', gerarBilhete);
 
 </body>
 </html>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./service-worker.js')
+    .then(reg => console.log('Service Worker registrado:', reg))
+    .catch(err => console.log('Falha ao registrar SW:', err));
+}
+</script>
