@@ -31,8 +31,8 @@ input:focus { border-color:#00ff99; outline:none; }
 .market-btn { margin:5px; padding:8px 12px; border:none; border-radius:8px; cursor:pointer; background:#333; color:#fff; transition:0.2s; box-shadow:0 0 3px rgba(0,255,153,0.2); }
 .market-btn.active { background:#00ff99; color:#000; transform:scale(1.05); }
 .market-btn:hover { opacity:0.8; }
-button#gerar, button#copiar, button#baixar { background:#00ff99; color:#000; font-weight:bold; border:none; padding:10px 20px; margin:10px 5px; border-radius:8px; cursor:pointer; transition:0.2s; box-shadow:0 0 5px #00ff99; }
-button#gerar:hover, button#copiar:hover, button#baixar:hover { background:#00cc7a; transform:scale(1.05); }
+button#gerar, button#copiar, button#baixar, button#estatisticasBtn { background:#00ff99; color:#000; font-weight:bold; border:none; padding:10px 20px; margin:10px 5px; border-radius:8px; cursor:pointer; transition:0.2s; box-shadow:0 0 5px #00ff99; }
+button#gerar:hover, button#copiar:hover, button#baixar:hover, button#estatisticasBtn:hover { background:#00cc7a; transform:scale(1.05); }
 #bilheteContainer { margin-top:20px; display:flex; flex-direction:column; gap:15px; }
 .bilhete-card { background:#111; border:1px solid #00ff99; border-radius:10px; padding:15px; text-align:left; opacity:0; transform:translateY(20px); transition: all 0.5s ease, box-shadow 0.3s ease; }
 .bilhete-card.show { opacity:1; transform:translateY(0); }
@@ -45,12 +45,13 @@ button#gerar:hover, button#copiar:hover, button#baixar:hover { background:#00cc7
 @keyframes pulse { 0%{text-shadow:0 0 5px #00ff99;} 100%{text-shadow:0 0 20px #00ff99;} }
 .legend { font-size:13px; text-align:left; margin-top:20px; }
 .footer { color:#666; font-size:13px; margin-top:40px; }
+#estatisticasModal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); color:#fff; z-index:1000; overflow:auto; padding:20px; }
+#estatisticasModal h2 { margin-top:0; }
+#closeEstatisticas { float:right; background:#00ff99; color:#000; border:none; border-radius:6px; padding:5px 10px; cursor:pointer; }
 @media(max-width:500px){ .container{padding:15px; width:95%;} }
 </style>
 
-<!-- jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 </head>
 <body>
 
@@ -84,6 +85,7 @@ button#gerar:hover, button#copiar:hover, button#baixar:hover { background:#00cc7
 <button id="gerar">Gerar Bilhete</button>
 <button id="copiar">📋 Copiar Bilhete</button>
 <button id="baixar">💾 Baixar PDF</button>
+<button id="estatisticasBtn">📊 Estatísticas</button>
 
 <div id="bilheteContainer"></div>
 <div id="totalOdd" class="totalOdd"></div>
@@ -92,6 +94,12 @@ button#gerar:hover, button#copiar:hover, button#baixar:hover { background:#00cc7
 🔹 JC: Jogos do time da casa | 🔹 JF: Jogos do time visitante | 🔹 CD: Confrontos diretos
 </p>
 
+</div>
+
+<div id="estatisticasModal">
+<button id="closeEstatisticas">Fechar</button>
+<h2>📊 Estatísticas</h2>
+<div id="estatisticasConteudo"></div>
 </div>
 
 <div class="footer">Desenvolvido por Kawan • Estatísticas coloridas</div>
@@ -110,6 +118,7 @@ const container=document.getElementById("bilheteContainer");
 const marketBtns=document.querySelectorAll(".market-btn");
 const totalOddEl=document.getElementById("totalOdd");
 
+// Toggle mercados
 marketBtns.forEach(btn=>{btn.addEventListener("click",()=>{btn.classList.toggle("active");});});
 
 function getColor(stat){
@@ -118,6 +127,25 @@ function getColor(stat){
   return "stat-red";
 }
 
+// Salvar histórico no localStorage
+function salvarHistorico(sorteados){
+  const historico=JSON.parse(localStorage.getItem('historicoBilhetes')||'[]');
+  const timestamp=new Date().toLocaleString();
+  sorteados.forEach(p=>{
+    historico.push({
+      jogo:p.jogo,
+      mercado:p.mercado,
+      odd:p.odd,
+      jc:p.jc,
+      jf:p.jf,
+      cd:p.cd,
+      horario:timestamp
+    });
+  });
+  localStorage.setItem('historicoBilhetes', JSON.stringify(historico));
+}
+
+// Gerar bilhete
 function gerarBilhete(){
   const qtd=parseInt(document.getElementById("qtd").value);
   const min=parseFloat(document.getElementById("min").value);
@@ -137,19 +165,14 @@ function gerarBilhete(){
     Mercado: ${p.mercado} | Odd: ${p.odd}<br>
     JC: <span class="${jcC}">${p.jc}</span> | JF: <span class="${jfC}">${p.jf}</span> | CD: <span class="${cdC}">${p.cd}</span>`;
     container.appendChild(card);
-    setTimeout(()=>{
-      card.classList.add("show");
-      const audio=new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
-      audio.volume=0.15;
-      audio.play();
-    }, i*400);
+    setTimeout(()=>{card.classList.add("show"); const audio=new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"); audio.volume=0.15; audio.play();}, i*400);
   });
   setTimeout(()=>{totalOddEl.textContent=`💰 Odd total: ${totalOdd.toFixed(2)}`;}, sorteados.length*400);
   localStorage.setItem("ultimoBilhete", JSON.stringify(sorteados));
+  salvarHistorico(sorteados);
 }
 
-document.getElementById("gerar").addEventListener("click", gerarBilhete);
-
+// Copiar bilhete
 document.getElementById("copiar").addEventListener("click", ()=>{
   const cards=Array.from(document.querySelectorAll(".bilhete-card"));
   const texto=cards.map(c=>c.innerText).join("\n\n") + "\n\n" + totalOddEl.textContent;
@@ -157,6 +180,7 @@ document.getElementById("copiar").addEventListener("click", ()=>{
   alert("Bilhete copiado!");
 });
 
+// Baixar PDF
 document.getElementById("baixar").addEventListener("click", ()=>{
   const { jsPDF }=window.jspdf;
   const doc=new jsPDF();
@@ -167,6 +191,38 @@ document.getElementById("baixar").addEventListener("click", ()=>{
   const data=new Date();
   doc.save(`bilhete-${data.getDate()}-${data.getMonth()+1}-${data.getFullYear()}.pdf`);
 });
+
+document.getElementById("gerar").addEventListener("click", gerarBilhete);
+
+// Estatísticas
+document.getElementById('estatisticasBtn').addEventListener('click',()=>{
+  const historico=JSON.parse(localStorage.getItem('historicoBilhetes')||'[]');
+  if(historico.length===0){
+    document.getElementById('estatisticasConteudo').innerHTML='Nenhum bilhete gerado ainda.';
+  } else {
+    const ligas = [...new Set(historico.map(h=>h.jogo.split(" x ")[0].trim() + " / " + h.jogo.split(" x ")[1].trim()))];
+    const mercados = [...new Set(historico.map(h=>h.mercado))];
+    const times = [...new Set(historico.flatMap(h=>h.jogo.split(" x ")))];
+    let statsHTML=`<p>Total de palpites gerados: ${historico.length}</p>`;
+    statsHTML+=`<p>Times: ${times.join(", ")}</p>`;
+    statsHTML+=`<p>Ligas/Confrontos: ${ligas.join(", ")}</p>`;
+    statsHTML+=`<p>Mercados usados: ${mercados.join(", ")}</p>`;
+    statsHTML+=`<h3>Horários:</h3><ul>${historico.map(h=>`<li>${h.jogo} - ${h.horario}</li>`).join("")}</ul>`;
+    document.getElementById('estatisticasConteudo').innerHTML=statsHTML;
+  }
+  document.getElementById('estatisticasModal').style.display='block';
+});
+
+document.getElementById('closeEstatisticas').addEventListener('click',()=>{
+  document.getElementById('estatisticasModal').style.display='none';
+});
+
+// Service Worker
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js')
+  .then(()=>console.log('SW registrado'))
+  .catch(err=>console.log('Erro SW:',err));
+}
 </script>
 
 </body>
