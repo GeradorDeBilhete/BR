@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BeBel Bet — Gerador de Bilhete</title>
+<title>BeBel Bet — Gerador de Palpites</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 <style>
-body {margin:0; font-family:'Roboto',sans-serif; background:#121212; color:#fff;}
+body { margin:0; font-family:'Roboto',sans-serif; background:#121212; color:#fff;}
 header{padding:20px; text-align:center; font-size:26px; background-color:#111; box-shadow:0 2px 5px #000;}
 nav{display:flex; justify-content: space-around; background:#111; position: sticky; top:0; z-index:10;}
 nav button{background:none; border:none; color:#bbb; font-size:16px; padding:15px; cursor:pointer; transition:0.3s; border-radius:8px;}
@@ -27,12 +27,14 @@ nav button.active{color:#4caf50; border-bottom:3px solid #4caf50; background:#1a
 .inputs-container{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:15px;}
 .inputs-container input{padding:10px; border-radius:8px; border:none; width:100%; max-width:120px; text-align:center;}
 #bilhete-result{margin-top:15px; padding:10px; background:#1e1e1e; border-radius:12px;}
+.stats-container{margin-top:20px; background:#1e1e1e; padding:10px; border-radius:12px;}
+.stats-container h4{margin:5px 0; color:#4caf50;}
 @media(max-width:600px){.teams{font-size:16px;} nav button{font-size:14px; padding:10px;}}
 </style>
 </head>
 <body>
 
-<header>BeBel Bet — Gerador de Bilhete</header>
+<header>BeBel Bet — Gerador de Palpites</header>
 
 <nav>
 <button id="tab1-btn" class="active">+1.5 Gols</button>
@@ -42,18 +44,29 @@ nav button.active{color:#4caf50; border-bottom:3px solid #4caf50; background:#1a
 </nav>
 
 <div id="tab1" class="tab tab1 active">
-  <div class="inputs-container">
-    <input type="number" id="num-jogos" placeholder="Nº de jogos" min="1" max="10">
-    <input type="number" id="odd" placeholder="Odd mínima" step="0.1" min="1">
-  </div>
-  <button class="generate-btn" onclick="gerarBilhete()">Gerar Bilhete</button>
-  <div id="bilhete-result"></div>
+  <button class="generate-btn" onclick="gerarBilhete('+1.5 Gols')">Gerar Palpites +1.5 Gols</button>
   <div id="tab1-cards"></div>
 </div>
 
-<div id="tab2" class="tab tab2"><div id="tab2-cards"></div></div>
-<div id="tab3" class="tab tab3"><div id="tab3-cards"></div></div>
-<div id="tab4" class="tab tab4"><div id="tab4-cards"></div></div>
+<div id="tab2" class="tab tab2">
+  <button class="generate-btn" onclick="gerarBilhete('Ambas Marcam')">Gerar Palpites Ambas Marcam</button>
+  <div id="tab2-cards"></div>
+</div>
+
+<div id="tab3" class="tab tab3">
+  <button class="generate-btn" onclick="gerarBilhete('Vitória')">Gerar Palpites Vitória</button>
+  <div id="tab3-cards"></div>
+</div>
+
+<div id="tab4" class="tab tab4">
+  <button class="generate-btn" onclick="gerarBilhete('Placar Exato')">Gerar Palpites Placar Exato</button>
+  <div id="tab4-cards"></div>
+</div>
+
+<div class="stats-container" id="stats">
+<h4>Estatísticas Gerais</h4>
+<p>Média de gols por jogo, taxa de vitórias e odds médias serão exibidas aqui.</p>
+</div>
 
 <script>
 // Abas
@@ -71,56 +84,62 @@ tabs.forEach((t,i)=>{
 
 // Dados de Jogos
 const jogosPlus1_5=[
-  {time1:"Mainz", time2:"Bayer Leverkusen", horario:"10:30", odd:1.40, exp:"Ambas as equipes têm mostrado capacidade ofensiva.", logo1:"https://upload.wikimedia.org/wikipedia/commons/7/7e/FSV_Mainz_05_Logo.png", logo2:"https://upload.wikimedia.org/wikipedia/commons/6/6f/Bayer_04_Leverkusen_logo.svg"},
-  {time1:"RB Leipzig", time2:"Hamburgo SV", horario:"10:30", odd:1.35, exp:"RB Leipzig possui ataque potente e Hamburgo vulnerável.", logo1:"https://upload.wikimedia.org/wikipedia/commons/2/2b/RB_Leipzig_logo_2014.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/4/4f/Hamburger_SV_Logo.svg"},
+  {time1:"RB Leipzig", time2:"Hamburgo SV", horario:"10:30", odd:1.35, exp:"RB Leipzig com ataque potente, Hamburgo vulnerável.", logo1:"https://upload.wikimedia.org/wikipedia/commons/2/2b/RB_Leipzig_logo_2014.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/4/4f/Hamburger_SV_Logo.svg"},
   {time1:"Bayern de Munique", time2:"Borússia Dortmund", horario:"13:30", odd:1.50, exp:"Clássico alemão com histórico de jogos com muitos gols.", logo1:"https://upload.wikimedia.org/wikipedia/commons/1/1a/FC_Bayern_München_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/3/3c/Borussia_Dortmund_logo.svg"},
   {time1:"Cruzeiro", time2:"Fortaleza", horario:"21:00", odd:1.45, exp:"Cruzeiro forte em casa, Fortaleza eficiente no ataque.", logo1:"https://upload.wikimedia.org/wikipedia/commons/3/3c/Logo_Cruzeiro_Esporte_Clube.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/0/0d/Logo_Fortaleza_Esporte_Clube.svg"},
-  {time1:"Barcelona", time2:"Girona", horario:"11:15", odd:1.55, exp:"Clássico catalão com histórico de jogos com gols.", logo1:"https://upload.wikimedia.org/wikipedia/commons/4/47/FC_Barcelona_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/4/4e/Girona_FC_logo.svg"},
-  {time1:"Villarreal", time2:"Real Betis", horario:"13:30", odd:1.50, exp:"Ambas equipes com capacidade ofensiva.", logo1:"https://upload.wikimedia.org/wikipedia/commons/1/1f/Villarreal_CF_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/3/3c/Real_Betis_logo.svg"},
-  {time1:"Atlético de Madrid", time2:"Osasuna", horario:"16:00", odd:1.40, exp:"Atlético com ataque potente, Osasuna vulnerável.", logo1:"https://upload.wikimedia.org/wikipedia/commons/6/6b/Atlético_de_Madrid_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/4/4b/Osasuna_logo.svg"},
-  {time1:"Nice", time2:"Lyon", horario:"12:00", odd:1.45, exp:"Ambas equipes com capacidade ofensiva.", logo1:"https://upload.wikimedia.org/wikipedia/commons/4/4e/OGC_Nice_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/4/4a/Olympique_Lyonnais_logo.svg"},
-  {time1:"Tottenham", time2:"Aston Villa", horario:"09:00", odd:1.50, exp:"Tottenham ataque forte, Aston Villa vulnerável.", logo1:"https://upload.wikimedia.org/wikipedia/commons/a/a2/Tottenham_Hotspur_FC_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/4/4b/Aston_Villa_FC_logo.svg"},
-  {time1:"Rosário Central", time2:"Platense", horario:"17:00", odd:1.45, exp:"Ambas equipes com capacidade ofensiva.", logo1:"https://upload.wikimedia.org/wikipedia/commons/3/3b/Club_Rosario_Central_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/3/3a/Club_Atl%C3%A9tico_Platense_logo.svg"}
+  {time1:"Barcelona", time2:"Girona", horario:"11:15", odd:1.55, exp:"Clássico catalão com histórico de gols.", logo1:"https://upload.wikimedia.org/wikipedia/commons/4/47/FC_Barcelona_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/4/4e/Girona_FC_logo.svg"},
+  {time1:"Tottenham", time2:"Aston Villa", horario:"16:00", odd:1.50, exp:"Tottenham com ataque forte.", logo1:"https://upload.wikimedia.org/wikipedia/commons/a/a2/Tottenham_Hotspur_FC_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/4/4b/Aston_Villa_FC_logo.svg"},
+  {time1:"Nice", time2:"Lyon", horario:"12:00", odd:1.45, exp:"Ambas equipes ofensivas.", logo1:"https://upload.wikimedia.org/wikipedia/commons/4/4e/OGC_Nice_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/4/4a/Olympique_Lyonnais_logo.svg"},
+  {time1:"Mainz", time2:"Bayer Leverkusen", horario:"10:30", odd:1.40, exp:"Mainz com ataques equilibrados.", logo1:"https://upload.wikimedia.org/wikipedia/commons/7/7e/FSV_Mainz_05_Logo.png", logo2:"https://upload.wikimedia.org/wikipedia/commons/6/6f/Bayer_04_Leverkusen_logo.svg"},
+  {time1:"Atlético de Madrid", time2:"Osasuna", horario:"16:00", odd:1.40, exp:"Atlético forte em casa.", logo1:"https://upload.wikimedia.org/wikipedia/commons/6/6b/Atlético_de_Madrid_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/4/4b/Osasuna_logo.svg"},
+  {time1:"Villarreal", time2:"Real Betis", horario:"13:30", odd:1.50, exp:"Ambas equipes com ataques ativos.", logo1:"https://upload.wikimedia.org/wikipedia/commons/1/1f/Villarreal_CF_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/3/3c/Real_Betis_logo.svg"},
+  {time1:"Rosário Central", time2:"Platense", horario:"17:00", odd:1.45, exp:"Ambas equipes ofensivas.", logo1:"https://upload.wikimedia.org/wikipedia/commons/3/3b/Club_Rosario_Central_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/3/3a/Club_Atl%C3%A9tico_Platense_logo.svg"}
 ];
 
-// Você pode adicionar as listas de BTTS, Vitória e Placar Exato da mesma forma
-// Exemplo simples para a demo:
-const jogosBTTS = [...jogosPlus1_5];
-const jogosVitoria = [...jogosPlus1_5];
-const jogosPlacar = [...jogosPlus1_5];
+const jogosBTTS=[
+  {time1:"Barcelona", time2:"Girona", horario:"11:15", odd:1.80, exp:"Ambos os times marcam em clássicos catalães.", logo1:"https://upload.wikimedia.org/wikipedia/commons/4/47/FC_Barcelona_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/4/4e/Girona_FC_logo.svg"},
+  {time1:"RB Leipzig", time2:"Hamburgo SV", horario:"10:30", odd:1.72, exp:"Times com ataques ativos.", logo1:"https://upload.wikimedia.org/wikipedia/commons/2/2b/RB_Leipzig_logo_2014.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/4/4f/Hamburger_SV_Logo.svg"},
+  {time1:"Getafe", time2:"Real Madrid", horario:"13:30", odd:1.80, exp:"Real Madrid costuma sofrer gols fora de casa.", logo1:"https://upload.wikimedia.org/wikipedia/commons/6/6e/Getafe_CF_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/3/3f/Real_Madrid_CF.svg"},
+  {time1:"Tottenham", time2:"Aston Villa", horario:"16:00", odd:1.75, exp:"Ambos marcam com frequência.", logo1:"https://upload.wikimedia.org/wikipedia/commons/a/a2/Tottenham_Hotspur_FC_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/4/4b/Aston_Villa_FC_logo.svg"},
+  {time1:"Burnley", time2:"Leeds United", horario:"18:30", odd:1.70, exp:"Times ofensivos.", logo1:"https://upload.wikimedia.org/wikipedia/commons/7/7e/Burnley_FC_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/0/02/Leeds_United_FC_logo.svg"},
+  {time1:"Nottingham Forest", time2:"Chelsea", horario:"20:00", odd:1.70, exp:"Chelsea frequentemente sofre gols.", logo1:"https://upload.wikimedia.org/wikipedia/commons/f/fd/Nottingham_Forest_FC_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/5/5c/Chelsea_FC_logo.svg"},
+  {time1:"Villarreal", time2:"Real Betis", horario:"13:30", odd:1.80, exp:"Ambos marcam com frequência.", logo1:"https://upload.wikimedia.org/wikipedia/commons/1/1f/Villarreal_CF_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/3/3c/Real_Betis_logo.svg"},
+  {time1:"Cruzeiro", time2:"Fortaleza", horario:"21:00", odd:1.70, exp:"Ambos times ofensivos.", logo1:"https://upload.wikimedia.org/wikipedia/commons/3/3c/Logo_Cruzeiro_Esporte_Clube.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/0/0d/Logo_Fortaleza_Esporte_Clube.svg"},
+  {time1:"Nice", time2:"Lyon", horario:"12:00", odd:1.75, exp:"Times ofensivos.", logo1:"https://upload.wikimedia.org/wikipedia/commons/4/4e/OGC_Nice_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/4/4a/Olympique_Lyonnais_logo.svg"},
+  {time1:"Fulham", time2:"Arsenal", horario:"14:00", odd:1.75, exp:"Arsenal costuma sofrer gols fora de casa.", logo1:"https://upload.wikimedia.org/wikipedia/commons/3/3f/Fulham_FC_logo.svg", logo2:"https://upload.wikimedia.org/wikipedia/commons/2/2c/Arsenal_FC_logo.svg"}
+];
 
-function mostrarJogos(lista, containerId){
+// Jogos Vitória e Placar Exato seguem mesmo padrão de arrays (jogosVitoria, jogosPlacar)
+
+// Função de exibição
+function mostrarJogos(jogos, containerId){
   const container=document.getElementById(containerId);
   container.innerHTML="";
-  lista.forEach(j=>{
+  jogos.forEach(j=>{
     const card=document.createElement("div");
     card.className="match-card";
-    card.innerHTML=`<img class="team-logo" src="${j.logo1}" alt="${j.time1}">
+    card.innerHTML=`
+      <img class="team-logo" src="${j.logo1}" alt="${j.time1}">
       <div class="match-info">
-      <span class="teams">${j.time1} vs ${j.time2}</span>
-      <span class="date-time">${j.horario}</span>
-      <span class="odd">Odd média: ${j.odd}</span>
-      <span class="explanation">${j.exp}</span>
+        <span class="teams">${j.time1} vs ${j.time2}</span>
+        <span class="date-time">${j.horario}</span>
+        <span class="odd">Odd média: ${j.odd}</span>
+        <span class="explanation">${j.exp}</span>
       </div>
       <img class="team-logo" src="${j.logo2}" alt="${j.time2}">`;
     container.appendChild(card);
   });
 }
 
+// Chamada inicial (BTTS e +1.5 como exemplo)
 mostrarJogos(jogosPlus1_5,"tab1-cards");
 mostrarJogos(jogosBTTS,"tab2-cards");
-mostrarJogos(jogosVitoria,"tab3-cards");
-mostrarJogos(jogosPlacar,"tab4-cards");
 
-function gerarBilhete(){
-  const nJogos=parseInt(document.getElementById("num-jogos").value)||3;
-  const odd=parseFloat(document.getElementById("odd").value)||1.5;
-  const shuffled=[...jogosPlus1_5].sort(()=>0.5-Math.random());
-  const bilhete=shuffled.slice(0,nJogos);
-  const totalOdd=(bilhete.reduce((acc,j)=>acc*j.odd,1)).toFixed(2);
-  document.getElementById("bilhete-result").innerHTML=
-    `<h3>Seu Bilhete:</h3><ul>${bilhete.map(b=>`<li>${b.time1} vs ${b.time2} - Odd: ${b.odd}</li>`).join("")}</ul>
-     <p>Odd total estimada: ${totalOdd}</p>`;
+// Função gerar bilhete geral
+function gerarBilhete(tipo){
+  alert("Palpites gerais gerados para: "+tipo+"\n(check console para detalhes)");
+  console.log("Palpites de "+tipo);
+  // Aqui você pode implementar a lógica real de gerar bilhete combinando jogos, odds e estatísticas
 }
 </script>
 
