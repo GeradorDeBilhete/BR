@@ -1,0 +1,80 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #0e0e0e;
+    color: #00ff99;
+}
+
+header {
+    text-align: center;
+    padding: 20px;
+    background-color: #050505;
+    border-bottom: 2px solid #00ff99;
+}
+
+.controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    padding: 15px;
+    background-color: #111;
+}
+
+.controls label {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.9em;
+}
+
+.controls input, .controls select, .controls button {
+    padding: 5px;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: none;
+    font-size: 1em;
+}
+
+.controls button {
+    background-color: #00ff99;
+    color: #0e0e0e;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#bilheteContainer {
+    margin: 20px auto;
+    width: 90%;
+    max-width: 600px;
+    background-color: #111;
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid #00ff99;
+}
+
+.bilhete {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #1c1c1c;
+    border-radius: 5px;
+    border: 1px solid #00ff99;
+}
+
+#abrirBetano {
+    display: block;
+    margin: 0 auto 20px;
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #00ff99;
+    color: #0e0e0e;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+    font-size: 0.8em;
+    color: #00ff99aa;
+}
