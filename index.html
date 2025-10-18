@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>🎯 Gerador De Bilhete🎟️</title>
+
+<!-- Manifest PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00ff99">
+
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
@@ -27,7 +32,7 @@
     padding: 25px;
     border-radius: 12px;
     width: 90%;
-    max-width: 750px;
+    max-width: 700px;
     margin: 20px auto;
     box-shadow: 0 0 20px rgba(0, 255, 153, 0.2);
   }
@@ -107,20 +112,6 @@
     overflow-y: auto;
   }
 
-  .footer {
-    color: #666;
-    font-size: 13px;
-    margin-top: 30px;
-  }
-
-  .stats span {
-    font-weight: bold;
-  }
-
-  .stat-green { color: #00ff99; }
-  .stat-yellow { color: #ffcc00; }
-  .stat-red { color: #ff4d4d; }
-
   .estatisticas {
     text-align: left;
     margin-top: 20px;
@@ -146,6 +137,10 @@
   .donate-card:hover {
     background-color: #e6b800;
   }
+
+  .stat-green { color: #00ff99; }
+  .stat-yellow { color: #ffcc00; }
+  .stat-red { color: #ff4d4d; }
 </style>
 </head>
 <body>
@@ -163,7 +158,7 @@
     <input id="max" type="number" step="0.01" value="2.50" placeholder="Odd máxima">
   </div>
 
-  <!-- Botão de gerar bilhete no topo -->
+  <!-- Botão gerar bilhete no topo -->
   <button onclick="gerarBilhete()">🎟️ Gerar Bilhete</button>
 
   <p>Escolha os esportes:</p>
@@ -214,10 +209,7 @@
     💖 Ajude um pobre (dono do app)<br>
     <strong>Pix: geradordebilhete@gmail.com</strong>
   </div>
-
 </div>
-
-<div class="footer">Desenvolvido por Kawan • ⚽ Estatísticas coloridas</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
@@ -240,6 +232,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Gerar bilhete
 function gerarBilhete() {
     const qtd = parseInt(document.getElementById("qtd").value);
     const oddMin = parseFloat(document.getElementById("min").value);
@@ -274,33 +267,26 @@ function gerarBilhete() {
         texto += "-----------------------------------\n";
         totalOdd *= p.odd;
 
-        const time1 = p.jogo.split(' x ')[0], time2 = p.jogo.split(' x ')[1];
-        times[time1] = (times[time1]||0)+1;
-        times[time2] = (times[time2]||0)+1;
-        acertosMercado[p.mercado] = acertosMercado[p.mercado] || 0;
-        if(gcClass==="stat-green") acertosMercado[p.mercado]++;
-        if(gcClass==="stat-green") acertosGC++;
-        if(gfClass==="stat-green") acertosGF++;
-        if(ggClass==="stat-green") acertosGG++;
+        // Estatísticas
+        times[p.jogo.split(" x ")[0]] = (times[p.jogo.split(" x ")[0]]||0)+1;
+        times[p.jogo.split(" x ")[1]] = (times[p.jogo.split(" x ")[1]]||0)+1;
+        acertosMercado[p.mercado] = (acertosMercado[p.mercado]||0)+1;
     });
 
     texto += `\n💰 Odd total: ${totalOdd.toFixed(2)}`;
     document.getElementById("saida").innerHTML = texto;
 
-    const estatTexto = `
-Bilhetes gerados: ${bilhetesGerados}
-Palpites gerados: ${sorteados.length}
-Times diferentes: ${Object.keys(times).length}
-Times mais frequentes: ${Object.entries(times).sort((a,b)=>b[1]-a[1]).map(t=>t[0]+"("+t[1]+")").join(', ')}
-Acertos GC: ${acertosGC}, GF: ${acertosGF}, GG: ${acertosGG}
-Acertos por mercado: ${Object.entries(acertosMercado).map(e=>e[0]+"("+e[1]+")").join(', ')}
-    `;
+    // Atualiza estatísticas
+    let estatTexto = `Bilhetes gerados: ${bilhetesGerados}\n`;
+    estatTexto += `Palpites gerados: ${sorteados.length}\n`;
+    estatTexto += `Times diferentes: ${Object.keys(times).length}\n`;
+    estatTexto += `Acertos por mercado: ${JSON.stringify(acertosMercado,null,2)}`;
     document.getElementById("estatTexto").textContent = estatTexto;
 }
 
 function getColorStat(stat){
-    if(stat.includes("V") || parseInt(stat.split("/")[0]) / parseInt(stat.split("/")[1]) >=0.7) return "stat-green";
-    if(stat.includes("E") || parseInt(stat.split("/")[0]) / parseInt(stat.split("/")[1]) >=0.5) return "stat-yellow";
+    if(stat.includes("V") || parseInt(stat.split("/")[0])/parseInt(stat.split("/")[1])>=0.7) return "stat-green";
+    if(stat.includes("E") || parseInt(stat.split("/")[0])/parseInt(stat.split("/")[1])>=0.5) return "stat-yellow";
     return "stat-red";
 }
 
@@ -323,9 +309,17 @@ function baixarPDF(){
     doc.save(filename);
 }
 
+// Copiar Pix
 function copiarPix(){
     navigator.clipboard.writeText("geradordebilhete@gmail.com");
-    alert("Pix copiado para a área de transferência! 🙏");
+    alert("Pix copiado para área de transferência!");
+}
+
+// PWA - Service Worker
+if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js')
+    .then(()=>console.log('Service Worker registrado'))
+    .catch(err=>console.log('Erro Service Worker:',err));
 }
 </script>
 </body>
