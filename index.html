@@ -2,191 +2,177 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>🎯 Gerador de Bilhete</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎯 Gerador de Bilhete Premium App</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00ff99">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<!-- CSS -->
 <style>
-  body {
-    font-family: 'Poppins', Arial, sans-serif;
-    background-color: #0e0e0e;
-    color: #f1f1f1;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-  }
-
-  h1 {
-    margin-top: 30px;
-    color: #00ff99;
-    letter-spacing: 1px;
-  }
-
-  .container {
-    background-color: #1b1b1b;
-    padding: 25px;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 600px;
-    margin: 30px auto;
-    box-shadow: 0 0 15px rgba(0, 255, 153, 0.15);
-  }
-
-  label, select, input {
-    display: block;
-    margin: 10px auto;
-    text-align: left;
-    width: 80%;
-    color: #ddd;
-  }
-
-  select, input {
-    background: #2a2a2a;
-    color: #fff;
-    border: 1px solid #444;
-    border-radius: 6px;
-    padding: 8px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  button {
-    background-color: #00ff99;
-    border: none;
-    color: #000;
-    font-weight: bold;
-    padding: 10px 20px;
-    margin-top: 15px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-
-  button:hover {
-    background-color: #00cc7a;
-  }
-
-  pre {
-    text-align: left;
-    background: #111;
-    border: 1px solid #333;
-    border-radius: 8px;
-    padding: 15px;
-    margin-top: 20px;
-    white-space: pre-wrap;
-    color: #d9d9d9;
-  }
-
-  .footer {
-    color: #666;
-    font-size: 13px;
-    margin-top: 40px;
-  }
-
-  hr {
-    border: none;
-    border-top: 1px solid #333;
-    margin: 15px 0;
-  }
+body {
+  margin:0;
+  font-family:'Poppins', sans-serif;
+  background:#0e0e0e;
+  color:#f1f1f1;
+  text-align:center;
+  overflow-x:hidden;
+}
+header h1 { color:#00ff99; margin-top:30px; text-shadow:0 0 5px #00ff99; }
+.container { background:#1b1b1b; padding:25px; border-radius:12px; width:90%; max-width:700px; margin:30px auto; box-shadow:0 0 25px rgba(0,255,153,0.2); }
+label { display:block; margin:10px auto; width:80%; text-align:left; color:#ddd; }
+input { width:100%; padding:8px; margin-top:5px; border-radius:6px; border:1px solid #444; background:#2a2a2a; color:#fff; transition:0.2s; }
+input:focus { border-color:#00ff99; outline:none; }
+.markets { display:flex; flex-wrap:wrap; justify-content:center; margin:10px 0; }
+.market-btn { margin:5px; padding:8px 12px; border:none; border-radius:8px; cursor:pointer; background:#333; color:#fff; transition:0.2s; box-shadow:0 0 3px rgba(0,255,153,0.2); }
+.market-btn.active { background:#00ff99; color:#000; transform:scale(1.05); }
+.market-btn:hover { opacity:0.8; }
+button#gerar, button#copiar, button#baixar { background:#00ff99; color:#000; font-weight:bold; border:none; padding:10px 20px; margin:10px 5px; border-radius:8px; cursor:pointer; transition:0.2s; box-shadow:0 0 5px #00ff99; }
+button#gerar:hover, button#copiar:hover, button#baixar:hover { background:#00cc7a; transform:scale(1.05); }
+#bilheteContainer { margin-top:20px; display:flex; flex-direction:column; gap:15px; }
+.bilhete-card { background:#111; border:1px solid #00ff99; border-radius:10px; padding:15px; text-align:left; opacity:0; transform:translateY(20px); transition: all 0.5s ease, box-shadow 0.3s ease; }
+.bilhete-card.show { opacity:1; transform:translateY(0); }
+.bilhete-card:hover { box-shadow:0 0 15px #00ff99; }
+.bilhete-card span { font-weight:bold; }
+.stat-green { color:#00ff99; }
+.stat-yellow { color:#ffcc00; }
+.stat-red { color:#ff4d4d; }
+.totalOdd { font-size:18px; font-weight:bold; color:#00ff99; text-align:center; margin-top:15px; animation: pulse 1s infinite alternate; }
+@keyframes pulse { 0%{text-shadow:0 0 5px #00ff99;} 100%{text-shadow:0 0 20px #00ff99;} }
+.legend { font-size:13px; text-align:left; margin-top:20px; }
+.footer { color:#666; font-size:13px; margin-top:40px; }
+@media(max-width:500px){ .container{padding:15px; width:95%;} }
 </style>
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 </head>
 <body>
-  <h1>🎯 Gerador de Bilhete</h1>
 
-  <div class="container">
-    <label>Quantidade de jogos:
-      <input id="qtd" type="number" min="1" value="2">
-    </label>
+<header>
+<h1>🎯 Gerador de Bilhete Premium App</h1>
+</header>
 
-    <label>Odd mínima:
-      <input id="min" type="number" step="0.01" value="1.40">
-    </label>
+<div class="container">
 
-    <label>Odd máxima:
-      <input id="max" type="number" step="0.01" value="2.50">
-    </label>
+<p>Filtros de bilhete:</p>
 
-    <label>Mercado:
-      <select id="mercado">
-        <option value="todos">Todos os mercados</option>
-        <option value="+1.5 gols">+1.5 Gols</option>
-        <option value="ambas">Ambas Marcam</option>
-        <option value="vitória casa">Vitória Casa</option>
-        <option value="vitória fora">Vitória Fora</option>
-      </select>
-    </label>
+<label>Quantidade de jogos:
+<input id="qtd" type="number" min="1" value="3">
+</label>
 
-    <button onclick="gerarBilhete()">Gerar Bilhete</button>
+<label>Odd mínima por jogo:
+<input id="min" type="number" step="0.01" value="1.20">
+</label>
 
-    <pre id="saida">---</pre>
-  </div>
+<label>Odd máxima por jogo:
+<input id="max" type="number" step="0.01" value="2.50">
+</label>
 
-  <div class="footer">Desenvolvido por Kawan • ⚽ Estatísticas automáticas</div>
+<div class="markets">
+<button class="market-btn active" data-market="+1.5 gols">+1.5 Gols</button>
+<button class="market-btn active" data-market="ambas">Ambas Marcam</button>
+<button class="market-btn active" data-market="vitória casa">Vitória Casa</button>
+<button class="market-btn active" data-market="vitória fora">Vitória Fora</button>
+</div>
 
+<button id="gerar">Gerar Bilhete</button>
+<button id="copiar">📋 Copiar Bilhete</button>
+<button id="baixar">💾 Baixar PDF</button>
+
+<div id="bilheteContainer"></div>
+<div id="totalOdd" class="totalOdd"></div>
+
+<p class="legend">
+🔹 JC: Jogos do time da casa | 🔹 JF: Jogos do time visitante | 🔹 CD: Confrontos diretos
+</p>
+
+</div>
+
+<div class="footer">Desenvolvido por Kawan • Estatísticas coloridas</div>
+
+<!-- JS -->
 <script>
-  // 📊 Lista de palpites com estatísticas
-  const palpites = [
-    {
-      jogo: "Flamengo x Palmeiras",
-      mercado: "+1.5 gols",
-      odd: 1.45,
-      jc: "3/5",
-      jf: "3/5",
-      cd: "3/5"
-    },
-    {
-      jogo: "Mirassol x São Paulo",
-      mercado: "+1.5 gols",
-      odd: 1.50,
-      jc: "9/10",
-      jf: "3/5",
-      cd: "11/12"
-    },
-    {
-      jogo: "Getafe x Real Madrid",
-      mercado: "vitória fora",
-      odd: 1.40,
-      jc: "4E 1V",
-      jf: "4V 1D",
-      cd: "8/10"
-    }
-  ];
+const palpites=[
+{jogo:"Flamengo x Palmeiras", mercado:"+1.5 gols", odd:1.45, jc:"3/5", jf:"3/5", cd:"3/5"},
+{jogo:"Mirassol x São Paulo", mercado:"+1.5 gols", odd:1.50, jc:"9/10", jf:"3/5", cd:"11/12"},
+{jogo:"Getafe x Real Madrid", mercado:"vitória fora", odd:1.40, jc:"4E 1V", jf:"4V 1D", cd:"8/10"},
+{jogo:"Celta de Vigo x Real Sociedad", mercado:"+0.5 gols casa", odd:1.22, jc:"5/5", jf:"4/5", cd:"4/5"},
+{jogo:"Como x Juventus", mercado:"+1.5 gols", odd:1.40, jc:"10/10", jf:"4/5", cd:"4/4"},
+{jogo:"Milan x Fiorentina", mercado:"vitória casa", odd:1.55, jc:"4V 1D", jf:"4E 1V", cd:"2V 2D 1E"}
+];
 
-  // 🎯 Função principal
-  function gerarBilhete() {
-    const qtd = parseInt(document.getElementById("qtd").value);
-    const oddMin = parseFloat(document.getElementById("min").value);
-    const oddMax = parseFloat(document.getElementById("max").value);
-    const mercado = document.getElementById("mercado").value;
+const container=document.getElementById("bilheteContainer");
+const marketBtns=document.querySelectorAll(".market-btn");
+const totalOddEl=document.getElementById("totalOdd");
 
-    let filtrados = palpites.filter(p => p.odd >= oddMin && p.odd <= oddMax);
+// toggle mercados
+marketBtns.forEach(btn=>{btn.addEventListener("click",()=>{btn.classList.toggle("active");});});
 
-    if (mercado !== "todos") {
-      filtrados = filtrados.filter(p => p.mercado.toLowerCase() === mercado.toLowerCase());
-    }
+function getColor(stat){
+  if(stat.includes("V")||parseInt(stat.split("/")[0])/parseInt(stat.split("/")[1])>=0.7) return "stat-green";
+  if(stat.includes("E")||parseInt(stat.split("/")[0])/parseInt(stat.split("/")[1])>=0.5) return "stat-yellow";
+  return "stat-red";
+}
 
-    if (filtrados.length === 0) {
-      document.getElementById("saida").textContent = "❌ Nenhum jogo encontrado com esses filtros.";
-      return;
-    }
+function gerarBilhete(){
+  const qtd=parseInt(document.getElementById("qtd").value);
+  const min=parseFloat(document.getElementById("min").value);
+  const max=parseFloat(document.getElementById("max").value);
+  const mercados=Array.from(document.querySelectorAll(".market-btn.active")).map(b=>b.dataset.market.toLowerCase());
+  let filtrados=palpites.filter(p=>p.odd>=min&&p.odd<=max&&mercados.includes(p.mercado.toLowerCase()));
+  if(filtrados.length===0){container.innerHTML="❌ Nenhum jogo encontrado"; totalOddEl.textContent=""; return;}
+  const sorteados=filtrados.sort(()=>0.5-Math.random()).slice(0,qtd);
+  container.innerHTML=""; totalOddEl.textContent="";
+  let totalOdd=1;
+  // animação sequencial com som
+  sorteados.forEach((p,i)=>{
+    totalOdd*=p.odd;
+    const jcC=getColor(p.jc), jfC=getColor(p.jf), cdC=getColor(p.cd);
+    const card=document.createElement("div");
+    card.className="bilhete-card";
+    card.innerHTML=`🏆 ${i+1}. ${p.jogo}<br>
+    Mercado: ${p.mercado} | Odd: ${p.odd}<br>
+    JC: <span class="${jcC}">${p.jc}</span> | JF: <span class="${jfC}">${p.jf}</span> | CD: <span class="${cdC}">${p.cd}</span>`;
+    container.appendChild(card);
+    setTimeout(()=>{
+      card.classList.add("show");
+      // efeito sonoro
+      const audio=new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+      audio.volume=0.15;
+      audio.play();
+    }, i*400);
+  });
+  // mostrar totalOdd animado depois de todos
+  setTimeout(()=>{totalOddEl.textContent=`💰 Odd total: ${totalOdd.toFixed(2)}`;}, sorteados.length*400);
+  localStorage.setItem("ultimoBilhete", JSON.stringify(sorteados));
+}
 
-    // Embaralhar e selecionar
-    const sorteados = filtrados.sort(() => 0.5 - Math.random()).slice(0, qtd);
+document.getElementById("gerar").addEventListener("click", gerarBilhete);
 
-    let texto = "";
-    let totalOdd = 1;
+document.getElementById("copiar").addEventListener("click", ()=>{
+  const cards=Array.from(document.querySelectorAll(".bilhete-card"));
+  const texto=cards.map(c=>c.innerText).join("\n\n") + "\n\n" + totalOddEl.textContent;
+  navigator.clipboard.writeText(texto);
+  alert("Bilhete copiado!");
+});
 
-    sorteados.forEach((p, i) => {
-      texto += `🏆 ${i + 1}. ${p.jogo}\n`;
-      texto += `   Mercado: ${p.mercado}\n`;
-      texto += `   Odd: ${p.odd}\n`;
-      texto += `   JC: ${p.jc} | JF: ${p.jf} | CD: ${p.cd}\n`;
-      texto += "-----------------------------------\n";
-      totalOdd *= p.odd;
-    });
-
-    texto += `\n💰 Odd total: ${totalOdd.toFixed(2)}`;
-
-    document.getElementById("saida").textContent = texto;
-  }
+document.getElementById("baixar").addEventListener("click", ()=>{
+  const { jsPDF }=window.jspdf;
+  const doc=new jsPDF();
+  const cards=Array.from(document.querySelectorAll(".bilhete-card"));
+  const texto=cards.map(c=>c.innerText).join("\n\n") + "\n\n" + totalOddEl.textContent;
+  doc.setFontSize(12);
+  doc.text(texto,10,10);
+  const data=new Date();
+  doc.save(`bilhete-${data.getDate()}-${data.getMonth()+1}-${data.getFullYear()}.pdf`);
+});
 </script>
+
 </body>
 </html>
