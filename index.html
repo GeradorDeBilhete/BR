@@ -1,398 +1,229 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>🎯 Gerador de Bilhete 🎟️ <small>beta</small></title>
-
-<!-- Fonte -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🎯 Gerador de Bilhete 🎟️ Beta</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-<!-- jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <style>
-:root{
-  --bg:#000;
-  --panel:#0b0b0b;
-  --muted:#bfbfbf;
-  --accent:#00ff88;
-  --accent-2:#00cc66;
-  --card:#0f0f0f;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:"Montserrat",system-ui,Arial,sans-serif;
-  background:var(--bg);
-  color:#f2f2f2;
-  -webkit-font-smoothing:antialiased;
-}
-header{
-  text-align:center;
-  padding:28px 16px 8px;
-}
+:root{--bg:#000;--panel:#0b0b0b;--muted:#bfbfbf;--accent:#00ff88;--card:#0f0f0f;}
+*{box-sizing:border-box}body{margin:0;font-family:"Montserrat",system-ui,Arial,sans-serif;background:var(--bg);color:#f2f2f2;-webkit-font-smoothing:antialiased;}
+header{text-align:center;padding:28px 16px 8px;}
 h1{margin:0;color:var(--accent);font-size:20px;font-weight:700;letter-spacing:0.6px;text-shadow:0 0 8px rgba(0,255,136,0.08);}
-.wrap{
-  max-width:900px;margin:18px auto;padding:18px;background:var(--panel);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.6);
-}
+.wrap{max-width:900px;margin:18px auto;padding:18px;background:var(--panel);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
 .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between;}
-label.ch{
-  display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px;
-}
-.controls{
-  padding:8px 0 6px;
-  display:flex;flex-direction:column;gap:10px;
-}
-.field{
-  display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;justify-content:space-between;
-}
-select,input[type=number], .select-like {
-  background:#0c0c0c;border:1px solid #171717;color:#f2f2f2;padding:10px;border-radius:8px;min-width:160px;
-}
-.markets, .sports, .days {
-  display:flex;gap:8px;flex-wrap:wrap;
-}
-.chip{
-  background:#101010;border:1px solid #161616;color:#ddd;padding:8px 10px;border-radius:10px;cursor:pointer;user-select:none;
-  transition:0.2s;
-}
+label.ch{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px;}
+.controls{padding:8px 0 6px;display:flex;flex-direction:column;gap:10px;}
+.field{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between;}
+select,input[type=number], .select-like{background:#0c0c0c;border:1px solid #171717;color:#f2f2f2;padding:10px;border-radius:8px;min-width:160px;}
+.markets, .sports, .days{display:flex;gap:8px;flex-wrap:wrap;}
+.chip{background:#101010;border:1px solid #161616;color:#ddd;padding:8px 10px;border-radius:10px;cursor:pointer;user-select:none;}
 .chip.active{background:var(--accent);color:#000;transform:scale(1.03);box-shadow:0 6px 18px rgba(0,255,136,0.08);}
 .actions{display:flex;gap:10px;flex-wrap:wrap;}
-button.btn{
-  background:var(--accent);color:#000;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer;
-  box-shadow:0 6px 18px rgba(0,255,136,0.06);
-}
+button.btn{background:var(--accent);color:#000;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(0,255,136,0.06);}
 button.ghost{background:transparent;border:1px solid #222;color:var(--muted);}
 #bilheteContainer{margin-top:14px;display:flex;flex-direction:column;gap:12px;align-items:center;}
-.card{
-  background:var(--card);border:1px solid rgba(0,255,136,0.08);padding:12px;border-radius:10px;opacity:0;transform:translateY(14px);
-  transition:all .35s cubic-bezier(.2,.9,.3,1);
-  width:100%;
-  max-width:600px;
-}
+.card{background:var(--card);border:1px solid rgba(0,255,136,0.08);padding:12px;border-radius:10px;opacity:0;transform:translateY(14px);transition:all .35s cubic-bezier(.2,.9,.3,1);width:80%;}
 .card.show{opacity:1;transform:none;}
-.card h3{margin:0;font-size:15px;color:#fff}
-.meta{font-size:13px;color:var(--muted);margin-top:6px}
-.stats-line{margin-top:8px;font-size:13px}
-.stat-green{color:var(--accent)}
-.stat-yellow{color:#ffcc00}
-.stat-red{color:#ff4d4d}
-.legend{margin-top:14px;color:var(--muted);font-size:13px;line-height:1.5}
-.foot{margin-top:18px;color:#7a7a7a;font-size:13px;text-align:center}
-#pixBtn{margin-top:12px;cursor:pointer;display:inline-block;background:#0c0c0c;color:var(--accent);padding:10px 14px;border-radius:10px;font-weight:600;}
-/* Modal */
-.modal{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:60;padding:28px;overflow:auto;
-}
+.card h3{margin:0;font-size:15px;color:#fff;}
+.meta{font-size:13px;color:var(--muted);margin-top:6px;}
+.stats-line{margin-top:8px;font-size:13px;}
+.stat-green{color:var(--accent);}
+.stat-yellow{color:#ffcc00;}
+.stat-red{color:#ff4d4d;}
+.foot{margin-top:18px;color:#7a7a7a;font-size:13px;text-align:center;}
+.pix-btn{background:#ffcc00;color:#000;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer;border:none;box-shadow:0 6px 18px rgba(0,0,0,0.2);margin-top:12px;width:100%;}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:60;padding:28px;overflow:auto;}
 .modal .panel{max-width:900px;margin:20px auto;background:#070707;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
 .modal h2{margin:0 0 8px;color:var(--accent)}
 table.stats{width:100%;border-collapse:collapse;margin-top:10px;color:var(--muted);font-size:14px}
 table.stats th, table.stats td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.02);text-align:left}
 .small{font-size:13px;color:var(--muted)}
-/* bilhete central animation */
-@keyframes highlight {
-  0%{transform:scale(0.5) translateY(-50px);opacity:0;}
-  50%{transform:scale(1.1) translateY(10px);opacity:1;}
-  100%{transform:scale(1) translateY(0);}
-}
-.card.highlight{animation:highlight 0.5s ease forwards;}
 @media(max-width:720px){ .row{flex-direction:column;align-items:stretch} .field{flex-direction:column;align-items:stretch} .markets,.sports,.days{justify-content:flex-start} }
 </style>
 </head>
 <body>
-
-<div id="loginScreen" style="position:fixed;inset:0;background:#000;display:flex;justify-content:center;align-items:center;flex-direction:column;z-index:100;">
-  <h2 style="color:var(--accent);margin-bottom:12px;">Digite seu código</h2>
-  <input id="codeInput" type="text" maxlength="6" placeholder="Código" style="padding:10px 14px;border-radius:8px;border:none;width:160px;margin-bottom:12px;">
-  <button id="loginBtn" class="btn">Entrar</button>
-  <div id="loginMsg" style="color:#ff4d4d;margin-top:8px;"></div>
-</div>
-
 <header>
-  <h1>🎯 Gerador de Bilhete 🎟️ <small style="font-size:12px;color:#777;">beta</small></h1>
+  <h1>🎯 Gerador de Bilhete 🎟️ <small style="font-size:12px;color:#fff;">Beta</small></h1>
 </header>
 
-<div class="wrap" role="main" style="display:none;" id="appMain">
-
+<div class="wrap" role="main">
   <div class="controls">
-
-    <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:10px;">
-      <div>
-        <label class="small">Quantidade de jogos</label><br>
-        <input id="qtd" type="number" min="1" value="3" style="width:84px">
-      </div>
-      <div>
-        <label class="small">Odd mínima</label><br>
-        <input id="minOdd" type="number" step="0.01" value="1.20" style="width:96px"><br>
-        <label class="small">Odd máxima</label><br>
+    <div style="margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <label class="small">Quantidade de jogos</label>
+      <input id="qtd" type="number" min="1" value="3" style="width:84px">
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <label class="small">Odd mínima</label>
+        <input id="minOdd" type="number" step="0.01" value="1.20" style="width:96px">
+        <label class="small">Odd máxima</label>
         <input id="maxOdd" type="number" step="0.01" value="2.50" style="width:96px">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <label class="small">% mínimo do bilhete</label>
+        <input id="minPercent" type="number" step="1" value="50" style="width:96px">
       </div>
     </div>
 
-    <div class="actions" style="margin-bottom:10px;">
-      <button id="generateBtn" class="btn" style="padding:12px 20px;font-size:16px;">🎲 Gerar Bilhete</button>
-      <button id="estatBtn" class="btn">📊 Estatísticas</button>
+    <div class="actions">
+      <button id="estatBtn" class="btn">📊 Estatísticas Gerador</button>
+      <button id="userEstatBtn" class="btn">📊 Estatísticas Usuário</button>
       <button id="copiarBtn" class="btn">📋 Copiar</button>
       <button id="pdfBtn" class="btn">💾 PDF</button>
     </div>
 
-    <!-- esporte selector: multi via chips + quick "apenas futebol" -->
-    <div class="field">
-      <div>
-        <div style="color:var(--muted);margin-bottom:6px">Escolher esporte</div>
-        <div class="sports" id="sportsWrap">
-          <!-- chips via JS -->
-        </div>
-      </div>
-
-      <div>
-        <label class="small">Filtro de dia</label>
-        <div class="days" id="daysWrap" style="margin-top:6px"></div>
-      </div>
+    <div style="margin-top:12px;text-align:center;">
+      <button id="generateBtn" class="btn" style="width:100%;font-size:18px;padding:14px;">🎲 Gerar Bilhete</button>
     </div>
-
-    <div style="margin-top:8px;">
-      <div style="color:var(--muted);margin-bottom:6px">Mercados (selecionáveis)</div>
-      <div class="markets" id="marketsWrap"></div>
-    </div>
-
-    <label class="ch" style="margin-top:8px"><input id="onlyFootball" type="checkbox">Somente Futebol</label>
-
   </div>
 
   <div id="bilheteContainer"></div>
-
-  <div class="legend">
-    🔹 <strong>GC:</strong> GREEN EM CASA &nbsp;|&nbsp;
-    🔹 <strong>GF:</strong> GREEN FORA DE CASA &nbsp;|&nbsp;
-    🔹 <strong>GG:</strong> ÚLTIMOS CONFRONTOS DIRETOS
-  </div>
-
-  <div id="pixBtn">pix e-mail: geradordebilhete@gmail.com • clique para copiar</div>
+  <button class="pix-btn" id="pixBtn">Pix e-mail: geradordebilhete@gmail.com - Ajude um pobre (dono do app) - Clique para copiar</button>
+  <div class="foot"></div>
 </div>
 
-<!-- Estatísticas Modal -->
 <div id="estatModal" class="modal" aria-hidden="true">
   <div class="panel">
-    <button id="closeEstat" style="float:right;background:var(--accent);border:none;padding:8px 10px;border-radius:8px;cursor:pointer">Fechar</button>
-    <h2>📊 Estatísticas</h2>
-    <div id="estatContent" style="margin-top:8px"></div>
+    <button id="closeEstat" style="float:right;background:none;border:none;color:#fff;font-size:20px;cursor:pointer">×</button>
+    <h2>Estatísticas do Gerador</h2>
+    <table class="stats" id="estatTable"></table>
   </div>
 </div>
 
 <script>
-/* ========== CÓDIGOS PRÉ-CADASTRADOS ========== */
-let codigos = {
-  "adm": {code:"082111", type:"adm", used:false, expire:null},
-  "teste": [],
-  "30dias": []
-};
-
-// gerar 25 códigos teste 24h
-for(let i=0;i<25;i++){
-  let c = Math.floor(100000 + Math.random()*900000).toString();
-  codigos.teste.push({code:c, type:"teste", used:false, expire:Date.now()+24*3600*1000});
-}
-// gerar 25 códigos 30 dias
-for(let i=0;i<25;i++){
-  let c = Math.floor(100000 + Math.random()*900000).toString();
-  codigos["30dias"].push({code:c, type:"30dias", used:false, expire:Date.now()+30*24*3600*1000});
-}
-
-/* ========== DADOS DE PALPITES ========== */
-const palpites = [
-  {esporte:"Futebol", dia:"domingo", jogo:"Flamengo x Palmeiras", mercado:"+1.5 Gols", odd:1.45, gc:"3/5", gf:"3/5", gg:"3/5"},
-  {esporte:"Futebol", dia:"domingo", jogo:"Mirassol x São Paulo", mercado:"+1.5 Gols", odd:1.50, gc:"9/10", gf:"3/5", gg:"11/12"},
-  {esporte:"Futebol", dia:"domingo", jogo:"Getafe x Real Madrid", mercado:"Vitória", odd:1.40, gc:"4V 1D", gf:"4V 1D", gg:"8/10"},
-  {esporte:"Futebol", dia:"domingo", jogo:"Celta de Vigo x Real Sociedad", mercado:"+0.5 Gols Casa", odd:1.22, gc:"5/5", gf:"4/5", gg:"4/5"},
-  {esporte:"Futebol", dia:"domingo", jogo:"Como x Juventus", mercado:"+1.5 Gols", odd:1.40, gc:"10/10", gf:"4/5", gg:"4/4"},
-  {esporte:"Futebol", dia:"domingo", jogo:"Milan x Fiorentina", mercado:"Vitória", odd:1.55, gc:"4V 1D", gf:"4E 1V", gg:"2V 2D 1E"}
+// === CÓDIGOS PRE-CADASTRADOS ===
+const codigos = [
+  {codigo:"082111", tipo:"admin", duracao:0, usado:false},
+  {codigo:"100001", tipo:"teste", duracao:1, usado:false},{codigo:"100002", tipo:"teste", duracao:1, usado:false},
+  {codigo:"100003", tipo:"teste", duracao:1, usado:false},{codigo:"100004", tipo:"teste", duracao:1, usado:false},
+  {codigo:"100005", tipo:"teste", duracao:1, usado:false},{codigo:"100006", tipo:"teste", duracao:1, usado:false},
+  {codigo:"200001", tipo:"30dias", duracao:30, usado:false},{codigo:"200002", tipo:"30dias", duracao:30, usado:false},
+  {codigo:"200003", tipo:"30dias", duracao:30, usado:false},{codigo:"200004", tipo:"30dias", duracao:30, usado:false},
+  {codigo:"200005", tipo:"30dias", duracao:30, usado:false},{codigo:"200006", tipo:"30dias", duracao:30, usado:false},
+  {codigo:"200007", tipo:"30dias", duracao:30, usado:false},{codigo:"200008", tipo:"30dias", duracao:30, usado:false},
+  {codigo:"200009", tipo:"30dias", duracao:30, usado:false},{codigo:"200010", tipo:"30dias", duracao:30, usado:false},
+  {codigo:"200011", tipo:"30dias", duracao:30, usado:false},{codigo:"200012", tipo:"30dias", duracao:30, usado:false},
+  {codigo:"200013", tipo:"30dias", duracao:30, usado:false},{codigo:"200014", tipo:"30dias", duracao:30, usado:false},
+  {codigo:"200015", tipo:"30dias", duracao:30, usado:false},{codigo:"200016", tipo:"30dias", duracao:30, usado:false},
+  {codigo:"200017", tipo:"30dias", duracao:30, usado:false},{codigo:"200018", tipo:"30dias", duracao:30, usado:false},
+  {codigo:"200019", tipo:"30dias", duracao:30, usado:false},{codigo:"200020", tipo:"30dias", duracao:30, usado:false},
+  {codigo:"200021", tipo:"30dias", duracao:30, usado:false},{codigo:"200022", tipo:"30dias", duracao:30, usado:false},
+  {codigo:"200023", tipo:"30dias", duracao:30, usado:false},{codigo:"200024", tipo:"30dias", duracao:30, usado:false},
+  {codigo:"200025", tipo:"30dias", duracao:30, usado:false},{codigo:"200026", tipo:"30dias", duracao:30, usado:false},
+  {codigo:"200027", tipo:"30dias", duracao:30, usado:false},{codigo:"200028", tipo:"30dias", duracao:30, usado:false},
+  {codigo:"200029", tipo:"30dias", duracao:30, usado:false},{codigo:"200030", tipo:"30dias", duracao:30, usado:false},
+  {codigo:"200031", tipo:"30dias", duracao:30, usado:false},{codigo:"200032", tipo:"30dias", duracao:30, usado:false},
+  {codigo:"200033", tipo:"30dias", duracao:30, usado:false},{codigo:"200034", tipo:"30dias", duracao:30, usado:false},
+  {codigo:"200035", tipo:"30dias", duracao:30, usado:false},{codigo:"200036", tipo:"30dias", duracao:30, usado:false},
+  {codigo:"200037", tipo:"30dias", duracao:30, usado:false},{codigo:"200038", tipo:"30dias", duracao:30, usado:false},
+  {codigo:"200039", tipo:"30dias", duracao:30, usado:false},{codigo:"200040", tipo:"30dias", duracao:30, usado:false},
 ];
 
-/* ========== LISTAS DE MERCADOS, ESPORTES, DIAS ========== */
-const marketsList = ["Vitória","Dupla Chance","+0.5 Gols 1T","+0.5 Gols Casa","+0.5 Gols Fora","+1.5 Gols","Ambas Marcam","Over 2.5","Under 3.5","Handicap"];
-const sportsList = ["Futebol","Basquete","Tênis","Vôlei","Futsal"];
-const daysList = ["segunda","terça","quarta","quinta","sexta","sábado","domingo"];
+// === PALPITES ===
+const palpites = [
+  // Domingo - Futebol
+  {esporte:"Futebol", dia:"domingo", jogo:"Liverpool x Manchester United", mercado:"Dupla Chance Casa", odd:1.16, green:79},
+  {esporte:"Futebol", dia:"domingo", jogo:"Celta x Real Sociedad", mercado:"+1.5 Gols", odd:1.30, green:80},
+  {esporte:"Futebol", dia:"domingo", jogo:"Celta x Real Sociedad", mercado:"+0.5 Gols Casa", odd:1.20, green:90},
+  {esporte:"Futebol", dia:"domingo", jogo:"Getafe x Real Madrid", mercado:"Vitória Fora", odd:1.42, green:62},
+  {esporte:"Futebol", dia:"domingo", jogo:"Getafe x Real Madrid", mercado:"Real Ganhar 1T", odd:1.90, green:25},
+  {esporte:"Futebol", dia:"domingo", jogo:"Getafe x Real Madrid", mercado:"+1.5 Gols Fora", odd:1.57, green:60},
+  {esporte:"Futebol", dia:"domingo", jogo:"Getafe x Real Madrid", mercado:"+0.5 Gols Fora", odd:1.11, green:95},
+  {esporte:"Futebol", dia:"domingo", jogo:"Freiburg x Frankfurt", mercado:"+1.5 Gols", odd:1.20, green:90},
+  {esporte:"Futebol", dia:"domingo", jogo:"St Pauli x Hoffenheim", mercado:"+1.5 Gols", odd:1.25, green:80},
+  {esporte:"Futebol", dia:"domingo", jogo:"Cagliari x Bologna", mercado:"-3.5 Gols", odd:1.22, green:90},
+  {esporte:"Futebol", dia:"domingo", jogo:"Cagliari x Bologna", mercado:"Dupla Chance Fora", odd:1.28, green:80},
+  {esporte:"Futebol", dia:"domingo", jogo:"Cagliari x Bologna", mercado:"+0.5 Gols Fora", odd:1.28, green:80},
+  {esporte:"Futebol", dia:"domingo", jogo:"Lazio x Atalanta", mercado:"+1.5 Gols", odd:1.25, green:80},
+  {esporte:"Futebol", dia:"domingo", jogo:"Milan x Fiorentina", mercado:"+1.5 Gols", odd:1.28, green:80},
+  {esporte:"Futebol", dia:"domingo", jogo:"Milan x Fiorentina", mercado:"Dupla Chance Casa", odd:1.14, green:95},
+  {esporte:"Futebol", dia:"domingo", jogo:"Milan x Fiorentina", mercado:"Ambas Marcam", odd:1.95, green:25},
+  {esporte:"Futebol", dia:"domingo", jogo:"Milan x Fiorentina", mercado:"+2.5 Gols", odd:1.90, green:25},
+  {esporte:"Futebol", dia:"domingo", jogo:"Lens x Paris", mercado:"+1.5 Gols", odd:1.20, green:90},
+  {esporte:"Futebol", dia:"domingo", jogo:"Lens x Paris", mercado:"Ambas Marcam", odd:1.60, green:50},
+  {esporte:"Futebol", dia:"domingo", jogo:"Lens x Paris", mercado:"+0.5 Gols 1T", odd:1.30, green:80},
+  {esporte:"Futebol", dia:"domingo", jogo:"Lens x Paris", mercado:"Casa ou Empate", odd:1.22, green:90},
+  {esporte:"Futebol", dia:"domingo", jogo:"Lens x Paris", mercado:"+0.5 Gols Casa", odd:1.14, green:95},
+  {esporte:"Futebol", dia:"domingo", jogo:"Nantes x Lille", mercado:"0.5 Gols 1T", odd:1.36, green:60},
+  {esporte:"Futebol", dia:"domingo", jogo:"Nantes x Lille", mercado:"Ambas Marcam", odd:1.75, green:40},
+  {esporte:"Futebol", dia:"domingo", jogo:"Nantes x Lille", mercado:"0.5 Gols Fora", odd:1.18, green:90},
+  {esporte:"Futebol", dia:"domingo", jogo:"Nantes x Lille", mercado:"Fora ou Empate", odd:1.22, green:90},
+  {esporte:"Futebol", dia:"domingo", jogo:"Nantes x Lille", mercado:"+1.5 Gols", odd:1.28, green:80},
+  {esporte:"Futebol", dia:"domingo", jogo:"Nantes x Lille", mercado:"+2.5 Gols", odd:1.90, green:25},
+  {esporte:"Futebol", dia:"domingo", jogo:"San Martin San Juan x Independiente", mercado:"-3.5 Gols", odd:1.11, green:95},
+  {esporte:"Futebol", dia:"domingo", jogo:"San Martin San Juan x Independiente", mercado:"-1.5 Gols 1T", odd:1.20, green:90},
+  {esporte:"Futebol", dia:"domingo", jogo:"San Martin San Juan x Independiente", mercado:"-0.5 Gols 1T", odd:2.10, green:20},
+  {esporte:"Futebol", dia:"domingo", jogo:"Empoli x Venezia", mercado:"-3.5 Gols", odd:1.22, green:80},
+  {esporte:"Futebol", dia:"domingo", jogo:"Empoli x Venezia", mercado:"-1.5 Gols 1T", odd:1.33, green:70},
+  {esporte:"Futebol", dia:"domingo", jogo:"Rosário Central x Plantense", mercado:"-3.5 Gols", odd:1.14, green:95},
+  {esporte:"Futebol", dia:"domingo", jogo:"Rosário Central x Plantense", mercado:"Casa ou Empate", odd:1.11, green:95},
+  {esporte:"Futebol", dia:"domingo", jogo:"Rosário Central x Plantense", mercado:"Vitória Casa", odd:1.72, green:50},
+  {esporte:"Futebol", dia:"domingo", jogo:"Botafogo SP x Cuiabá", mercado:"+0.5 Gols Fora", odd:1.38, green:60},
+  {esporte:"Futebol", dia:"domingo", jogo:"Botafogo SP x Cuiabá", mercado:"-3.5 Gols", odd:1.18, green:90},
+  {esporte:"Futebol", dia:"domingo", jogo:"Lech Poznań x Pogoń Szczecin", mercado:"Casa ou Empate", odd:1.22, green:90},
+  {esporte:"Futebol", dia:"domingo", jogo:"Lech Poznań x Pogoń Szczecin", mercado:"+1.5 Gols", odd:1.14, green:95},
+  {esporte:"Futebol", dia:"domingo", jogo:"Lech Poznań x Pogoń Szczecin", mercado:"Ambas Marcam", odd:1.50, green:60},
+  {esporte:"Futebol", dia:"domingo", jogo:"Lech Poznań x Pogoń Szczecin", mercado:"Vitória Casa", odd:1.72, green:50},
+  {esporte:"Futebol", dia:"domingo", jogo:"Bahia x Grêmio", mercado:"Casa ou Empate", odd:1.18, green:90},
+  {esporte:"Futebol", dia:"domingo", jogo:"Bahia x Grêmio", mercado:"+0.5 Gol Cada", odd:1.18, green:90},
+  {esporte:"Futebol", dia:"domingo", jogo:"Bahia x Grêmio", mercado:"+1.5 Gols", odd:1.36, green:60},
+  {esporte:"Futebol", dia:"domingo", jogo:"Nürnberg x Holstein Kiel", mercado:"+1.5 Gols", odd:1.20, green:90},
+  {esporte:"Futebol", dia:"domingo", jogo:"Tottenham x Aston Villa", mercado:"Dupla Chance Casa", odd:1.28, green:80},
+  {esporte:"Futebol", dia:"domingo", jogo:"Tottenham x Aston Villa", mercado:"Ambas Marcam", odd:1.70, green:40},
+  {esporte:"Futebol", dia:"domingo", jogo:"Tottenham x Aston Villa", mercado:"+2.5 Gols", odd:1.90, green:25},
+  {esporte:"Futebol", dia:"domingo", jogo:"Tottenham x Aston Villa", mercado:"+1.5 Gols", odd:1.28, green:80},
+  {esporte:"Futebol", dia:"domingo", jogo:"Liverpool x Manchester United", mercado:"Ambas Marcam", odd:1.50, green:60},
+  {esporte:"Futebol", dia:"domingo", jogo:"Liverpool x Manchester United", mercado:"Vitória Casa", odd:1.60, green:50},
+  {esporte:"Futebol", dia:"domingo", jogo:"Liverpool x Manchester United", mercado:"+0.5 Gols 1T", odd:1.22, green:90},
+  {esporte:"Futebol", dia:"domingo", jogo:"Liverpool x Manchester United", mercado:"+1.5 Gols", odd:1.14, green:95},
+  {esporte:"Futebol", dia:"domingo", jogo:"Liverpool x Manchester United", mercado:"+2.5 Gols", odd:1.44, green:60}
+];
+];
 
-/* ========== ELEMENTOS ========== */
-const bilheteContainer = document.getElementById("bilheteContainer");
-const marketsWrap = document.getElementById("marketsWrap");
-const sportsWrap = document.getElementById("sportsWrap");
-const daysWrap = document.getElementById("daysWrap");
-const generateBtn = document.getElementById("generateBtn");
-const estatBtn = document.getElementById("estatBtn");
-const estatModal = document.getElementById("estatModal");
-const closeEstat = document.getElementById("closeEstat");
-const estatContent = document.getElementById("estatContent");
-const copiarBtn = document.getElementById("copiarBtn");
-const pdfBtn = document.getElementById("pdfBtn");
-const onlyFootball = document.getElementById("onlyFootball");
-const loginScreen = document.getElementById("loginScreen");
-const codeInput = document.getElementById("codeInput");
-const loginBtn = document.getElementById("loginBtn");
-const loginMsg = document.getElementById("loginMsg");
-const appMain = document.getElementById("appMain");
-const pixBtn = document.getElementById("pixBtn");
-
-/* ========== FUNÇÕES ========== */
-function mkChip(text, container, initial=true){
-  const el = document.createElement("div");
-  el.className = "chip" + (initial ? " active" : "");
-  el.textContent = text;
-  el.dataset.value = text;
-  el.addEventListener("click", ()=> el.classList.toggle("active"));
-  container.appendChild(el);
-  return el;
-}
-
-/* render chips */
-marketsList.forEach(m => mkChip(m, marketsWrap, true));
-sportsList.forEach(s => mkChip(s, sportsWrap, s==="Futebol"));
-daysList.forEach(d=>{
-  const el = document.createElement("div");
-  el.className = "chip" + (d==="domingo" ? " active" : "");
-  el.textContent = d[0].toUpperCase()+d.slice(1);
-  el.dataset.value=d;
-  el.addEventListener("click", ()=>{
-    document.querySelectorAll('#daysWrap .chip').forEach(c=>c.classList.remove('active'));
-    el.classList.add('active');
-  });
-  daysWrap.appendChild(el);
-});
-
-/* parse stat */
-function parseFractionPercent(stat){
-  try{
-    if(!stat || stat.trim()==='-') return null;
-    if(stat.includes('/')){
-      const parts = stat.split('/').map(s=>parseInt(s.replace(/\D/g,'')));
-      if(parts.length>=2 && parts[1]>0) return Math.round(parts[0]/parts[1]*100);
-    }
-    const winMatch = stat.match(/(\d+)\s*V/i);
-    const nums = stat.match(/\d+/g);
-    if(nums && nums.length>0){
-      const total = nums.map(n=>parseInt(n,10)).reduce((a,b)=>a+b,0);
-      let wins = 0;
-      if(winMatch) wins=parseInt(winMatch[1],10);
-      else { const lastV=stat.match(/(\d+)\s*[Vv]/); wins=lastV?parseInt(lastV[1],10):parseInt(nums[0],10);}
-      if(total>0) return Math.round((wins/total)*100);
-    }
-  }catch(e){}
-  return null;
-}
-
-/* ========== GERAR BILHETE ========== */
 function gerarBilhete(){
-  const qtd = Math.max(1, parseInt(document.getElementById("qtd").value||3));
-  const minOdd = parseFloat(document.getElementById("minOdd").value||1.0);
-  const maxOdd = parseFloat(document.getElementById("maxOdd").value||999);
-  const selectedMarkets = Array.from(document.querySelectorAll('#marketsWrap .chip.active')).map(n=>n.dataset.value.toLowerCase());
-  const selectedSports = Array.from(document.querySelectorAll('#sportsWrap .chip.active')).map(n=>n.dataset.value.toLowerCase());
-  const dayEl = document.querySelector('#daysWrap .chip.active');
-  const selectedDay = dayEl ? dayEl.dataset.value : "domingo";
-  const onlyF = onlyFootball.checked;
-
-  let filtered = palpites.filter(p=>{
-    const pMarket = String(p.mercado||'').toLowerCase();
-    const pSport = String(p.esporte||'').toLowerCase();
-    const pDay = String(p.dia||'').toLowerCase();
-    const oddOK = (p.odd>=minOdd && p.odd<=maxOdd);
-    const marketOK = selectedMarkets.includes(pMarket);
-    const sportByUser = onlyF?(pSport==='futebol'):selectedSports.includes(pSport);
-    const dayOK = (pDay===selectedDay);
-    return oddOK && marketOK && sportByUser && dayOK;
+  const qtd = parseInt(document.getElementById('qtd').value);
+  const minOdd = parseFloat(document.getElementById('minOdd').value);
+  const maxOdd = parseFloat(document.getElementById('maxOdd').value);
+  const minPercent = parseFloat(document.getElementById('minPercent').value);
+  const container = document.getElementById('bilheteContainer');
+  container.innerHTML="";
+  
+  const filtro = palpites.filter(p=>p.odd>=minOdd && p.odd<=maxOdd && p.green>=minPercent);
+  const shuffled = filtro.sort(()=>Math.random()-0.5).slice(0,qtd);
+  if(shuffled.length===0){container.innerHTML="<div class='small'>Nenhum palpite atende aos filtros</div>"; return;}
+  
+  let greenTotal = 0;
+  shuffled.forEach(p=>{
+    greenTotal += p.green;
+    const div = document.createElement('div');
+    div.className="card";
+    div.innerHTML=`<h3>${p.jogo} - ${p.mercado}</h3><div class="meta">Odd: ${p.odd} | % Green: ${p.green}%</div>`;
+    container.appendChild(div);
+    setTimeout(()=>div.classList.add("show"),50);
   });
+  
+  const mediaGreen = (greenTotal/shuffled.length).toFixed(1);
+  const risco = (100-mediaGreen).toFixed(1);
+  const info = document.createElement('div');
+  info.className="stats-line";
+  info.innerHTML=`<strong>% Green do bilhete: ${mediaGreen}%</strong> | Risco: ${risco}%`;
+  container.appendChild(info);
+}
 
-  filtered = filtered.sort(()=>0.5-Math.random()).slice(0,qtd);
+document.getElementById("pixBtn").addEventListener("click",()=>{navigator.clipboard.writeText("geradordebilhete@gmail.com");alert("PIX copiado!")});
+document.getElementById("generateBtn").addEventListener("click",gerarBilhete);
 
-  bilheteContainer.innerHTML="";
-  filtered.forEach(p=>{
-    const div = document.createElement("div");
-    div.className="card highlight";
-    div.innerHTML=`<h3>${p.jogo}</h3>
-    <div class="meta">Esporte: ${p.esporte} | Mercado: ${p.mercado} | Odd: ${p.odd}</div>
-    <div class="stats-line">
-      <span class="stat-green">GC:${p.gc}</span> | <span class="stat-green">GF:${p.gf}</span> | <span class="stat-yellow">GG:${p.gg}</span>
-    </div>`;
-    bilheteContainer.appendChild(div);
+document.getElementById("estatBtn").addEventListener("click",()=>{
+  const table = document.getElementById("estatTable");
+  table.innerHTML="<tr><th>Jogo</th><th>Mercado</th><th>Odd</th><th>% Green</th></tr>";
+  palpites.forEach(p=>{
+    const row = document.createElement("tr");
+    row.innerHTML=`<td>${p.jogo}</td><td>${p.mercado}</td><td>${p.odd}</td><td>${p.green}%</td>`;
+    table.appendChild(row);
   });
-}
-
-/* ========== ESTATÍSTICAS ========== */
-function showEstatisticas(){
-  const total = palpites.length;
-  let html="<h3>📊 Estatísticas do Gerador</h3>";
-  html+=`<table class="stats"><tr><th>Total de palpites</th><td>${total}</td></tr></table>`;
-  estatContent.innerHTML=html;
-  estatModal.style.display="block";
-}
-
-/* ========== COPIAR / PDF ========== */
-copiarBtn.addEventListener("click",()=>{
-  let text = Array.from(bilheteContainer.querySelectorAll(".card")).map(c=>c.innerText).join("\n\n");
-  navigator.clipboard.writeText(text).then(()=>alert("Bilhete copiado!"));
+  document.getElementById("estatModal").style.display="block";
 });
-
-pdfBtn.addEventListener("click",()=>{
-  const { jsPDF } = window.jspdf;
-  let doc = new jsPDF();
-  let y=10;
-  Array.from(bilheteContainer.querySelectorAll(".card")).forEach(c=>{
-    const t=c.innerText.split('\n');
-    t.forEach(line=>{doc.text(line,10,y);y+=6;});
-    y+=6;
-  });
-  doc.save("bilhete.pdf");
-});
-
-/* ========== MODAL ========== */
-closeEstat.addEventListener("click",()=>estatModal.style.display="none");
-
-/* ========== LOGIN ========== */
-function checkCode(code){
-  code=code.trim();
-  if(code===codigos.adm.code && !codigos.adm.used) return codigos.adm;
-  const allCodes = codigos.teste.concat(codigos["30dias"]);
-  for(let c of allCodes){
-    if(c.code===code && !c.used){
-      if(c.expire && Date.now()>c.expire) return null;
-      return c;
-    }
-  }
-  return null;
-}
-
-loginBtn.addEventListener("click",()=>{
-  const code = codeInput.value.trim();
-  const cObj = checkCode(code);
-  if(!cObj){loginMsg.textContent="Código inválido ou expirado";return;}
-  cObj.used=true;
-  loginScreen.style.display="none";
-  appMain.style.display="block";
-  if(cObj.type!=="adm") setInterval(()=>updateTime(cObj),1000);
-});
-
-function updateTime(c){
-  if(!c.expire) return;
-  const diff = c.expire - Date.now();
-  if(diff<=0){
-    alert("Seu código expirou!");
-    location.reload();
-    return;
-  }
-  const dias = Math.floor(diff/(1000*3600*24));
-  const horas = Math.floor((diff%(1000*3600*24))/(1000*3600));
-  const mins = Math.floor((diff%(1000*3600))/(1000*60));
-  const secs = Math.floor((diff%(1000*60))/1000);
-  loginMsg.textContent=`Expira em ${dias}d ${horas}h ${mins}m ${secs}s`;
-}
-
-/* ========== EVENTOS ========== */
-generateBtn.addEventListener("click",gerarBilhete);
-estatBtn.addEventListener("click",showEstatisticas);
-pixBtn.addEventListener("click",()=>navigator.clipboard.writeText("geradordebilhete@gmail.com").then(()=>alert("E-mail copiado!")));
+document.getElementById("closeEstat").addEventListener("click",()=>{document.getElementById("estatModal").style.display="none"});
 </script>
-
 </body>
 </html>
