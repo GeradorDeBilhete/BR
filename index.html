@@ -1,326 +1,324 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>🎯 Gerador De Bilhete🎟️</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🎯 Gerador De Bilhete 🎟️</title>
 
-<!-- Manifest PWA -->
+<!-- Fonte -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<!-- PWA -->
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#00ff99">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#000000">
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
-
-  body {
-    font-family: 'Poppins', sans-serif;
-    background-color: #0b0b0b;
-    color: #f1f1f1;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-  }
-
-  h1 {
-    margin-top: 20px;
-    color: #00ff99;
-    letter-spacing: 1px;
-  }
-
-  .container {
-    background-color: #1a1a1a;
-    padding: 25px;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 700px;
-    margin: 20px auto;
-    box-shadow: 0 0 20px rgba(0, 255, 153, 0.2);
-  }
-
-  label, select, input {
-    display: block;
-    margin: 10px auto;
-    text-align: left;
-    width: 80%;
-    color: #ddd;
-  }
-
-  .input-row {
-    display: flex;
-    justify-content: space-between;
-    width: 80%;
-    margin: 10px auto;
-  }
-
-  .input-row input {
-    width: 48%;
-    background: #2a2a2a;
-    color: #fff;
-    border: 1px solid #444;
-    border-radius: 6px;
-    padding: 8px;
-    box-sizing: border-box;
-  }
-
-  button {
-    background-color: #00ff99;
-    border: none;
-    color: #000;
-    font-weight: bold;
-    padding: 10px 20px;
-    margin: 15px 5px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-
-  button:hover {
-    background-color: #00cc7a;
-  }
-
-  .markets, .esportes, .dias {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin: 10px 0;
-  }
-
-  .markets label, .esportes label, .dias label {
-    display: flex;
-    align-items: center;
-    margin: 5px 10px;
-  }
-
-  .markets input, .esportes input, .dias input {
-    margin-right: 5px;
-  }
-
-  .dias input:disabled + span {
-    color: #888;
-  }
-
-  pre {
-    text-align: left;
-    background: #111;
-    border: 1px solid #333;
-    border-radius: 8px;
-    padding: 15px;
-    margin-top: 20px;
-    white-space: pre-wrap;
-    color: #d9d9d9;
-    max-height: 350px;
-    overflow-y: auto;
-  }
-
-  .estatisticas {
-    text-align: left;
-    margin-top: 20px;
-    background: #111;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #333;
-  }
-
-  /* Card de doação Pix */
-  .donate-card {
-    background-color: #ffcc00;
-    color: #000;
-    padding: 12px 20px;
-    border-radius: 10px;
-    cursor: pointer;
-    margin: 20px auto;
-    width: fit-content;
-    text-align: center;
-    font-weight: bold;
-    transition: 0.2s;
-  }
-  .donate-card:hover {
-    background-color: #e6b800;
-  }
-
-  .stat-green { color: #00ff99; }
-  .stat-yellow { color: #ffcc00; }
-  .stat-red { color: #ff4d4d; }
+:root{
+  --bg:#000000;
+  --panel:#0b0b0b;
+  --muted:#bfbfbf;
+  --accent:#00ff88;
+  --accent-2:#00cc66;
+  --card:#0f0f0f;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:"Montserrat",system-ui,Arial,sans-serif;
+  background:var(--bg);
+  color:#f2f2f2;
+  -webkit-font-smoothing:antialiased;
+}
+header{
+  text-align:center;
+  padding:28px 16px 8px;
+}
+h1{margin:0;color:var(--accent);font-size:20px;font-weight:700;letter-spacing:0.6px;text-shadow:0 0 8px rgba(0,255,136,0.08);}
+.wrap{
+  max-width:900px;margin:18px auto;padding:18px;background:var(--panel);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.6);
+}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between;}
+label.ch{
+  display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px;
+}
+.controls{
+  padding:8px 0 6px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.field{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between;
+}
+select,input[type=number], .select-like {
+  background:#0c0c0c;border:1px solid #171717;color:#f2f2f2;padding:10px;border-radius:8px;min-width:160px;
+}
+.markets, .sports, .days {
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+.chip{
+  background:#101010;border:1px solid #161616;color:#ddd;padding:8px 10px;border-radius:10px;cursor:pointer;user-select:none;
+}
+.chip.active{background:var(--accent);color:#000;transform:scale(1.03);box-shadow:0 6px 18px rgba(0,255,136,0.08);}
+.actions{display:flex;gap:10px;flex-wrap:wrap;}
+button.btn{
+  background:var(--accent);color:#000;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer;
+  box-shadow:0 6px 18px rgba(0,255,136,0.06);
+}
+button.ghost{background:transparent;border:1px solid #222;color:var(--muted);}
+#bilheteContainer{margin-top:14px;display:flex;flex-direction:column;gap:12px}
+.card{
+  background:var(--card);border:1px solid rgba(0,255,136,0.08);padding:12px;border-radius:10px;opacity:0;transform:translateY(14px);
+  transition:all .35s cubic-bezier(.2,.9,.3,1);
+}
+.card.show{opacity:1;transform:none;}
+.card h3{margin:0;font-size:15px;color:#fff}
+.meta{font-size:13px;color:var(--muted);margin-top:6px}
+.stats-line{margin-top:8px;font-size:13px}
+.stat-green{color:var(--accent)}
+.stat-yellow{color:#ffcc00}
+.stat-red{color:#ff4d4d}
+.legend{margin-top:14px;color:var(--muted);font-size:13px;line-height:1.5}
+.foot{margin-top:18px;color:#7a7a7a;font-size:13px;text-align:center}
+/* Modal */
+.modal{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:60;padding:28px;overflow:auto;
+}
+.modal .panel{max-width:900px;margin:20px auto;background:#070707;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+.modal h2{margin:0 0 8px;color:var(--accent)}
+table.stats{width:100%;border-collapse:collapse;margin-top:10px;color:var(--muted);font-size:14px}
+table.stats th, table.stats td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.02);text-align:left}
+.small{font-size:13px;color:var(--muted)}
+@media(max-width:720px){ .row{flex-direction:column;align-items:stretch} .field{flex-direction:column;align-items:stretch} .markets,.sports,.days{justify-content:flex-start} }
 </style>
 </head>
 <body>
-<h1>🎯 Gerador De Bilhete🎟️</h1>
 
-<div class="container">
-  <p>Filtros de bilhete:</p>
+<header>
+  <h1>🎯 Gerador De Bilhete 🎟️</h1>
+</header>
 
-  <label>Quantidade de jogos:
-    <input id="qtd" type="number" min="1" value="3">
-  </label>
+<div class="wrap" role="main">
+  <div class="controls">
 
-  <div class="input-row">
-    <input id="min" type="number" step="0.01" value="1.20" placeholder="Odd mínima">
-    <input id="max" type="number" step="0.01" value="2.50" placeholder="Odd máxima">
+    <div style="margin-bottom:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <button id="generateBtn" class="btn">🎲 Gerar Bilhete</button>
+      <button id="estatBtn" class="btn">📊 Estatísticas</button>
+      <button id="copiarBtn" class="btn">📋 Copiar</button>
+      <button id="pdfBtn" class="btn">💾 PDF</button>
+      <button class="btn" onclick="alert('Pix: geradordebilhete@gmail.com')">💖 Ajude um pobre</button>
+    </div>
+
+    <div class="field">
+      <div>
+        <div style="color:var(--muted);margin-bottom:6px">Escolher esporte</div>
+        <div class="sports" id="sportsWrap"></div>
+        <label class="ch"><input id="onlyFootball" type="checkbox">Somente Futebol</label>
+      </div>
+
+      <div>
+        <label class="small">Filtro de dia</label>
+        <div class="days" id="daysWrap" style="margin-top:6px"></div>
+      </div>
+    </div>
+
+    <div>
+      <div style="color:var(--muted);margin-bottom:6px">Mercados (selecionáveis)</div>
+      <div class="markets" id="marketsWrap"></div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+      <label class="small">Quantidade de jogos</label>
+      <input id="qtd" type="number" min="1" value="3" style="width:84px">
+      <label class="small">Odd mín</label>
+      <input id="minOdd" type="number" step="0.01" value="1.20" style="width:96px">
+      <label class="small">Odd máx</label>
+      <input id="maxOdd" type="number" step="0.01" value="2.50" style="width:96px">
+    </div>
+
   </div>
 
-  <!-- Botão gerar bilhete no topo -->
-  <button onclick="gerarBilhete()">🎟️ Gerar Bilhete</button>
+  <div id="bilheteContainer"></div>
 
-  <p>Escolha os esportes:</p>
-  <div class="esportes">
-    <label><input type="checkbox" class="esporte" value="futebol" checked>Futebol</label>
-    <label><input type="checkbox" class="esporte" value="basquete" checked>Basquete</label>
-    <label><input type="checkbox" class="esporte" value="tenis" checked>Tênis</label>
+  <div class="legend">
+    🔹 <strong>GC:</strong> GREEN EM CASA &nbsp;|&nbsp;
+    🔹 <strong>GF:</strong> GREEN FORA DE CASA &nbsp;|&nbsp;
+    🔹 <strong>GG:</strong> ÚLTIMOS CONFRONTOS DIRETOS
   </div>
 
-  <p>Escolha os mercados:</p>
-  <div class="markets">
-    <label><input type="checkbox" class="market" value="+1.5 gols" checked>+1.5 Gols</label>
-    <label><input type="checkbox" class="market" value="+0.5 1T" checked>+0.5 1T</label>
-    <label><input type="checkbox" class="market" value="vitória" checked>Vitória</label>
-    <label><input type="checkbox" class="market" value="dupla chance" checked>Dupla Chance</label>
-    <label><input type="checkbox" class="market" value="+0.5 gols casa" checked>+0.5 Gols Casa/Fora</label>
-  </div>
+  <div class="foot">Tema preto premium</div>
+</div>
 
-  <p>Escolha o dia:</p>
-  <div class="dias" id="diasContainer">
-    <label><input type="radio" name="dia" value="Seg"><span>Seg</span></label>
-    <label><input type="radio" name="dia" value="Ter"><span>Ter</span></label>
-    <label><input type="radio" name="dia" value="Qua"><span>Qua</span></label>
-    <label><input type="radio" name="dia" value="Qui"><span>Qui</span></label>
-    <label><input type="radio" name="dia" value="Sex"><span>Sex</span></label>
-    <label><input type="radio" name="dia" value="Sab"><span>Sab</span></label>
-    <label><input type="radio" name="dia" value="Dom"><span>Dom</span></label>
-  </div>
-
-  <button onclick="copiarBilhete()">📋 Copiar Bilhete</button>
-  <button onclick="baixarPDF()">💾 Baixar PDF</button>
-
-  <pre id="saida">---</pre>
-
-  <div class="estatisticas" id="estatisticas">
-    <h3>📊 Estatísticas do Gerador</h3>
-    <p id="estatTexto">Nenhum bilhete gerado ainda.</p>
-  </div>
-
-  <p style="text-align:left; font-size:13px; margin-top:20px;">
-    🔹 GC: GREEN EM CASA<br>
-    🔹 GF: GREEN FORA DE CASA<br>
-    🔹 GG: ÚLTIMOS CONFRONTO DIRETO
-  </p>
-
-  <!-- Card de doação Pix -->
-  <div class="donate-card" onclick="copiarPix()">
-    💖 Ajude um pobre (dono do app)<br>
-    <strong>Pix: geradordebilhete@gmail.com</strong>
+<!-- Estatísticas Modal -->
+<div id="estatModal" class="modal" aria-hidden="true">
+  <div class="panel">
+    <button id="closeEstat" style="float:right;background:var(--accent);border:none;padding:8px 10px;border-radius:8px;cursor:pointer">Fechar</button>
+    <h2>📊 Estatísticas do Gerador</h2>
+    <div id="estatContent" style="margin-top:8px"></div>
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-let bilhetesGerados = 0;
-
+// ================= DADOS INICIAIS =================
 const palpites = [
-    { jogo: "Flamengo x Palmeiras", mercado: "+1.5 gols", odd: 1.45, gc:"3/5", gf:"3/5", gg:"3/5", esporte:"futebol", dia:"Dom" },
-    { jogo: "Mirassol x São Paulo", mercado: "+1.5 gols", odd: 1.50, gc:"9/10", gf:"3/5", gg:"11/12", esporte:"futebol", dia:"Dom" },
-    { jogo: "Getafe x Real Madrid", mercado: "vitória", odd: 1.40, gc:"4V 1E", gf:"4V 1D", gg:"8/10", esporte:"futebol", dia:"Dom" },
-    { jogo: "Celta de Vigo x Real Sociedad", mercado: "+0.5 gols casa", odd: 1.22, gc:"5/5", gf:"4/5", gg:"4/5", esporte:"futebol", dia:"Dom" },
-    { jogo: "Como x Juventus", mercado: "+1.5 gols", odd: 1.40, gc:"10/10", gf:"4/5", gg:"4/4", esporte:"futebol", dia:"Dom" },
-    { jogo: "Milan x Fiorentina", mercado: "vitória", odd: 1.55, gc:"4V 1D", gf:"4E 1V", gg:"2V 2D 1E", esporte:"futebol", dia:"Dom" }
+  {esporte:"Futebol", dia:"domingo", jogo:"Flamengo x Palmeiras", mercado:"+1.5 Gols", odd:1.45, gc:"3/5", gf:"3/5", gg:"3/5"},
+  {esporte:"Futebol", dia:"domingo", jogo:"Mirassol x São Paulo", mercado:"+1.5 Gols", odd:1.50, gc:"9/10", gf:"3/5", gg:"11/12"},
+  {esporte:"Basquete", dia:"domingo", jogo:"Lakers x Warriors", mercado:"Vitória", odd:1.80, gc:"4/5", gf:"3/5", gg:"3/5"},
+  {esporte:"Tênis", dia:"domingo", jogo:"Djokovic x Alcaraz", mercado:"Vitória", odd:1.65, gc:"7/10", gf:"-", gg:"3/5"}
 ];
 
-window.addEventListener('DOMContentLoaded', () => {
-    const diasDisponiveis = [...new Set(palpites.map(p => p.dia))];
-    document.querySelectorAll('.dias input').forEach(input => {
-      if (!diasDisponiveis.includes(input.value)) input.disabled = true;
-      if(input.value === 'Sab' && !input.disabled) input.checked = true;
-    });
+const marketsList = [
+  "Vitória","Dupla Chance","+0.5 Gols 1T","+0.5 Gols Casa","+0.5 Gols Fora","+1.5 Gols","Ambas Marcam","Over 2.5","Under 3.5","Handicap"
+];
+const sportsList = [...new Set(palpites.map(p=>p.esporte))].sort();
+const daysList = ["segunda","terça","quarta","quinta","sexta","sábado","domingo"];
+
+const bilheteContainer = document.getElementById("bilheteContainer");
+const marketsWrap = document.getElementById("marketsWrap");
+const sportsWrap = document.getElementById("sportsWrap");
+const daysWrap = document.getElementById("daysWrap");
+const generateBtn = document.getElementById("generateBtn");
+const estatBtn = document.getElementById("estatBtn");
+const estatModal = document.getElementById("estatModal");
+const closeEstat = document.getElementById("closeEstat");
+const estatContent = document.getElementById("estatContent");
+const copiarBtn = document.getElementById("copiarBtn");
+const pdfBtn = document.getElementById("pdfBtn");
+const onlyFootball = document.getElementById("onlyFootball");
+
+// ================= RENDER CHIPS =================
+function mkChip(text, container, initial=true){
+  const el = document.createElement("div");
+  el.className = "chip" + (initial ? " active" : "");
+  el.textContent = text;
+  el.dataset.value = text;
+  el.addEventListener("click", ()=> el.classList.toggle("active"));
+  container.appendChild(el);
+  return el;
+}
+
+marketsList.forEach(m => mkChip(m, marketsWrap, true));
+sportsList.forEach(s => mkChip(s, sportsWrap, true));
+daysList.forEach(d => {
+  const el = document.createElement("div");
+  el.className = "chip" + (d==="domingo" ? " active" : "");
+  el.textContent = d[0].toUpperCase() + d.slice(1);
+  el.dataset.value = d;
+  el.addEventListener("click", ()=>{
+    document.querySelectorAll('#daysWrap .chip').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active');
+  });
+  daysWrap.appendChild(el);
 });
 
-// Gerar bilhete
-function gerarBilhete() {
-    const qtd = parseInt(document.getElementById("qtd").value);
-    const oddMin = parseFloat(document.getElementById("min").value);
-    const oddMax = parseFloat(document.getElementById("max").value);
-    const mercadosSelecionados = Array.from(document.querySelectorAll(".market:checked")).map(m => m.value.toLowerCase());
-    const esportesSelecionados = Array.from(document.querySelectorAll(".esporte:checked")).map(e => e.value.toLowerCase());
-    const diaSelecionado = document.querySelector('input[name="dia"]:checked').value;
-
-    let filtrados = palpites.filter(p => p.odd >= oddMin && p.odd <= oddMax)
-                            .filter(p => mercadosSelecionados.includes(p.mercado.toLowerCase())
-                                      && esportesSelecionados.includes(p.esporte.toLowerCase())
-                                      && p.dia === diaSelecionado);
-
-    if(filtrados.length === 0){
-      document.getElementById("saida").textContent = `❌ Não há mais palpites disponíveis para o dia ${diaSelecionado}.`;
-      return;
+// ================= UTILIDADES =================
+function parseFractionPercent(stat){
+  try{
+    if(!stat || stat.trim()==='-') return null;
+    if(stat.includes('/')){
+      const parts = stat.split('/').map(s=>parseInt(s.replace(/\D/g,'')));
+      if(parts.length>=2 && parts[1]>0) return Math.round(parts[0]/parts[1]*100);
     }
+    const winMatch = stat.match(/(\d+)\s*V/i);
+    const nums = stat.match(/\d+/g);
+    if(nums && nums.length>0){
+      const total = nums.map(n=>parseInt(n,10)).reduce((a,b)=>a+b,0);
+      let wins = 0;
+      if(winMatch) wins = parseInt(winMatch[1],10);
+      else wins = parseInt(nums[0],10);
+      if(total>0) return Math.round((wins/total)*100);
+    }
+  }catch(e){}
+  return null;
+}
 
-    const sorteados = filtrados.sort(() => 0.5 - Math.random()).slice(0, qtd);
-    bilhetesGerados++;
+// ================= GERAR BILHETE =================
+function gerarBilhete(){
+  const qtd = Math.max(1, parseInt(document.getElementById("qtd").value||3));
+  const minOdd = parseFloat(document.getElementById("minOdd").value||1.0);
+  const maxOdd = parseFloat(document.getElementById("maxOdd").value||999);
+  const selectedMarkets = Array.from(document.querySelectorAll('#marketsWrap .chip.active')).map(n=>n.dataset.value.toLowerCase());
+  const selectedSports = Array.from(document.querySelectorAll('#sportsWrap .chip.active')).map(n=>n.dataset.value.toLowerCase());
+  const dayEl = document.querySelector('#daysWrap .chip.active');
+  const selectedDay = dayEl ? dayEl.dataset.value : "domingo";
+  const onlyF = onlyFootball.checked;
 
-    let texto = "";
-    let totalOdd = 1;
-    const times = {}, acertosMercado = {}, acertosGC = 0, acertosGF = 0, acertosGG = 0;
+  const filtered = palpites.filter(p=>{
+    const pMarket = String(p.mercado||'').toLowerCase();
+    const pSport = String(p.esporte||'').toLowerCase();
+    const pDay = String(p.dia||'').toLowerCase();
+    const oddOK = (p.odd >= minOdd && p.odd <= maxOdd);
+    const marketOK = selectedMarkets.includes(pMarket);
+    const sportByUser = onlyF ? (pSport === 'futebol') : selectedSports.includes(pSport);
+    const dayOK = (selectedDay === 'todos' || pDay === selectedDay);
+    return oddOK && marketOK && sportByUser && dayOK;
+  });
 
-    sorteados.forEach((p,i)=>{
-        let gcClass = getColorStat(p.gc), gfClass = getColorStat(p.gf), ggClass = getColorStat(p.gg);
-        texto += `🏆 ${i+1}. ${p.jogo}\n`;
-        texto += `   Mercado: ${p.mercado}\n`;
-        texto += `   Odd: ${p.odd}\n`;
-        texto += `   GC: ${colorText(p.gc,gcClass)} | GF: ${colorText(p.gf,gfClass)} | GG: ${colorText(p.gg,ggClass)}\n`;
-        texto += "-----------------------------------\n";
-        totalOdd *= p.odd;
+  if(filtered.length === 0){
+    bilheteContainer.innerHTML = `<div class="card show"><div class="meta">❌ Nenhum jogo encontrado com esses filtros.</div></div>`;
+    return;
+  }
 
-        // Estatísticas
-        times[p.jogo.split(" x ")[0]] = (times[p.jogo.split(" x ")[0]]||0)+1;
-        times[p.jogo.split(" x ")[1]] = (times[p.jogo.split(" x ")[1]]||0)+1;
-        acertosMercado[p.mercado] = (acertosMercado[p.mercado]||0)+1;
+  const shuffled = filtered.sort(()=>0.5 - Math.random()).slice(0, qtd);
+  bilheteContainer.innerHTML = "";
+  const bilheteObj = { timestamp: new Date().toISOString(), items: [] };
+  let totalOdd = 1;
+
+  shuffled.forEach((p,i)=>{
+    totalOdd *= p.odd;
+    const card = document.createElement('div');
+    card.className = 'card';
+    const gcPct = parseFractionPercent(p.gc);
+    const gfPct = parseFractionPercent(p.gf);
+    const ggPct = parseFractionPercent(p.gg);
+    const gcText = (gcPct===null? (p.gc || '-') : `${p.gc} (${gcPct}%)`);
+    const gfText = (gfPct===null? (p.gf || '-') : `${p.gf} (${gfPct}%)`);
+    const ggText = (ggPct===null? (p.gg || '-') : `${p.gg} (${ggPct}%)`);
+    const gcClass = gcPct>=70 ? 'stat-green' : (gcPct>=50 ? 'stat-yellow' : 'stat-red');
+    const gfClass = gfPct>=70 ? 'stat-green' : (gfPct>=50 ? 'stat-yellow' : 'stat-red');
+    const ggClass = ggPct>=70 ? 'stat-green' : (ggPct>=50 ? 'stat-yellow' : 'stat-red');
+    const avail = [];
+    if(typeof gcPct==='number') avail.push(gcPct);
+    if(typeof gfPct==='number') avail.push(gfPct);
+    if(typeof ggPct==='number') avail.push(ggPct);
+    const chanceGreen = avail.length ? Math.round(avail.reduce((a,b)=>a+b,0)/avail.length) : 0;
+    const chanceClass = chanceGreen>=70 ? 'stat-green' : (chanceGreen>=50 ? 'stat-yellow' : 'stat-red');
+
+    card.innerHTML = `
+      <h3>🏆 ${i+1}. [${p.esporte}] ${p.jogo}</h3>
+      <div class="meta">${p.mercado} • Odd: <strong>${p.odd.toFixed(2)}</strong> • Dia: ${p.dia[0].toUpperCase()+p.dia.slice(1)}</div>
+      <div class="stats-line">
+        GC: <span class="${gcClass}">${gcText}</span> &nbsp; | &nbsp;
+        GF: <span class="${gfClass}">${gfText}</span> &nbsp; | &nbsp;
+        GG: <span class="${ggClass}">${ggText}</span>
+      </div>
+      <div class="stats-line" style="margin-top:8px">🔹 Chance de green: <span class="${chanceClass}">${chanceGreen}%</span></div>
+    `;
+    bilheteContainer.appendChild(card);
+    setTimeout(()=>card.classList.add('show'), i*200);
+    bilheteObj.items.push({
+      esporte: p.esporte, jogo: p.jogo, mercado: p.mercado, odd: p.odd,
+      gc: p.gc||'-', gf:p.gf||'-', gg:p.gg||'-', green:chanceGreen, dia:p.dia
     });
+  });
 
-    texto += `\n💰 Odd total: ${totalOdd.toFixed(2)}`;
-    document.getElementById("saida").innerHTML = texto;
+  const footer = document.createElement('div');
+  footer.className = 'card show';
+  footer.style.padding = '12px';
+  footer.innerHTML = `<div class="meta"><strong>💰 Odd total:</strong> ${totalOdd.toFixed(2)}</div>`;
+  setTimeout(()=>footer.classList.add('show'), shuffled.length*200);
+  bilheteContainer.appendChild(footer);
 
-    // Atualiza estatísticas
-    let estatTexto = `Bilhetes gerados: ${bilhetesGerados}\n`;
-    estatTexto += `Palpites gerados: ${sorteados.length}\n`;
-    estatTexto += `Times diferentes: ${Object.keys(times).length}\n`;
-    estatTexto += `Acertos por mercado: ${JSON.stringify(acertosMercado,null,2)}`;
-    document.getElementById("estatTexto").textContent = estatTexto;
+  const historico = JSON.parse(localStorage.getItem('historicoBilhetes')||'[]');
+  historico.push(bilheteObj);
+  localStorage.setItem('historicoBilhetes', JSON.stringify(historico));
 }
 
-function getColorStat(stat){
-    if(stat.includes("V") || parseInt(stat.split("/")[0])/parseInt(stat.split("/")[1])>=0.7) return "stat-green";
-    if(stat.includes("E") || parseInt(stat.split("/")[0])/parseInt(stat.split("/")[1])>=0.5) return "stat-yellow";
-    return "stat-red";
-}
-
-function colorText(text,className){ return `<span class="${className}">${text}</span>`; }
-
-function copiarBilhete(){
-    const texto = document.getElementById("saida").innerText;
-    navigator.clipboard.writeText(texto);
-    alert("Bilhete copiado para a área de transferência!");
-}
-
-function baixarPDF(){
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const texto = document.getElementById("saida").innerText;
-    doc.setFontSize(12);
-    doc.text(texto,10,10);
-    const data = new Date();
-    const filename = `bilhete-${String(data.getDate()).padStart(2,'0')}-${String(data.getMonth()+1).padStart(2,'0')}-${data.getFullYear()}.pdf`;
-    doc.save(filename);
-}
-
-// Copiar Pix
-function copiarPix(){
-    navigator.clipboard.writeText("geradordebilhete@gmail.com");
-    alert("Pix copiado para área de transferência!");
-}
-
-// PWA - Service Worker
-if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('sw.js')
-    .then(()=>console.log('Service Worker registrado'))
-    .catch(err=>console.log('Erro Service Worker:',err));
-}
+generateBtn.addEventListener('click', gerarBilhete);
 </script>
+
 </body>
 </html>
