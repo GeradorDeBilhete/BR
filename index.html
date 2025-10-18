@@ -2,68 +2,191 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gerador de Bilhete</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🎯 Gerador de Bilhete</title>
+<style>
+  body {
+    font-family: 'Poppins', Arial, sans-serif;
+    background-color: #0e0e0e;
+    color: #f1f1f1;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
 
-<!-- PWA -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#00ff99">
+  h1 {
+    margin-top: 30px;
+    color: #00ff99;
+    letter-spacing: 1px;
+  }
 
-<!-- iOS -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Gerador de Bilhete">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+  .container {
+    background-color: #1b1b1b;
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    margin: 30px auto;
+    box-shadow: 0 0 15px rgba(0, 255, 153, 0.15);
+  }
 
-<!-- CSS -->
-<link rel="stylesheet" href="style.css">
+  label, select, input {
+    display: block;
+    margin: 10px auto;
+    text-align: left;
+    width: 80%;
+    color: #ddd;
+  }
 
-<script>
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js')
-    .then(() => console.log('Service Worker registrado'))
-    .catch(err => console.log('Erro SW:', err));
-}
-</script>
+  select, input {
+    background: #2a2a2a;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  button {
+    background-color: #00ff99;
+    border: none;
+    color: #000;
+    font-weight: bold;
+    padding: 10px 20px;
+    margin-top: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  button:hover {
+    background-color: #00cc7a;
+  }
+
+  pre {
+    text-align: left;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+    white-space: pre-wrap;
+    color: #d9d9d9;
+  }
+
+  .footer {
+    color: #666;
+    font-size: 13px;
+    margin-top: 40px;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid #333;
+    margin: 15px 0;
+  }
+</style>
 </head>
 <body>
+  <h1>🎯 Gerador de Bilhete</h1>
 
-<header>
-    <h1>Gerador de Bilhete</h1>
-</header>
-
-<section class="controls">
+  <div class="container">
     <label>Quantidade de jogos:
-        <input type="number" id="numJogos" min="1" value="3">
+      <input id="qtd" type="number" min="1" value="2">
     </label>
+
     <label>Odd mínima:
-        <input type="number" id="oddMin" step="0.01" value="1.2">
+      <input id="min" type="number" step="0.01" value="1.40">
     </label>
+
     <label>Odd máxima:
-        <input type="number" id="oddMax" step="0.01" value="2.0">
+      <input id="max" type="number" step="0.01" value="2.50">
     </label>
-    <label>Mercados:
-        <select id="market">
-            <option value="todos">Todos</option>
-            <option value="+1.5">+1.5 gols</option>
-            <option value="ambas">Ambas Marcam</option>
-        </select>
+
+    <label>Mercado:
+      <select id="mercado">
+        <option value="todos">Todos os mercados</option>
+        <option value="+1.5 gols">+1.5 Gols</option>
+        <option value="ambas">Ambas Marcam</option>
+        <option value="vitória casa">Vitória Casa</option>
+        <option value="vitória fora">Vitória Fora</option>
+      </select>
     </label>
-    <button id="gerarBilhete">Gerar Bilhete</button>
-</section>
 
-<div id="iosInstructions" style="display:none; text-align:center; padding:10px; background:#111; color:#00ff99; font-size:0.9em;">
-    Para instalar no iPhone: toque no botão <strong>Compartilhar</strong> e selecione <strong>Adicionar à Tela de Início</strong>.
-</div>
+    <button onclick="gerarBilhete()">Gerar Bilhete</button>
 
-<section id="bilheteContainer"></section>
-<button id="abrirBetano" style="display:none;">Abrir no Betano</button>
+    <pre id="saida">---</pre>
+  </div>
 
-<footer>
-<p>JC = Jogos do time da casa jogando em casa | JF = Jogos do time de fora | CD = Confrontos Direto</p>
-</footer>
+  <div class="footer">Desenvolvido por Kawan • ⚽ Estatísticas automáticas</div>
 
-<script src="script.js"></script>
+<script>
+  // 📊 Lista de palpites com estatísticas
+  const palpites = [
+    {
+      jogo: "Flamengo x Palmeiras",
+      mercado: "+1.5 gols",
+      odd: 1.45,
+      jc: "3/5",
+      jf: "3/5",
+      cd: "3/5"
+    },
+    {
+      jogo: "Mirassol x São Paulo",
+      mercado: "+1.5 gols",
+      odd: 1.50,
+      jc: "9/10",
+      jf: "3/5",
+      cd: "11/12"
+    },
+    {
+      jogo: "Getafe x Real Madrid",
+      mercado: "vitória fora",
+      odd: 1.40,
+      jc: "4E 1V",
+      jf: "4V 1D",
+      cd: "8/10"
+    }
+  ];
+
+  // 🎯 Função principal
+  function gerarBilhete() {
+    const qtd = parseInt(document.getElementById("qtd").value);
+    const oddMin = parseFloat(document.getElementById("min").value);
+    const oddMax = parseFloat(document.getElementById("max").value);
+    const mercado = document.getElementById("mercado").value;
+
+    let filtrados = palpites.filter(p => p.odd >= oddMin && p.odd <= oddMax);
+
+    if (mercado !== "todos") {
+      filtrados = filtrados.filter(p => p.mercado.toLowerCase() === mercado.toLowerCase());
+    }
+
+    if (filtrados.length === 0) {
+      document.getElementById("saida").textContent = "❌ Nenhum jogo encontrado com esses filtros.";
+      return;
+    }
+
+    // Embaralhar e selecionar
+    const sorteados = filtrados.sort(() => 0.5 - Math.random()).slice(0, qtd);
+
+    let texto = "";
+    let totalOdd = 1;
+
+    sorteados.forEach((p, i) => {
+      texto += `🏆 ${i + 1}. ${p.jogo}\n`;
+      texto += `   Mercado: ${p.mercado}\n`;
+      texto += `   Odd: ${p.odd}\n`;
+      texto += `   JC: ${p.jc} | JF: ${p.jf} | CD: ${p.cd}\n`;
+      texto += "-----------------------------------\n";
+      totalOdd *= p.odd;
+    });
+
+    texto += `\n💰 Odd total: ${totalOdd.toFixed(2)}`;
+
+    document.getElementById("saida").textContent = texto;
+  }
+</script>
 </body>
 </html>
