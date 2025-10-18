@@ -9,6 +9,12 @@ const jogos = [
 
 const btnBetano = document.getElementById("abrirBetano");
 
+// Detectar iOS
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+if (isIOS) {
+    document.getElementById("iosInstructions").style.display = "block";
+}
+
 document.getElementById("gerarBilhete").addEventListener("click", () => {
     const num = Number(document.getElementById("numJogos").value);
     const oddMin = Number(document.getElementById("oddMin").value);
