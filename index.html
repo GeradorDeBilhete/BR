@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>🎯 Gerador De Bilhete 🎟️ <small>Beta</small></title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>🎯 Gerador de Bilhete 🎟️ <small>beta</small></title>
 
-<link rel="manifest" href="./manifest.json">
+<!-- Fonte -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
 :root{
@@ -18,98 +21,146 @@
   --card:#0f0f0f;
 }
 *{box-sizing:border-box}
-body{margin:0;font-family:"Montserrat",system-ui,Arial,sans-serif;background:var(--bg);color:#f2f2f2;-webkit-font-smoothing:antialiased;}
-header{text-align:center;padding:28px 16px 8px;}
+body{
+  margin:0;
+  font-family:"Montserrat",system-ui,Arial,sans-serif;
+  background:var(--bg);
+  color:#f2f2f2;
+  -webkit-font-smoothing:antialiased;
+}
+header{
+  text-align:center;
+  padding:28px 16px 8px;
+}
 h1{margin:0;color:var(--accent);font-size:20px;font-weight:700;letter-spacing:0.6px;text-shadow:0 0 8px rgba(0,255,136,0.08);}
-.wrap{max-width:900px;margin:18px auto;padding:18px;background:var(--panel);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
+.wrap{
+  max-width:900px;margin:18px auto;padding:18px;background:var(--panel);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.6);
+}
 .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between;}
-label.ch{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px;}
-.controls{padding:8px 0 6px;display:flex;flex-direction:column;gap:10px;}
-.field{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between;}
-select,input[type=number], .select-like{background:#0c0c0c;border:1px solid #171717;color:#f2f2f2;padding:10px;border-radius:8px;min-width:160px;}
-.markets, .sports, .days{display:flex;gap:8px;flex-wrap:wrap;}
-.chip{background:#101010;border:1px solid #161616;color:#ddd;padding:8px 10px;border-radius:10px;cursor:pointer;user-select:none;}
+label.ch{
+  display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px;
+}
+.controls{
+  padding:8px 0 6px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.field{
+  display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;justify-content:space-between;
+}
+select,input[type=number], .select-like {
+  background:#0c0c0c;border:1px solid #171717;color:#f2f2f2;padding:10px;border-radius:8px;min-width:160px;
+}
+.markets, .sports, .days {
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+.chip{
+  background:#101010;border:1px solid #161616;color:#ddd;padding:8px 10px;border-radius:10px;cursor:pointer;user-select:none;
+  transition:0.2s;
+}
 .chip.active{background:var(--accent);color:#000;transform:scale(1.03);box-shadow:0 6px 18px rgba(0,255,136,0.08);}
 .actions{display:flex;gap:10px;flex-wrap:wrap;}
-button.btn{background:var(--accent);color:#000;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(0,255,136,0.06);}
+button.btn{
+  background:var(--accent);color:#000;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer;
+  box-shadow:0 6px 18px rgba(0,255,136,0.06);
+}
 button.ghost{background:transparent;border:1px solid #222;color:var(--muted);}
 #bilheteContainer{margin-top:14px;display:flex;flex-direction:column;gap:12px;align-items:center;}
-.card{background:var(--card);border:1px solid rgba(0,255,136,0.08);padding:12px;border-radius:10px;opacity:0;transform:translateY(14px);transition:all .35s cubic-bezier(.2,.9,.3,1);width:100%;max-width:720px;}
+.card{
+  background:var(--card);border:1px solid rgba(0,255,136,0.08);padding:12px;border-radius:10px;opacity:0;transform:translateY(14px);
+  transition:all .35s cubic-bezier(.2,.9,.3,1);
+  width:100%;
+  max-width:600px;
+}
 .card.show{opacity:1;transform:none;}
-.card h3{margin:0;font-size:15px;color:#fff;}
-.meta{font-size:13px;color:var(--muted);margin-top:6px;}
-.stats-line{margin-top:8px;font-size:13px;}
-.stat-green{color:var(--accent);}
-.stat-yellow{color:#ffcc00;}
-.stat-red{color:#ff4d4d;}
-.legend{margin-top:14px;color:var(--muted);font-size:13px;line-height:1.5;}
-.foot{margin-top:18px;color:#7a7a7a;font-size:13px;text-align:center;}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:60;padding:28px;overflow:auto;}
-.modal .panel{max-width:900px;margin:20px auto;background:#070707;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);}
-.modal h2{margin:0 0 8px;color:var(--accent);}
-table.stats{width:100%;border-collapse:collapse;margin-top:10px;color:var(--muted);font-size:14px;}
-table.stats th, table.stats td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.02);text-align:left;}
-.small{font-size:13px;color:var(--muted);}
-@media(max-width:720px){.row{flex-direction:column;align-items:stretch}.field{flex-direction:column;align-items:stretch}.markets,.sports,.days{justify-content:flex-start}}
+.card h3{margin:0;font-size:15px;color:#fff}
+.meta{font-size:13px;color:var(--muted);margin-top:6px}
+.stats-line{margin-top:8px;font-size:13px}
+.stat-green{color:var(--accent)}
+.stat-yellow{color:#ffcc00}
+.stat-red{color:#ff4d4d}
+.legend{margin-top:14px;color:var(--muted);font-size:13px;line-height:1.5}
+.foot{margin-top:18px;color:#7a7a7a;font-size:13px;text-align:center}
+#pixBtn{margin-top:12px;cursor:pointer;display:inline-block;background:#0c0c0c;color:var(--accent);padding:10px 14px;border-radius:10px;font-weight:600;}
+/* Modal */
+.modal{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:60;padding:28px;overflow:auto;
+}
+.modal .panel{max-width:900px;margin:20px auto;background:#070707;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+.modal h2{margin:0 0 8px;color:var(--accent)}
+table.stats{width:100%;border-collapse:collapse;margin-top:10px;color:var(--muted);font-size:14px}
+table.stats th, table.stats td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.02);text-align:left}
+.small{font-size:13px;color:var(--muted)}
+/* bilhete central animation */
+@keyframes highlight {
+  0%{transform:scale(0.5) translateY(-50px);opacity:0;}
+  50%{transform:scale(1.1) translateY(10px);opacity:1;}
+  100%{transform:scale(1) translateY(0);}
+}
+.card.highlight{animation:highlight 0.5s ease forwards;}
+@media(max-width:720px){ .row{flex-direction:column;align-items:stretch} .field{flex-direction:column;align-items:stretch} .markets,.sports,.days{justify-content:flex-start} }
 </style>
 </head>
 <body>
 
+<div id="loginScreen" style="position:fixed;inset:0;background:#000;display:flex;justify-content:center;align-items:center;flex-direction:column;z-index:100;">
+  <h2 style="color:var(--accent);margin-bottom:12px;">Digite seu código</h2>
+  <input id="codeInput" type="text" maxlength="6" placeholder="Código" style="padding:10px 14px;border-radius:8px;border:none;width:160px;margin-bottom:12px;">
+  <button id="loginBtn" class="btn">Entrar</button>
+  <div id="loginMsg" style="color:#ff4d4d;margin-top:8px;"></div>
+</div>
+
 <header>
-  <h1>🎯 Gerador De Bilhete 🎟️ <small style="font-size:12px;color:var(--muted)">Beta</small></h1>
+  <h1>🎯 Gerador de Bilhete 🎟️ <small style="font-size:12px;color:#777;">beta</small></h1>
 </header>
 
-<div class="wrap" role="main">
+<div class="wrap" role="main" style="display:none;" id="appMain">
+
   <div class="controls">
 
-    <!-- Número de jogos e odd -->
-    <div class="row" style="margin-bottom:10px">
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <label class="small">Quantidade de jogos</label>
+    <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:10px;">
+      <div>
+        <label class="small">Quantidade de jogos</label><br>
         <input id="qtd" type="number" min="1" value="3" style="width:84px">
-        <label class="small">Odd mín</label>
-        <input id="minOdd" type="number" step="0.01" value="1.20" style="width:96px">
-        <label class="small">Odd máx</label>
+      </div>
+      <div>
+        <label class="small">Odd mínima</label><br>
+        <input id="minOdd" type="number" step="0.01" value="1.20" style="width:96px"><br>
+        <label class="small">Odd máxima</label><br>
         <input id="maxOdd" type="number" step="0.01" value="2.50" style="width:96px">
       </div>
     </div>
 
-    <!-- Botões de ação -->
-    <div class="row" style="margin-bottom:10px">
-      <button id="generateBtn" class="btn" style="flex:1.5">🎲 Gerar Bilhete</button>
-      <div class="actions" style="flex:1;justify-content:flex-end">
-        <button id="estatBtn" class="btn">📊 Estatísticas</button>
-        <button id="copiarBtn" class="btn">📋 Copiar</button>
-        <button id="pdfBtn" class="btn">💾 PDF</button>
-      </div>
+    <div class="actions" style="margin-bottom:10px;">
+      <button id="generateBtn" class="btn" style="padding:12px 20px;font-size:16px;">🎲 Gerar Bilhete</button>
+      <button id="estatBtn" class="btn">📊 Estatísticas</button>
+      <button id="copiarBtn" class="btn">📋 Copiar</button>
+      <button id="pdfBtn" class="btn">💾 PDF</button>
     </div>
 
-    <!-- Seleção de esportes e dias -->
+    <!-- esporte selector: multi via chips + quick "apenas futebol" -->
     <div class="field">
       <div>
         <div style="color:var(--muted);margin-bottom:6px">Escolher esporte</div>
-        <div class="sports" id="sportsWrap"></div>
+        <div class="sports" id="sportsWrap">
+          <!-- chips via JS -->
+        </div>
       </div>
+
       <div>
         <label class="small">Filtro de dia</label>
         <div class="days" id="daysWrap" style="margin-top:6px"></div>
       </div>
     </div>
 
-    <!-- Mercados -->
-    <div style="margin-top:8px">
+    <div style="margin-top:8px;">
       <div style="color:var(--muted);margin-bottom:6px">Mercados (selecionáveis)</div>
       <div class="markets" id="marketsWrap"></div>
     </div>
 
-    <!-- Somente futebol e Pix -->
-    <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <label class="ch"><input id="onlyFootball" type="checkbox">Somente Futebol</label>
-    </div>
+    <label class="ch" style="margin-top:8px"><input id="onlyFootball" type="checkbox">Somente Futebol</label>
 
   </div>
 
-  <!-- Bilhetes -->
   <div id="bilheteContainer"></div>
 
   <div class="legend">
@@ -118,53 +169,38 @@ table.stats th, table.stats td{padding:8px;border-bottom:1px solid rgba(255,255,
     🔹 <strong>GG:</strong> ÚLTIMOS CONFRONTOS DIRETOS
   </div>
 
-  <div class="foot">
-    <div style="margin-bottom:6px">Ajude um pobre dono do app: <strong>geradordebilhete@gmail.com</strong></div>
-  </div>
+  <div id="pixBtn">pix e-mail: geradordebilhete@gmail.com • clique para copiar</div>
 </div>
 
 <!-- Estatísticas Modal -->
 <div id="estatModal" class="modal" aria-hidden="true">
   <div class="panel">
     <button id="closeEstat" style="float:right;background:var(--accent);border:none;padding:8px 10px;border-radius:8px;cursor:pointer">Fechar</button>
-    <h2>📊 Estatísticas do Gerador</h2>
+    <h2>📊 Estatísticas</h2>
     <div id="estatContent" style="margin-top:8px"></div>
   </div>
 </div>
 
-<!-- jsPDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <script>
-// Aqui entra todo o JS do seu app (palpites, geração, estatísticas, códigos, animação destaque etc.)
-// Posso enviar o JS completo pronto no próximo passo
-</script>
+/* ========== CÓDIGOS PRÉ-CADASTRADOS ========== */
+let codigos = {
+  "adm": {code:"082111", type:"adm", used:false, expire:null},
+  "teste": [],
+  "30dias": []
+};
 
-<script>
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./service-worker.js')
-  .then(()=>console.log('Service Worker registrado'))
-  .catch(err=>console.log('SW erro:', err));
+// gerar 25 códigos teste 24h
+for(let i=0;i<25;i++){
+  let c = Math.floor(100000 + Math.random()*900000).toString();
+  codigos.teste.push({code:c, type:"teste", used:false, expire:Date.now()+24*3600*1000});
 }
-</script>
-<script>
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./service-worker.js')
-  .then(() => console.log('Service Worker registrado'))
-  .catch(err => console.log('SW erro:', err));
+// gerar 25 códigos 30 dias
+for(let i=0;i<25;i++){
+  let c = Math.floor(100000 + Math.random()*900000).toString();
+  codigos["30dias"].push({code:c, type:"30dias", used:false, expire:Date.now()+30*24*3600*1000});
 }
-</script>
-<script>
-/* ====================== CONFIGURAÇÃO DE CÓDIGOS ====================== */
-const codigos24h = Array.from({length:25},()=>Math.floor(Math.random()*900000+100000).toString());
-const codigos30d = Array.from({length:25},()=>Math.floor(Math.random()*900000+100000).toString());
-const codigoDono = "082111"; // 1 acesso
-const usoCodigos = {}; // {codigo: {tipo: "24h"|"30d"|"adm", usado:true/false, expiracao:timestamp}}
 
-let codigoAtivo = null; // código usado atualmente
-let expiracaoAtiva = null;
-
-/* ====================== DADOS DE PALPITES ====================== */
+/* ========== DADOS DE PALPITES ========== */
 const palpites = [
   {esporte:"Futebol", dia:"domingo", jogo:"Flamengo x Palmeiras", mercado:"+1.5 Gols", odd:1.45, gc:"3/5", gf:"3/5", gg:"3/5"},
   {esporte:"Futebol", dia:"domingo", jogo:"Mirassol x São Paulo", mercado:"+1.5 Gols", odd:1.50, gc:"9/10", gf:"3/5", gg:"11/12"},
@@ -174,15 +210,12 @@ const palpites = [
   {esporte:"Futebol", dia:"domingo", jogo:"Milan x Fiorentina", mercado:"Vitória", odd:1.55, gc:"4V 1D", gf:"4E 1V", gg:"2V 2D 1E"}
 ];
 
-/* ====================== CONFIGURAÇÕES ====================== */
-const marketsList = [
-  "Vitória","Dupla Chance","+0.5 Gols 1T","+0.5 Gols Casa","+0.5 Gols Fora","+1.5 Gols","Ambas Marcam","Over 2.5","Under 3.5","Handicap"
-];
-
-const sportsList = [...new Set(palpites.map(p=>p.esporte))].sort();
+/* ========== LISTAS DE MERCADOS, ESPORTES, DIAS ========== */
+const marketsList = ["Vitória","Dupla Chance","+0.5 Gols 1T","+0.5 Gols Casa","+0.5 Gols Fora","+1.5 Gols","Ambas Marcam","Over 2.5","Under 3.5","Handicap"];
+const sportsList = ["Futebol","Basquete","Tênis","Vôlei","Futsal"];
 const daysList = ["segunda","terça","quarta","quinta","sexta","sábado","domingo"];
 
-/* ====================== ELEMENTOS ====================== */
+/* ========== ELEMENTOS ========== */
 const bilheteContainer = document.getElementById("bilheteContainer");
 const marketsWrap = document.getElementById("marketsWrap");
 const sportsWrap = document.getElementById("sportsWrap");
@@ -195,36 +228,43 @@ const estatContent = document.getElementById("estatContent");
 const copiarBtn = document.getElementById("copiarBtn");
 const pdfBtn = document.getElementById("pdfBtn");
 const onlyFootball = document.getElementById("onlyFootball");
+const loginScreen = document.getElementById("loginScreen");
+const codeInput = document.getElementById("codeInput");
+const loginBtn = document.getElementById("loginBtn");
+const loginMsg = document.getElementById("loginMsg");
+const appMain = document.getElementById("appMain");
+const pixBtn = document.getElementById("pixBtn");
 
-/* ====================== FUNÇÕES DE UI ====================== */
+/* ========== FUNÇÕES ========== */
 function mkChip(text, container, initial=true){
   const el = document.createElement("div");
-  el.className = "chip" + (initial?" active":"");
+  el.className = "chip" + (initial ? " active" : "");
   el.textContent = text;
   el.dataset.value = text;
-  el.addEventListener("click",()=>el.classList.toggle("active"));
+  el.addEventListener("click", ()=> el.classList.toggle("active"));
   container.appendChild(el);
   return el;
 }
 
-marketsList.forEach(m=>mkChip(m, marketsWrap,true));
-sportsList.forEach(s=>mkChip(s, sportsWrap,true));
+/* render chips */
+marketsList.forEach(m => mkChip(m, marketsWrap, true));
+sportsList.forEach(s => mkChip(s, sportsWrap, s==="Futebol"));
 daysList.forEach(d=>{
   const el = document.createElement("div");
-  el.className = "chip"+(d==="domingo"?" active":"");
+  el.className = "chip" + (d==="domingo" ? " active" : "");
   el.textContent = d[0].toUpperCase()+d.slice(1);
   el.dataset.value=d;
-  el.addEventListener("click",()=>{
+  el.addEventListener("click", ()=>{
     document.querySelectorAll('#daysWrap .chip').forEach(c=>c.classList.remove('active'));
     el.classList.add('active');
   });
   daysWrap.appendChild(el);
 });
 
-/* ====================== FUNÇÃO PERCENTUAL ====================== */
+/* parse stat */
 function parseFractionPercent(stat){
   try{
-    if(!stat||stat.trim()==='-') return null;
+    if(!stat || stat.trim()==='-') return null;
     if(stat.includes('/')){
       const parts = stat.split('/').map(s=>parseInt(s.replace(/\D/g,'')));
       if(parts.length>=2 && parts[1]>0) return Math.round(parts[0]/parts[1]*100);
@@ -234,141 +274,125 @@ function parseFractionPercent(stat){
     if(nums && nums.length>0){
       const total = nums.map(n=>parseInt(n,10)).reduce((a,b)=>a+b,0);
       let wins = 0;
-      if(winMatch) wins = parseInt(winMatch[1],10);
-      else{
-        const lastV = stat.match(/(\d+)\s*[Vv]/);
-        if(lastV) wins=parseInt(lastV[1],10);
-        else wins=parseInt(nums[0],10);
-      }
+      if(winMatch) wins=parseInt(winMatch[1],10);
+      else { const lastV=stat.match(/(\d+)\s*[Vv]/); wins=lastV?parseInt(lastV[1],10):parseInt(nums[0],10);}
       if(total>0) return Math.round((wins/total)*100);
     }
   }catch(e){}
   return null;
 }
 
-/* ====================== LOGIN CÓDIGO ====================== */
-function promptLogin(){
-  const codigo = prompt("Digite seu código de acesso:");
-  if(!codigo) return false;
-
-  if(codigo===codigoDono){
-    if(usoCodigos[codigo] && usoCodigos[codigo].usado){
-      alert("Código de dono já usado!");
-      return false;
-    }
-    usoCodigos[codigo]={tipo:"adm",usado:true,expiracao:null};
-    codigoAtivo=codigo; expiracaoAtiva=null;
-    alert("Bem-vindo, dono! Acesso concedido.");
-    return true;
-  }
-
-  let tipo=null;
-  if(codigos24h.includes(codigo)) tipo="24h";
-  else if(codigos30d.includes(codigo)) tipo="30d";
-  if(!tipo){ alert("Código inválido!"); return false; }
-
-  if(usoCodigos[codigo] && usoCodigos[codigo].usado){alert("Código já usado!");return false;}
-
-  usoCodigos[codigo]={tipo:tipo,usado:true,expiracao:(tipo==="24h"?Date.now()+24*3600*1000:Date.now()+30*24*3600*1000)};
-  codigoAtivo=codigo; expiracaoAtiva=usoCodigos[codigo].expiracao;
-  const diasRest = tipo==="24h"?1:30;
-  alert(`Código aceito! Validade: ${diasRest} dias.`);
-  return true;
-}
-
-/* Verifica expiração */
-function checkCodigo(){
-  if(!codigoAtivo) return false;
-  if(usoCodigos[codigoAtivo] && usoCodigos[codigoAtivo].expiracao){
-    if(Date.now()>usoCodigos[codigoAtivo].expiracao){
-      alert("Seu código expirou! Insira outro código.");
-      codigoAtivo=null; expiracaoAtiva=null;
-      return false;
-    }
-  }
-  return true;
-}
-
-/* ====================== GERAR BILHETE ====================== */
+/* ========== GERAR BILHETE ========== */
 function gerarBilhete(){
-  if(!checkCodigo()){ bilheteContainer.innerHTML='<div class="card show"><div class="meta">⚠️ Insira código válido antes de gerar bilhete.</div></div>'; return; }
-
   const qtd = Math.max(1, parseInt(document.getElementById("qtd").value||3));
   const minOdd = parseFloat(document.getElementById("minOdd").value||1.0);
   const maxOdd = parseFloat(document.getElementById("maxOdd").value||999);
   const selectedMarkets = Array.from(document.querySelectorAll('#marketsWrap .chip.active')).map(n=>n.dataset.value.toLowerCase());
   const selectedSports = Array.from(document.querySelectorAll('#sportsWrap .chip.active')).map(n=>n.dataset.value.toLowerCase());
   const dayEl = document.querySelector('#daysWrap .chip.active');
-  const selectedDay = dayEl?dayEl.dataset.value:"domingo";
+  const selectedDay = dayEl ? dayEl.dataset.value : "domingo";
   const onlyF = onlyFootball.checked;
 
   let filtered = palpites.filter(p=>{
     const pMarket = String(p.mercado||'').toLowerCase();
     const pSport = String(p.esporte||'').toLowerCase();
     const pDay = String(p.dia||'').toLowerCase();
-    const oddOK = (p.odd >= minOdd && p.odd <= maxOdd);
+    const oddOK = (p.odd>=minOdd && p.odd<=maxOdd);
     const marketOK = selectedMarkets.includes(pMarket);
-    const sportByUser = onlyF? (pSport==='futebol'):selectedSports.includes(pSport);
-    const dayOK = (selectedDay==='todos'||pDay===selectedDay);
+    const sportByUser = onlyF?(pSport==='futebol'):selectedSports.includes(pSport);
+    const dayOK = (pDay===selectedDay);
     return oddOK && marketOK && sportByUser && dayOK;
   });
 
-  if(filtered.length===0){ bilheteContainer.innerHTML='<div class="card show"><div class="meta">❌ Nenhum jogo encontrado para os filtros.</div></div>'; return; }
-
-  const shuffled = filtered.sort(()=>0.5-Math.random()).slice(0,qtd);
+  filtered = filtered.sort(()=>0.5-Math.random()).slice(0,qtd);
 
   bilheteContainer.innerHTML="";
-  const bilheteObj={id:Date.now(), jogos:shuffled};
-  const card = document.createElement("div"); card.className="card"; 
-  card.innerHTML='<h3>🎟️ Bilhete Gerado</h3>'+shuffled.map(j=>`
-    <div class="meta">${j.jogo} | ${j.mercado} | Odd: ${j.odd}</div>
-  `).join('')+`<div class="stats-line small">Dias restantes: ${expiracaoAtiva?Math.ceil((expiracaoAtiva-Date.now())/(24*3600*1000)): '∞'}</div>`;
-  bilheteContainer.appendChild(card);
-  setTimeout(()=>card.classList.add("show"),10);
+  filtered.forEach(p=>{
+    const div = document.createElement("div");
+    div.className="card highlight";
+    div.innerHTML=`<h3>${p.jogo}</h3>
+    <div class="meta">Esporte: ${p.esporte} | Mercado: ${p.mercado} | Odd: ${p.odd}</div>
+    <div class="stats-line">
+      <span class="stat-green">GC:${p.gc}</span> | <span class="stat-green">GF:${p.gf}</span> | <span class="stat-yellow">GG:${p.gg}</span>
+    </div>`;
+    bilheteContainer.appendChild(div);
+  });
 }
 
-/* ====================== ESTATÍSTICAS ====================== */
-function mostrarEstat(){
-  if(!bilheteContainer.children.length){ alert("Nenhum bilhete gerado ainda."); return; }
-  estatContent.innerHTML="";
-  const cards = bilheteContainer.querySelectorAll(".card");
-  cards.forEach((c,i)=>{
-    const jogos = Array.from(c.querySelectorAll(".meta")).map(el=>el.textContent);
-    const table = document.createElement("table"); table.className="stats";
-    table.innerHTML='<tr><th>Jogo</th><th>Odd</th><th>Mercado</th></tr>';
-    jogos.forEach(j=>{
-      const parts = j.split('|').map(s=>s.trim());
-      table.innerHTML+=`<tr><td>${parts[0]}</td><td>${parts[2]||''}</td><td>${parts[1]}</td></tr>`;
-    });
-    estatContent.appendChild(table);
-  });
+/* ========== ESTATÍSTICAS ========== */
+function showEstatisticas(){
+  const total = palpites.length;
+  let html="<h3>📊 Estatísticas do Gerador</h3>";
+  html+=`<table class="stats"><tr><th>Total de palpites</th><td>${total}</td></tr></table>`;
+  estatContent.innerHTML=html;
   estatModal.style.display="block";
 }
 
-/* ====================== COPIAR PDF ====================== */
+/* ========== COPIAR / PDF ========== */
 copiarBtn.addEventListener("click",()=>{
-  let text = Array.from(document.querySelectorAll("#bilheteContainer .card .meta")).map(el=>el.textContent).join("\n");
+  let text = Array.from(bilheteContainer.querySelectorAll(".card")).map(c=>c.innerText).join("\n\n");
   navigator.clipboard.writeText(text).then(()=>alert("Bilhete copiado!"));
 });
 
 pdfBtn.addEventListener("click",()=>{
-  if(typeof jspdf==='undefined'){ alert("PDF não carregado!"); return; }
-  const doc = new jspdf.jsPDF();
+  const { jsPDF } = window.jspdf;
+  let doc = new jsPDF();
   let y=10;
-  Array.from(document.querySelectorAll("#bilheteContainer .card .meta")).forEach(el=>{
-    doc.text(el.textContent,10,y); y+=10;
+  Array.from(bilheteContainer.querySelectorAll(".card")).forEach(c=>{
+    const t=c.innerText.split('\n');
+    t.forEach(line=>{doc.text(line,10,y);y+=6;});
+    y+=6;
   });
   doc.save("bilhete.pdf");
 });
 
-/* ====================== EVENTOS ====================== */
-generateBtn.addEventListener("click",gerarBilhete);
-estatBtn.addEventListener("click",mostrarEstat);
+/* ========== MODAL ========== */
 closeEstat.addEventListener("click",()=>estatModal.style.display="none");
 
-/* ====================== LOGIN INICIAL ====================== */
-promptLogin();
+/* ========== LOGIN ========== */
+function checkCode(code){
+  code=code.trim();
+  if(code===codigos.adm.code && !codigos.adm.used) return codigos.adm;
+  const allCodes = codigos.teste.concat(codigos["30dias"]);
+  for(let c of allCodes){
+    if(c.code===code && !c.used){
+      if(c.expire && Date.now()>c.expire) return null;
+      return c;
+    }
+  }
+  return null;
+}
 
+loginBtn.addEventListener("click",()=>{
+  const code = codeInput.value.trim();
+  const cObj = checkCode(code);
+  if(!cObj){loginMsg.textContent="Código inválido ou expirado";return;}
+  cObj.used=true;
+  loginScreen.style.display="none";
+  appMain.style.display="block";
+  if(cObj.type!=="adm") setInterval(()=>updateTime(cObj),1000);
+});
+
+function updateTime(c){
+  if(!c.expire) return;
+  const diff = c.expire - Date.now();
+  if(diff<=0){
+    alert("Seu código expirou!");
+    location.reload();
+    return;
+  }
+  const dias = Math.floor(diff/(1000*3600*24));
+  const horas = Math.floor((diff%(1000*3600*24))/(1000*3600));
+  const mins = Math.floor((diff%(1000*3600))/(1000*60));
+  const secs = Math.floor((diff%(1000*60))/1000);
+  loginMsg.textContent=`Expira em ${dias}d ${horas}h ${mins}m ${secs}s`;
+}
+
+/* ========== EVENTOS ========== */
+generateBtn.addEventListener("click",gerarBilhete);
+estatBtn.addEventListener("click",showEstatisticas);
+pixBtn.addEventListener("click",()=>navigator.clipboard.writeText("geradordebilhete@gmail.com").then(()=>alert("E-mail copiado!")));
 </script>
+
 </body>
 </html>
