@@ -1,12 +1,11 @@
 {
-  "name": "Gerador de Bilhete 🎯",
-  "short_name": "Bilhete",
-  "description": "Gerador de bilhetes esportivos com estatísticas e odds.",
+  "name": "🎯 Gerador de Bilhete 🎟️",
+  "short_name": "BilheteBeta",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#00ff88",
-  "orientation": "portrait",
+  "description": "Gerador de bilhetes esportivos com estatísticas",
   "icons": [
     {
       "src": "icons/icon-192.png",
