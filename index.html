@@ -146,15 +146,31 @@ button {
     <button id="generateBtn">🎲 Gerar Bilhete</button>
   </div>
 
-  <div id="filters">
-    ⚙️ Mostrar Filtros (Esporte e Mercado)
+<div id="filters">
+  ⚙️ Mostrar Filtros (Esporte e Mercado)
+</div>
+<div id="filtersContent" style="display:none; padding:10px; background:#111; border-radius:8px; margin-top:10px;">
+  <div>
+    <strong>Escolher Esporte:</strong>
+    <div id="sportsWrap" style="margin-top:6px; display:flex; flex-wrap:wrap; gap:6px;">
+      <!-- chips de esportes geradas pelo script.js -->
+    </div>
   </div>
-  <div id="filtersContent">
-    <div style="margin-top:6px;">Escolher esporte:</div>
-    <div id="sportsWrap"></div>
-    <div style="margin-top:6px;">Escolher mercado:</div>
-    <div id="marketsWrap"></div>
+  <div style="margin-top:12px;">
+    <strong>Escolher Mercado:</strong>
+    <div id="marketsWrap" style="margin-top:6px; display:flex; flex-wrap:wrap; gap:6px;">
+      <!-- chips de mercados geradas pelo script.js -->
+    </div>
   </div>
+</div>
+
+<script>
+const filtersBtn = document.getElementById("filters");
+const filtersContent = document.getElementById("filtersContent");
+filtersBtn.addEventListener("click", () => {
+  filtersContent.style.display = filtersContent.style.display === "block" ? "none" : "block";
+});
+</script>
 
   <div id="bilheteContainer"></div>
 
