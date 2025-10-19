@@ -99,11 +99,62 @@ button.btn:hover{opacity:0.9;}
 <script>
 // ============ LOGIN ===========
 const loginCodes = [
-  {code:"082111", tipo:"adm", usado:false, expira:null}
+  {code:"082111", tipo:"adm", usado:false, expira:null}, // admin, ilimitado
+
+  // 25 códigos de teste (24h)
+  {code:"153947", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"469283", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"582914", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"730192", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"918374", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"264839", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"105937", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"849102", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"372918", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"691274", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"487120", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"293847", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"109283", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"564738", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"748291", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"831029", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"912837", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"374920", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"210948", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"495861", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"608472", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"731095", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"984612", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"250913", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+  {code:"847209", tipo:"teste", usado:false, expira:Date.now()+24*60*60*1000},
+
+  // 25 códigos de 30 dias
+  {code:"193847", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"274910", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"385902", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"496183", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"517294", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"628475", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"739516", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"841627", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"952738", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"163849", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"274950", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"385061", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"496172", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"517283", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"628374", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"739165", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"841276", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"952387", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"163498", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"274519", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"385620", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"496731", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"517842", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"628953", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
+  {code:"739064", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000}
 ];
-for(let i=0;i<25;i++){
-  loginCodes.push({code:Math.floor(Math.random()*900000+100000).toString(),tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000});
-  loginCodes.push({code:Math.floor(Math.random()*900000+100000).toString(),tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000});
 }
 const loginOverlay=document.getElementById("loginOverlay");
 const loginInput=document.getElementById("loginCode");
