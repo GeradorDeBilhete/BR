@@ -1,122 +1,257 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>🎯 Gerador de Bilhete 🎟️ Beta</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎯 Gerador de Bilhete Beta</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+
 <style>
-body{margin:0;font-family:'Montserrat',sans-serif;background:#000;color:#fff;-webkit-font-smoothing:antialiased;}
+:root {
+  --bg:#000000;
+  --panel:#0b0b0b;
+  --muted:#bfbfbf;
+  --accent:#00ff88;
+  --accent2:#00cc66;
+  --card:#0f0f0f;
+}
+body{
+  margin:0;
+  font-family:"Montserrat",sans-serif;
+  background:var(--bg);
+  color:#f2f2f2;
+  -webkit-font-smoothing:antialiased;
+}
 header{text-align:center;padding:20px;}
-h1{font-size:24px;color:#00ff88;margin:0;font-weight:700;text-align:center;}
-.wrap{max-width:900px;margin:0 auto;padding:16px;}
-.controls{display:flex;flex-direction:column;gap:12px;margin-bottom:12px;}
-.field{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
-input[type=number]{padding:8px;border-radius:8px;border:none;background:#111;color:#fff;width:80px;}
-button.btn{background:#00ff88;color:#000;border:none;padding:10px 14px;border-radius:8px;font-weight:600;cursor:pointer;}
-.card{background:#0f0f0f;border:1px solid #00ff88;border-radius:12px;padding:14px;margin:12px auto;width:90%;max-width:450px;opacity:0;transform:translateY(20px);transition:all .4s ease;}
-.card.show{opacity:1;transform:translateY(0);}
-.stats-line{margin-top:10px;font-size:14px;color:#fff;}
-.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:10px;}
-#bilheteContainer{display:flex;flex-direction:column;align-items:center;gap:12px;}
-#estatModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:60;padding:28px;overflow:auto;}
-#estatModal .panel{max-width:600px;margin:20px auto;background:#070707;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);}
-#estatModal table.stats{width:100%;border-collapse:collapse;margin-top:10px;color:#fff;}
-#estatModal table.stats th, #estatModal table.stats td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.1);text-align:left;}
-#showFilters{background:#222;color:#00ff88;padding:6px 10px;border:none;border-radius:6px;cursor:pointer;}
-#filters{display:none;margin-top:10px;}
-.chip{background:#101010;border:1px solid #161616;color:#ddd;padding:6px 10px;border-radius:10px;cursor:pointer;user-select:none;}
-.chip.active{background:#00ff88;color:#000;transform:scale(1.03);}
-#pixBtn{margin-top:20px;background:#ffcc00;color:#000;}
+h1{color:var(--accent);margin:0;font-size:24px;font-weight:700;text-shadow:0 0 8px rgba(0,255,136,0.1);}
+.wrap{max-width:900px;margin:0 auto;padding:16px;background:var(--panel);border-radius:12px;}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+input, select{padding:10px;border-radius:8px;border:none;background:#111;color:#fff;}
+button.btn{background:var(--accent);color:#000;border:none;padding:10px 14px;border-radius:8px;font-weight:600;cursor:pointer;}
+button.ghost{background:transparent;border:1px solid #222;color:#f2f2f2;}
+.card{background:var(--card);border:1px solid rgba(0,255,136,0.08);padding:14px;border-radius:12px;margin-top:14px;animation:fadeUp 0.5s ease forwards;opacity:0;transform:translateY(20px);}
+@keyframes fadeUp{
+  to{opacity:1;transform:translateY(0);}
+}
+.stats-line{margin-top:8px;font-size:14px;color:var(--muted);}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:50;padding:28px;overflow:auto;}
+.modal .panel{max-width:900px;margin:20px auto;background:#070707;padding:18px;border-radius:12px;}
+.chip{background:#101010;border:1px solid #161616;color:#ddd;padding:8px 10px;border-radius:10px;cursor:pointer;user-select:none;}
+.chip.active{background:var(--accent);color:#000;transform:scale(1.03);box-shadow:0 6px 18px rgba(0,255,136,0.08);}
+#filters{display:none;margin-top:12px;gap:8px;}
 </style>
 </head>
 <body>
 
 <header>
-<h1>🎯 Gerador de Bilhete 🎟️</h1>
+  <h1>🎯 Gerador de Bilhete 🎟️ Beta</h1>
 </header>
 
 <div class="wrap">
-
-<div class="controls">
-  <div class="field">
-    <label>Qtd de Jogos:</label>
-    <input id="qtd" type="number" min="1" value="3">
-    <label>Odd Min:</label>
-    <input id="minOdd" type="number" step="0.01" value="1.20">
-    <label>Odd Max:</label>
-    <input id="maxOdd" type="number" step="0.01" value="2.50">
-    <label>% Min:</label>
-    <input id="minPercent" type="number" step="1" value="50">
+  <div class="row" style="justify-content:center;gap:12px;flex-wrap:wrap;">
+    <label>Qtd de Jogos</label>
+    <input id="qtd" type="number" min="1" value="3" style="width:70px;">
+    <label>Odd Mínima</label>
+    <input id="minOdd" type="number" step="0.01" value="1.20" style="width:70px;">
+    <label>Odd Máxima</label>
+    <input id="maxOdd" type="number" step="0.01" value="2.50" style="width:70px;">
+    <label>% Mínimo</label>
+    <input id="minPercent" type="number" step="1" value="50" style="width:70px;">
   </div>
 
-  <div id="generateBtnWrapper">
+  <div style="text-align:center;margin-top:12px;">
     <button id="generateBtn" class="btn">🎲 Gerar Bilhete</button>
-  </div>
-
-  <div class="actions">
     <button id="estatBtn" class="btn">📊 Estatísticas</button>
-    <button id="showFilters">🔍 Mostrar Filtros</button>
+    <button id="showFilters" class="btn">⚙️ Mostrar filtros</button>
   </div>
 
   <div id="filters">
-    <div>
-      <strong>Esportes:</strong>
-      <div id="sportsWrap"></div>
-    </div>
-    <div>
-      <strong>Mercados:</strong>
-      <div id="marketsWrap"></div>
-    </div>
+    <div style="margin-top:10px;">Escolher Esporte:</div>
+    <div id="sportsWrap" class="row"></div>
+    <div style="margin-top:10px;">Escolher Mercado:</div>
+    <div id="marketsWrap" class="row"></div>
+  </div>
+
+  <div id="bilheteContainer" style="display:flex;flex-direction:column;align-items:center;"></div>
+
+  <div style="text-align:center;margin-top:20px;">
+    <button id="pixBtn" class="btn" style="background:#ffcc00;color:#000;">💛 Doação Pix</button>
   </div>
 </div>
 
-<div id="bilheteContainer"></div>
-
-<div style="text-align:center;">
-<button id="pixBtn" class="btn">💰 Doação PIX</button>
-</div>
-
-</div>
-
-<div id="estatModal">
+<!-- Estatísticas -->
+<div id="estatModal" class="modal">
   <div class="panel">
-    <button id="closeEstat" class="btn" style="float:right;background:#00ff88;color:#000;">Fechar</button>
+    <button id="closeEstat" class="btn">Fechar</button>
     <h2>📊 Estatísticas do Gerador</h2>
     <div id="estatContent"></div>
   </div>
 </div>
 
-<script src="script.js"></script>
 <script>
-const sportsList = ["Futebol","Basquete","Vôlei","Tênis"];
-const marketsList = ["Dupla Chance Casa","Dupla Chance Fora","Casa ou Empate","+1.5 gols","+2.5 gols","+0.5 gol 1T","Vitória Casa","Vitória Fora","Ambas Marcam","+0.5 gol Casa","-1.5 HT"];
+// ===== PALPITES PENDENTES =====
+const palpitesPendentes = [
+  {esporte:"Futebol",jogo:"Rosario Central x Platense",mercado:"-3.5 gols",odd:1.14,percent:90},
+  {esporte:"Futebol",jogo:"Rosario Central x Platense",mercado:"Casa ou Empate",odd:1.11,percent:95},
+  {esporte:"Futebol",jogo:"Rosario Central x Platense",mercado:"Vitória Casa",odd:1.72,percent:40},
+  {esporte:"Futebol",jogo:"Botafogo SP x Cuiabá",mercado:"+0.5 gols Casa",odd:1.38,percent:80},
+  {esporte:"Futebol",jogo:"Botafogo SP x Cuiabá",mercado:"-3.5 gols",odd:1.18,percent:90},
+  {esporte:"Futebol",jogo:"Lech Poznan x Pogon Szczecin",mercado:"Casa ou Empate",odd:1.22,percent:70},
+  {esporte:"Futebol",jogo:"Lech Poznan x Pogon Szczecin",mercado:"+1.5 gols",odd:1.14,percent:90},
+  {esporte:"Futebol",jogo:"Lech Poznan x Pogon Szczecin",mercado:"Ambas Marcam",odd:1.50,percent:60},
+  {esporte:"Futebol",jogo:"Lech Poznan x Pogon Szczecin",mercado:"Vitória Casa",odd:1.72,percent:40},
+  {esporte:"Futebol",jogo:"Bahia x Grêmio",mercado:"Casa ou Empate",odd:1.18,percent:70},
+  {esporte:"Futebol",jogo:"Bahia x Grêmio",mercado:"+0.5 gol Casa",odd:1.18,percent:70},
+  {esporte:"Futebol",jogo:"Bahia x Grêmio",mercado:"+1.5 gols",odd:1.36,percent:50},
+  {esporte:"Futebol",jogo:"Nurnberg x Holstein Kiel",mercado:"+1.5 gols",odd:1.20,percent:70},
+  {esporte:"Futebol",jogo:"Tottenham x Aston Villa",mercado:"Dupla Chance Casa",odd:1.28,percent:40},
+  {esporte:"Futebol",jogo:"Tottenham x Aston Villa",mercado:"Ambas Marcam",odd:1.70,percent:60},
+  {esporte:"Futebol",jogo:"Tottenham x Aston Villa",mercado:"+2.5 gols",odd:1.90,percent:30},
+  {esporte:"Futebol",jogo:"Tottenham x Aston Villa",mercado:"+0.5 gols Casa",odd:1.15,percent:80}
+];
+
+// ===== ESTATÍSTICAS DE RESULTADOS =====
+const estatisticas = {
+  totalJogos: 58,
+  totalPalpites: 64,
+  acertos: 36,
+  oddMedia: 1.45,
+  acertosPorTime: {
+    "Liverpool":3,
+    "Paris FC":2,
+    "Tottenham":4
+  },
+  acertosPorMercado:{
+    "+0.5 gols Casa":5,
+    "-1.5 HT":1,
+    "Dupla Chance Casa":3,
+    "Ambas Marcam":2
+  }
+};
+
+// ===== FILTROS =====
 const sportsWrap = document.getElementById("sportsWrap");
 const marketsWrap = document.getElementById("marketsWrap");
-
-sportsList.forEach(s => {
-  let chip = document.createElement("div");
-  chip.textContent = s;
-  chip.className="chip";
-  chip.onclick=()=>chip.classList.toggle("active");
-  sportsWrap.appendChild(chip);
+const sports = [...new Set(palpitesPendentes.map(p=>p.esporte))];
+const markets = [...new Set(palpitesPendentes.map(p=>p.mercado))];
+sports.forEach(s=>{
+  let btn = document.createElement("div");
+  btn.textContent = s; btn.className="chip"; btn.onclick=()=>{btn.classList.toggle("active");}; sportsWrap.appendChild(btn);
 });
-marketsList.forEach(m => {
-  let chip = document.createElement("div");
-  chip.textContent = m;
-  chip.className="chip";
-  chip.onclick=()=>chip.classList.toggle("active");
-  marketsWrap.appendChild(chip);
+markets.forEach(m=>{
+  let btn = document.createElement("div");
+  btn.textContent = m; btn.className="chip"; btn.onclick=()=>{btn.classList.toggle("active");}; marketsWrap.appendChild(btn);
 });
 
-document.getElementById("showFilters").onclick=()=>{
-  const f=document.getElementById("filters");
-  f.style.display=f.style.display==="none"?"block":"none";
+// ===== GERAR BILHETE =====
+const bilheteContainer = document.getElementById("bilheteContainer");
+document.getElementById("generateBtn").onclick = () => {
+  bilheteContainer.innerHTML="";
+  let qtd = Number(document.getElementById("qtd").value);
+  let minOdd = Number(document.getElementById("minOdd").value);
+  let maxOdd = Number(document.getElementById("maxOdd").value);
+  let minPercent = Number(document.getElementById("minPercent").value);
+
+  // Aplicar filtros pendentes
+  let filtered = palpitesPendentes.filter(p => p.odd>=minOdd && p.odd<=maxOdd && p.percent>=minPercent);
+
+  if(filtered.length<qtd) qtd=filtered.length;
+  let bilhete = [], oddTotal=1, percentTotal=0;
+  for(let i=0;i<qtd;i++){
+    let idx = Math.floor(Math.random()*filtered.length);
+    let p = filtered.splice(idx,1)[0];
+    bilhete.push(p);
+    oddTotal*=p.odd;
+    percentTotal+=p.percent;
+  }
+
+  bilhete.forEach(p=>{
+    let div = document.createElement("div");
+    div.className="card";
+    div.innerHTML=`<strong>⚽ ${p.jogo}</strong><br>🏷 ${p.mercado} | Odd: ${p.odd} | %: ${p.percent}%`;
+    bilheteContainer.appendChild(div);
+  });
+
+  // Odd total e % média
+  let totalDiv = document.createElement("div");
+  totalDiv.className="card";
+  totalDiv.innerHTML=`🎯 Odd Total: ${oddTotal.toFixed(2)}<br>✅ % Média: ${(percentTotal/qtd).toFixed(0)}%`;
+  bilheteContainer.appendChild(totalDiv);
 }
 
-document.getElementById("pixBtn").onclick=()=>navigator.clipboard.writeText("geradordebilhete@gmail.com").then(()=>alert("PIX copiado!"));
-</script>
+// ===== ESTATÍSTICAS MODAL =====
+const estatBtn = document.getElementById("estatBtn");
+const estatModal = document.getElementById("estatModal");
+const closeEstat = document.getElementById("closeEstat");
+estatBtn.onclick = () => {
+  estatModal.style.display="block";
+  let content="";
+  content+=`Total Jogos: ${estatisticas.totalJogos}<br>`;
+  content+=`Total Palpites: ${estatisticas.totalPalpites}<br>`;
+  content+=`Acertos: ${estatisticas.acertos}<br>`;
+  content+=`Odd Média: ${estatisticas.oddMedia}<br>`;
+  content+=`<h4>Acertos por Time:</h4>`;
+  for(let t in estatisticas.acertosPorTime) content+=`${t}: ${estatisticas.acertosPorTime[t]}<br>`;
+  content+=`<h4>Acertos por Mercado:</h4>`;
+  for(let m in estatisticas.acertosPorMercado) content+=`${m}: ${estatisticas.acertosPorMercado[m]}<br>`;
+  document.getElementById("estatContent").innerHTML=content;
+}
+closeEstat.onclick=()=>{estatModal.style.display="none";}
+window.onclick=(e)=>{if(e.target===estatModal) estatModal.style.display="none";}
 
+// ===== MOSTRAR FILTROS =====
+document.getElementById("showFilters").onclick=()=>{
+  let f=document.getElementById("filters");
+  f.style.display=(f.style.display==="none")?"flex":"none";
+}
+</script>
+<!-- Estatísticas Modal -->
+<div id="estatModal" class="modal" aria-hidden="true">
+  <div class="panel">
+    <button id="closeEstat" class="btn" style="float:right;">Fechar</button>
+    <h2>📊 Estatísticas do Gerador</h2>
+    <div id="estatContent" style="margin-top:8px"></div>
+  </div>
+</div>
+
+<!-- Botão para abrir modal -->
+<button id="estatBtn" class="btn">📊 Estatísticas</button>
+<script>
+const estatBtn = document.getElementById("estatBtn");
+const estatModal = document.getElementById("estatModal");
+const closeEstat = document.getElementById("closeEstat");
+const estatContent = document.getElementById("estatContent");
+
+// Carrega estatísticas do arquivo externo
+estatBtn.onclick = function(){
+  fetch("estatisticas.json")
+    .then(res => res.json())
+    .then(data => {
+      let html = `<table class="stats">
+        <tr><th>Total de Jogos</th><td>${data.totalJogos}</td></tr>
+        <tr><th>Total de Palpites</th><td>${data.totalPalpites}</td></tr>
+        <tr><th>Acertos (Green)</th><td>${data.acertos}</td></tr>
+        <tr><th>Odd Média</th><td>${data.oddsMedia.toFixed(2)}</td></tr>
+      </table>
+      <h4>Acertos por Mercado</h4>
+      <ul>`;
+      for(let m in data.acertosPorMercado){
+        html += `<li>${m}: ${data.acertosPorMercado[m]}</li>`;
+      }
+      html += `</ul><h4>Acertos por Esporte</h4><ul>`;
+      for(let e in data.acertosPorEsporte){
+        html += `<li>${e}: ${data.acertosPorEsporte[e]}</li>`;
+      }
+      html += `</ul>`;
+      estatContent.innerHTML = html;
+      estatModal.style.display = "block";
+    });
+}
+
+closeEstat.onclick = () => estatModal.style.display = "none";
+window.onclick = function(e){
+  if(e.target === estatModal) estatModal.style.display = "none";
+}
+</script>
 </body>
 </html>
