@@ -1,0 +1,18 @@
+{
+  "totalJogos": 50,
+  "totalPalpites": 50,
+  "acertos": 25,
+  "oddsMedia": 1.45,
+  "acertosPorMercado": {
+    "+1.5 gols": 10,
+    "Vitória Casa": 5,
+    "Dupla Chance Casa": 3,
+    "Ambas Marcam": 7
+  },
+  "acertosPorEsporte": {
+    "Futebol": 25,
+    "Basquete": 0,
+    "Vôlei": 0,
+    "Tênis": 0
+  }
+}
