@@ -70,6 +70,13 @@ table.stats th, table.stats td{padding:8px;border-bottom:1px solid rgba(255,255,
       <div id="sportsWrap" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
       <div style="margin-top:6px;margin-bottom:6px;">Escolher mercado:</div>
       <div id="marketsWrap" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
+			<div style="display:flex;gap:12px;align-items:flex-start;margin-top:12px;">
+  <button id="toggleMarkets" class="btn">📂 Mostrar Mercados</button>
+  <div id="marketCategories" style="display:none;flex-direction:column;gap:6px;background:#0b0b0b;padding:10px;border-radius:8px;max-height:300px;overflow:auto;">
+    <!-- Os botões de mercado serão gerados aqui pelo JS -->
+  </div>
+</div>
+<div id="filteredPalpitesContainer" style="margin-top:12px;"></div>
     </div>
   </div>
 
@@ -230,6 +237,40 @@ generateBtn.onclick=gerarBilhete;
 document.getElementById("pixBtn").onclick=function(){
   navigator.clipboard.writeText("geradordebilhete@gmail.com");
   alert("✅ Pix copiado: geradordebilhete@gmail.com");
+}
+const toggleMarketsBtn = document.getElementById("toggleMarkets");
+const marketCategories = document.getElementById("marketCategories");
+const filteredPalpitesContainer = document.getElementById("filteredPalpitesContainer");
+
+// Criar botões de mercado dinamicamente
+markets.forEach(m => {
+  let btn = document.createElement("button");
+  btn.textContent = m;
+  btn.className = "btn";
+  btn.style.fontSize = "12px";
+  btn.style.padding = "6px 10px";
+  btn.onclick = () => mostrarPalpitesPorMercado(m);
+  marketCategories.appendChild(btn);
+});
+
+// Mostrar/ocultar painel de mercados
+toggleMarketsBtn.onclick = () => {
+  marketCategories.style.display = marketCategories.style.display === "none" ? "flex" : "none";
+};
+
+// Função para filtrar e mostrar palpites
+function mostrarPalpitesPorMercado(mercadoSelecionado) {
+  filteredPalpitesContainer.innerHTML = "";
+  const filtrados = palpites.filter(p => p.mercado === mercadoSelecionado);
+  filtrados.forEach(p => {
+    const div = document.createElement("div");
+    div.style.background = "#111";
+    div.style.padding = "8px";
+    div.style.borderRadius = "6px";
+    div.style.marginBottom = "6px";
+    div.textContent = `${p.jogo} — ${p.mercado} | Odd: ${p.odd} | % Green: ${p.percent}%`;
+    filteredPalpitesContainer.appendChild(div);
+  });
 }
 </script>
 </body>
