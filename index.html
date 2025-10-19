@@ -1,47 +1,44 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>🎯 Gerador de Bilhete 🎟️ Beta</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎯 Gerador de Bilhete Beta</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-:root{
-  --bg:#000;
+:root {
+  --bg:#000000;
   --panel:#0b0b0b;
-  --card:#0f0f0f;
-  --highlight:#00ff88;
-  --accent-dark:#00cc66;
   --muted:#bfbfbf;
+  --accent:#00ff88;
+  --accent2:#00cc66;
+  --card:#0f0f0f;
 }
-*{box-sizing:border-box}
 body{
   margin:0;
   font-family:"Montserrat",sans-serif;
   background:var(--bg);
   color:#f2f2f2;
+  -webkit-font-smoothing:antialiased;
 }
 header{text-align:center;padding:20px;}
-h1{margin:0;color:var(--highlight);font-size:28px;font-weight:700;letter-spacing:0.5px;}
-.wrap{max-width:950px;margin:20px auto;padding:20px;background:var(--panel);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.6);}
-.controls{display:flex;flex-direction:column;gap:12px;}
-.field{display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
-input[type=number]{padding:10px;border-radius:8px;border:1px solid #171717;background:#0c0c0c;color:#f2f2f2;min-width:80px;}
-button.btn{background:var(--highlight);color:#000;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer;transition:0.2s;}
-button.btn:hover{background:var(--accent-dark);}
-.chip{background:#101010;border:1px solid #161616;color:#ddd;padding:6px 10px;border-radius:8px;cursor:pointer;user-select:none;}
-.chip.active{background:var(--highlight);color:#000;}
-#bilheteContainer{margin-top:20px;display:flex;flex-direction:column;align-items:center;gap:12px;}
-.card{background:var(--card);border:1px solid rgba(0,255,136,0.08);padding:16px;border-radius:12px;width:80%;opacity:0;transform:translateY(20px);transition:all 0.4s cubic-bezier(.2,.9,.3,1);}
-.card.show{opacity:1;transform:none;text-align:center;}
-.card h3{margin:0 0 10px;font-size:18px;color:#fff;}
-.stats-line{margin-top:8px;font-size:14px;color:var(--highlight);}
-#marketSportPanel{display:none;flex-direction:column;gap:8px;margin-top:10px;}
-.togglePanel{cursor:pointer;color:var(--highlight);text-decoration:underline;font-size:14px;}
-#statsPanel{margin-top:20px;padding:12px;background:#101010;border-radius:12px;color:#fff;}
-#topBilhete{margin-top:20px;padding:16px;background:#111;border-radius:12px;border:2px solid var(--highlight);text-align:center;font-weight:600;font-size:16px;display:none;}
+h1{color:var(--accent);margin:0;font-size:24px;font-weight:700;text-shadow:0 0 8px rgba(0,255,136,0.1);}
+.wrap{max-width:900px;margin:0 auto;padding:16px;background:var(--panel);border-radius:12px;}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+input, select{padding:10px;border-radius:8px;border:none;background:#111;color:#fff;}
+button.btn{background:var(--accent);color:#000;border:none;padding:10px 14px;border-radius:8px;font-weight:600;cursor:pointer;}
+button.ghost{background:transparent;border:1px solid #222;color:#f2f2f2;}
+.card{background:var(--card);border:1px solid rgba(0,255,136,0.08);padding:14px;border-radius:12px;margin-top:14px;animation:fadeUp 0.5s ease forwards;opacity:0;transform:translateY(20px);}
+@keyframes fadeUp{
+  to{opacity:1;transform:translateY(0);}
+}
+.stats-line{margin-top:8px;font-size:14px;color:var(--muted);}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:50;padding:28px;overflow:auto;}
+.modal .panel{max-width:900px;margin:20px auto;background:#070707;padding:18px;border-radius:12px;}
+.chip{background:#101010;border:1px solid #161616;color:#ddd;padding:8px 10px;border-radius:10px;cursor:pointer;user-select:none;}
+.chip.active{background:var(--accent);color:#000;transform:scale(1.03);box-shadow:0 6px 18px rgba(0,255,136,0.08);}
+#filters{display:none;margin-top:12px;gap:8px;}
 </style>
 </head>
 <body>
@@ -51,195 +48,162 @@ button.btn:hover{background:var(--accent-dark);}
 </header>
 
 <div class="wrap">
-
-  <div class="controls">
-    <div class="field">
-      <label>Quantidade de jogos</label>
-      <input id="qtd" type="number" value="5" min="1">
-      <label>Odd mínima</label>
-      <input id="minOdd" type="number" step="0.01" value="1.2">
-      <label>Odd máxima</label>
-      <input id="maxOdd" type="number" step="0.01" value="2.5">
-      <label>% mínimo de acerto</label>
-      <input id="minPercent" type="number" step="1" value="50">
-    </div>
-
-    <div class="togglePanel" onclick="document.getElementById('marketSportPanel').style.display = document.getElementById('marketSportPanel').style.display==='flex'?'none':'flex'">
-      🔽 Mostrar mercados e esportes
-    </div>
-    <div id="marketSportPanel">
-      <div class="markets" id="marketsWrap"></div>
-      <div class="sports" id="sportsWrap"></div>
-    </div>
-
-    <div style="margin-top:12px;display:flex;justify-content:center;">
-      <button id="generateBtn" class="btn">🎲 Gerar Bilhete</button>
-    </div>
+  <div class="row" style="justify-content:center;gap:12px;flex-wrap:wrap;">
+    <label>Qtd de Jogos</label>
+    <input id="qtd" type="number" min="1" value="3" style="width:70px;">
+    <label>Odd Mínima</label>
+    <input id="minOdd" type="number" step="0.01" value="1.20" style="width:70px;">
+    <label>Odd Máxima</label>
+    <input id="maxOdd" type="number" step="0.01" value="2.50" style="width:70px;">
+    <label>% Mínimo</label>
+    <input id="minPercent" type="number" step="1" value="50" style="width:70px;">
   </div>
 
-  <div id="topBilhete"></div>
-  <div id="bilheteContainer"></div>
-
-  <div id="statsPanel">
-    <h3>📊 Estatísticas do Gerador</h3>
-    <div id="totalGames">Total de jogos pendentes: 0</div>
-    <div id="totalBets">Total de palpites: 0</div>
-    <div id="totalGreen">Acertos (Green): 0</div>
-    <div id="totalRed">Erros (Red): 0</div>
-    <div id="avgOdd">Odd média: 0</div>
-    <div id="perTeam"></div>
-    <div id="perMarket"></div>
+  <div style="text-align:center;margin-top:12px;">
+    <button id="generateBtn" class="btn">🎲 Gerar Bilhete</button>
+    <button id="estatBtn" class="btn">📊 Estatísticas</button>
+    <button id="showFilters" class="btn">⚙️ Mostrar filtros</button>
   </div>
 
-  <div style="margin-top:20px;text-align:center;">
-    <button id="pixBtn" class="btn" style="background:#ffcc00;">💰 Doe via Pix</button>
+  <div id="filters">
+    <div style="margin-top:10px;">Escolher Esporte:</div>
+    <div id="sportsWrap" class="row"></div>
+    <div style="margin-top:10px;">Escolher Mercado:</div>
+    <div id="marketsWrap" class="row"></div>
   </div>
 
+  <div id="bilheteContainer" style="display:flex;flex-direction:column;align-items:center;"></div>
+
+  <div style="text-align:center;margin-top:20px;">
+    <button id="pixBtn" class="btn" style="background:#ffcc00;color:#000;">💛 Doação Pix</button>
+  </div>
 </div>
 
-<div class="foot">© 2025 Gerador de Bilhete Beta</div>
+<!-- Estatísticas -->
+<div id="estatModal" class="modal">
+  <div class="panel">
+    <button id="closeEstat" class="btn">Fechar</button>
+    <h2>📊 Estatísticas do Gerador</h2>
+    <div id="estatContent"></div>
+  </div>
+</div>
 
 <script>
-// ==== PALPITES PENDENTES ====
-const palpites = [
-  {esporte:"Futebol", jogo:"Getafe x Real Madrid", mercado:"Vitória Fora", odd:1.42, percent:62},
-  {esporte:"Futebol", jogo:"Getafe x Real Madrid", mercado:"+1.5 gols Fora", odd:1.57, percent:62},
-  {esporte:"Futebol", jogo:"Getafe x Real Madrid", mercado:"+0.5 gol Fora", odd:1.11, percent:62},
-  {esporte:"Futebol", jogo:"Freiburg x Frankfurt", mercado:"+1.5 gols", odd:1.20, percent:62},
-  {esporte:"Futebol", jogo:"St Pauli x Hoffenheim", mercado:"+1.5 gols", odd:1.25, percent:62},
-  {esporte:"Futebol", jogo:"Cagliari x Bologna", mercado:"-3.5 gols", odd:1.22, percent:62},
-  {esporte:"Futebol", jogo:"Cagliari x Bologna", mercado:"Dupla Chance Fora", odd:1.28, percent:62},
-  {esporte:"Futebol", jogo:"Cagliari x Bologna", mercado:"+0.5 gols Fora", odd:1.28, percent:62},
-  {esporte:"Futebol", jogo:"Lazio x Atalanta", mercado:"+1.5 gols", odd:1.25, percent:62},
-  {esporte:"Futebol", jogo:"Milan x Fiorentina", mercado:"+1.5 gols", odd:1.28, percent:62},
-  {esporte:"Futebol", jogo:"Milan x Fiorentina", mercado:"Dupla Chance Casa", odd:1.14, percent:62},
-  {esporte:"Futebol", jogo:"Milan x Fiorentina", mercado:"Ambas Marcam", odd:1.95, percent:62},
-  {esporte:"Futebol", jogo:"Milan x Fiorentina", mercado:"+2.5 gols", odd:1.90, percent:62},
-  {esporte:"Futebol", jogo:"Lens x Paris FC", mercado:"+1.5 gols", odd:1.20, percent:62},
-  {esporte:"Futebol", jogo:"Lens x Paris FC", mercado:"Ambas Marcam", odd:1.60, percent:62},
-  {esporte:"Futebol", jogo:"Lens x Paris FC", mercado:"+0.5 gol 1T", odd:1.30, percent:62},
-  {esporte:"Futebol", jogo:"Lens x Paris FC", mercado:"Casa ou Empate", odd:1.22, percent:62},
-  {esporte:"Futebol", jogo:"Lens x Paris FC", mercado:"+0.5 gol Casa", odd:1.14, percent:62},
-  {esporte:"Futebol", jogo:"Nantes x Lille", mercado:"0.5 gol 1T", odd:1.36, percent:62},
-  {esporte:"Futebol", jogo:"Nantes x Lille", mercado:"Ambas Marcam", odd:1.75, percent:62},
-  {esporte:"Futebol", jogo:"Nantes x Lille", mercado:"0.5 gol Fora", odd:1.18, percent:62},
-  {esporte:"Futebol", jogo:"Nantes x Lille", mercado:"Fora ou Empate", odd:1.22, percent:62},
-  {esporte:"Futebol", jogo:"Nantes x Lille", mercado:"+1.5 gols", odd:1.28, percent:62},
-  {esporte:"Futebol", jogo:"Nantes x Lille", mercado:"+2.5 gols", odd:1.90, percent:62},
-  {esporte:"Futebol", jogo:"Empoli x Venezia", mercado:"-3.5 gols", odd:1.22, percent:62},
-  {esporte:"Futebol", jogo:"Empoli x Venezia", mercado:"-1.5 gols 1T", odd:1.33, percent:62},
-  {esporte:"Futebol", jogo:"Botafogo SP x Cuiabá", mercado:"+0.5 gols Fora", odd:1.38, percent:62},
-  {esporte:"Futebol", jogo:"Botafogo SP x Cuiabá", mercado:"-3.5 gols", odd:1.18, percent:62},
-  {esporte:"Futebol", jogo:"Nurnberg x Holstein Kiel", mercado:"+1.5 gols", odd:1.20, percent:62},
-  {esporte:"Futebol", jogo:"Tottenham x Aston Villa", mercado:"Dupla Chance Casa", odd:1.28, percent:62},
-  {esporte:"Futebol", jogo:"Tottenham x Aston Villa", mercado:"Ambas Marcam", odd:1.70, percent:62},
-  {esporte:"Futebol", jogo:"Tottenham x Aston Villa", mercado:"+2.5 gols", odd:1.90, percent:62},
-  {esporte:"Futebol", jogo:"Tottenham x Aston Villa", mercado:"+1.5 gols", odd:1.28, percent:62},
+// ===== PALPITES PENDENTES =====
+const palpitesPendentes = [
+  {esporte:"Futebol",jogo:"Rosario Central x Platense",mercado:"-3.5 gols",odd:1.14,percent:90},
+  {esporte:"Futebol",jogo:"Rosario Central x Platense",mercado:"Casa ou Empate",odd:1.11,percent:95},
+  {esporte:"Futebol",jogo:"Rosario Central x Platense",mercado:"Vitória Casa",odd:1.72,percent:40},
+  {esporte:"Futebol",jogo:"Botafogo SP x Cuiabá",mercado:"+0.5 gols Casa",odd:1.38,percent:80},
+  {esporte:"Futebol",jogo:"Botafogo SP x Cuiabá",mercado:"-3.5 gols",odd:1.18,percent:90},
+  {esporte:"Futebol",jogo:"Lech Poznan x Pogon Szczecin",mercado:"Casa ou Empate",odd:1.22,percent:70},
+  {esporte:"Futebol",jogo:"Lech Poznan x Pogon Szczecin",mercado:"+1.5 gols",odd:1.14,percent:90},
+  {esporte:"Futebol",jogo:"Lech Poznan x Pogon Szczecin",mercado:"Ambas Marcam",odd:1.50,percent:60},
+  {esporte:"Futebol",jogo:"Lech Poznan x Pogon Szczecin",mercado:"Vitória Casa",odd:1.72,percent:40},
+  {esporte:"Futebol",jogo:"Bahia x Grêmio",mercado:"Casa ou Empate",odd:1.18,percent:70},
+  {esporte:"Futebol",jogo:"Bahia x Grêmio",mercado:"+0.5 gol Casa",odd:1.18,percent:70},
+  {esporte:"Futebol",jogo:"Bahia x Grêmio",mercado:"+1.5 gols",odd:1.36,percent:50},
+  {esporte:"Futebol",jogo:"Nurnberg x Holstein Kiel",mercado:"+1.5 gols",odd:1.20,percent:70},
+  {esporte:"Futebol",jogo:"Tottenham x Aston Villa",mercado:"Dupla Chance Casa",odd:1.28,percent:40},
+  {esporte:"Futebol",jogo:"Tottenham x Aston Villa",mercado:"Ambas Marcam",odd:1.70,percent:60},
+  {esporte:"Futebol",jogo:"Tottenham x Aston Villa",mercado:"+2.5 gols",odd:1.90,percent:30},
+  {esporte:"Futebol",jogo:"Tottenham x Aston Villa",mercado:"+0.5 gols Casa",odd:1.15,percent:80}
 ];
 
-// ==== RESULTADOS ANTIGOS ====
-const resultados = {
-  green:[56,54,52,46,47,45,28,27,26,25,24,18,17,16,15,14,8,7,5,4,2,1,55],
-  red:[58,45,3,1]
+// ===== ESTATÍSTICAS DE RESULTADOS =====
+const estatisticas = {
+  totalJogos: 58,
+  totalPalpites: 64,
+  acertos: 36,
+  oddMedia: 1.45,
+  acertosPorTime: {
+    "Liverpool":3,
+    "Paris FC":2,
+    "Tottenham":4
+  },
+  acertosPorMercado:{
+    "+0.5 gols Casa":5,
+    "-1.5 HT":1,
+    "Dupla Chance Casa":3,
+    "Ambas Marcam":2
+  }
 };
 
-// ==== MERCADOS E ESPORTES ====
-const sports = ["Futebol","Basquete","Vôlei","Tênis"];
-const markets = ["Dupla Chance Casa","Dupla Chance Fora","+1.5 gols","+2.5 gols","-3.5 gols","+0.5 gol 1T","Vitória Casa","Vitória Fora","Ambas Marcam","+0.5 gol Casa","+0.5 gol fora","-1.5 HT"];
-
+// ===== FILTROS =====
 const sportsWrap = document.getElementById("sportsWrap");
-sports.forEach(s => {
-  let chip = document.createElement("div");
-  chip.textContent=s;
-  chip.className="chip";
-  chip.onclick=()=>chip.classList.toggle("active");
-  sportsWrap.appendChild(chip);
-});
-
 const marketsWrap = document.getElementById("marketsWrap");
-markets.forEach(m => {
-  let chip = document.createElement("div");
-  chip.textContent=m;
-  chip.className="chip";
-  chip.onclick=()=>chip.classList.toggle("active");
-  marketsWrap.appendChild(chip);
+const sports = [...new Set(palpitesPendentes.map(p=>p.esporte))];
+const markets = [...new Set(palpitesPendentes.map(p=>p.mercado))];
+sports.forEach(s=>{
+  let btn = document.createElement("div");
+  btn.textContent = s; btn.className="chip"; btn.onclick=()=>{btn.classList.toggle("active");}; sportsWrap.appendChild(btn);
+});
+markets.forEach(m=>{
+  let btn = document.createElement("div");
+  btn.textContent = m; btn.className="chip"; btn.onclick=()=>{btn.classList.toggle("active");}; marketsWrap.appendChild(btn);
 });
 
-// ==== GERAR BILHETE E ESTATÍSTICAS ====
+// ===== GERAR BILHETE =====
 const bilheteContainer = document.getElementById("bilheteContainer");
-const topBilheteDiv = document.getElementById("topBilhete");
-const generateBtn = document.getElementById("generateBtn");
-const qtdInput = document.getElementById("qtd");
-const minOddInput = document.getElementById("minOdd");
-const maxOddInput = document.getElementById("maxOdd");
-const minPercentInput = document.getElementById("minPercent");
-
-const totalGamesDiv = document.getElementById("totalGames");
-const totalBetsDiv = document.getElementById("totalBets");
-const totalGreenDiv = document.getElementById("totalGreen");
-const totalRedDiv = document.getElementById("totalRed");
-const avgOddDiv = document.getElementById("avgOdd");
-const perTeamDiv = document.getElementById("perTeam");
-const perMarketDiv = document.getElementById("perMarket");
-
-function atualizarEstatisticas(){
-  totalGamesDiv.textContent = `Total de jogos pendentes: ${palpites.length}`;
-  totalBetsDiv.textContent = `Total de palpites: ${palpites.length}`;
-  totalGreenDiv.textContent = `Acertos (Green): ${resultados.green.length}`;
-  totalRedDiv.textContent = `Erros (Red): ${resultados.red.length}`;
-  const mediaOdd = (palpites.reduce((sum,p)=>sum+p.odd,0)/palpites.length).toFixed(2);
-  avgOddDiv.textContent = `Odd média: ${mediaOdd}`;
-
-  let perTeam = {};
-  let perMarket = {};
-  palpites.forEach(p=>{
-    perTeam[p.jogo] = (perTeam[p.jogo]||0)+1;
-    perMarket[p.mercado] = (perMarket[p.mercado]||0)+1;
-  });
-  let perTeamStr = "✅ Jogos por time:<br>"+Object.entries(perTeam).map(([k,v])=>`${k}: ${v}`).join("<br>");
-  let perMarketStr = "✅ Palpites por mercado:<br>"+Object.entries(perMarket).map(([k,v])=>`${k}: ${v}`).join("<br>");
-  perTeamDiv.innerHTML=perTeamStr;
-  perMarketDiv.innerHTML=perMarketStr;
-}
-
-function gerarBilhete(){
+document.getElementById("generateBtn").onclick = () => {
   bilheteContainer.innerHTML="";
-  topBilheteDiv.style.display="none";
-  let qtd = Number(qtdInput.value);
-  let minOdd = Number(minOddInput.value);
-  let maxOdd = Number(maxOddInput.value);
-  let minPerc = Number(minPercentInput.value);
+  let qtd = Number(document.getElementById("qtd").value);
+  let minOdd = Number(document.getElementById("minOdd").value);
+  let maxOdd = Number(document.getElementById("maxOdd").value);
+  let minPercent = Number(document.getElementById("minPercent").value);
 
-  let activeMarkets = Array.from(document.querySelectorAll("#marketsWrap .chip.active")).map(c=>c.textContent);
-  let activeSports = Array.from(document.querySelectorAll("#sportsWrap .chip.active")).map(c=>c.textContent);
+  // Aplicar filtros pendentes
+  let filtered = palpitesPendentes.filter(p => p.odd>=minOdd && p.odd<=maxOdd && p.percent>=minPercent);
 
-  let filtered = palpites.filter(p=>p.odd>=minOdd && p.odd<=maxOdd && p.percent>=minPerc);
-  if(activeMarkets.length>0) filtered=filtered.filter(p=>activeMarkets.includes(p.mercado));
-  if(activeSports.length>0) filtered=filtered.filter(p=>activeSports.includes(p.esporte));
+  if(filtered.length<qtd) qtd=filtered.length;
+  let bilhete = [], oddTotal=1, percentTotal=0;
+  for(let i=0;i<qtd;i++){
+    let idx = Math.floor(Math.random()*filtered.length);
+    let p = filtered.splice(idx,1)[0];
+    bilhete.push(p);
+    oddTotal*=p.odd;
+    percentTotal+=p.percent;
+  }
 
-  if(filtered.length===0){bilheteContainer.innerHTML="<div class='card show'>Nenhum palpite encontrado 😕</div>"; return;}
-
-  // destaca o bilhete mais provável
-  let top = filtered.reduce((a,b)=>a.percent>b.percent?a:b);
-  topBilheteDiv.style.display="block";
-  topBilheteDiv.innerHTML=`🔥 Bilhete Top: ${top.jogo} | Odd: ${top.odd} | Prob: ${top.percent}%`;
-
-  let bilhete = filtered.slice(0,qtd);
-  bilhete.forEach((p,i)=>{
-    let card = document.createElement("div");
-    card.className="card";
-    setTimeout(()=>card.classList.add("show"),i*100);
-    card.innerHTML=`<h3>🎯 ${p.jogo}</h3>
-                    <div>🏷️ Mercado: ${p.mercado}</div>
-                    <div>📊 Odd: ${p.odd} | Probabilidade: ${p.percent}%</div>`;
-    bilheteContainer.appendChild(card);
+  bilhete.forEach(p=>{
+    let div = document.createElement("div");
+    div.className="card";
+    div.innerHTML=`<strong>⚽ ${p.jogo}</strong><br>🏷 ${p.mercado} | Odd: ${p.odd} | %: ${p.percent}%`;
+    bilheteContainer.appendChild(div);
   });
 
-  atualizarEstatisticas();
+  // Odd total e % média
+  let totalDiv = document.createElement("div");
+  totalDiv.className="card";
+  totalDiv.innerHTML=`🎯 Odd Total: ${oddTotal.toFixed(2)}<br>✅ % Média: ${(percentTotal/qtd).toFixed(0)}%`;
+  bilheteContainer.appendChild(totalDiv);
 }
 
-generateBtn.onclick=gerarBilhete;
-atualizarEstatisticas();
+// ===== ESTATÍSTICAS MODAL =====
+const estatBtn = document.getElementById("estatBtn");
+const estatModal = document.getElementById("estatModal");
+const closeEstat = document.getElementById("closeEstat");
+estatBtn.onclick = () => {
+  estatModal.style.display="block";
+  let content="";
+  content+=`Total Jogos: ${estatisticas.totalJogos}<br>`;
+  content+=`Total Palpites: ${estatisticas.totalPalpites}<br>`;
+  content+=`Acertos: ${estatisticas.acertos}<br>`;
+  content+=`Odd Média: ${estatisticas.oddMedia}<br>`;
+  content+=`<h4>Acertos por Time:</h4>`;
+  for(let t in estatisticas.acertosPorTime) content+=`${t}: ${estatisticas.acertosPorTime[t]}<br>`;
+  content+=`<h4>Acertos por Mercado:</h4>`;
+  for(let m in estatisticas.acertosPorMercado) content+=`${m}: ${estatisticas.acertosPorMercado[m]}<br>`;
+  document.getElementById("estatContent").innerHTML=content;
+}
+closeEstat.onclick=()=>{estatModal.style.display="none";}
+window.onclick=(e)=>{if(e.target===estatModal) estatModal.style.display="none";}
+
+// ===== MOSTRAR FILTROS =====
+document.getElementById("showFilters").onclick=()=>{
+  let f=document.getElementById("filters");
+  f.style.display=(f.style.display==="none")?"flex":"none";
+}
 </script>
 
 </body>
