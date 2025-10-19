@@ -8,129 +8,178 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
-  --bg:#000; --panel:#0b0b0b; --muted:#bfbfbf; --accent:#00ff88; --accent-2:#00cc66; --card:#0f0f0f;
+  --bg:#000000;
+  --panel:#07100b;
+  --muted:#bfbfbf;
+  --accent:#00ff66;
+  --accent-2:#00cc66;
+  --card:#0f0f0f;
+  --sidebar-width:260px;
 }
 *{box-sizing:border-box}
 body{margin:0;font-family:"Montserrat",system-ui,Arial,sans-serif;background:var(--bg);color:#f2f2f2;-webkit-font-smoothing:antialiased;}
-header{text-align:center;padding:18px 12px;}
-h1{margin:0;color:var(--accent);font-size:22px;font-weight:700;}
-.wrap{max-width:1000px;margin:18px auto;padding:18px;background:var(--panel);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
-.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;}
-label.small{font-size:13px;color:var(--muted);display:flex;flex-direction:column;align-items:center;}
-input[type=number], input[type=text]{background:#0b0b0b;border:1px solid #171717;color:#f2f2f2;padding:8px;border-radius:8px;width:86px;text-align:center;}
-button{cursor:pointer;border:none;border-radius:8px;font-weight:600;}
-button.btn{background:var(--accent);color:#000;padding:10px 14px;box-shadow:0 6px 18px rgba(0,255,136,0.06);}
-button.ghost{background:transparent;border:1px solid #222;color:var(--muted);}
-.chip{background:#101010;border:1px solid #161616;color:#ddd;padding:8px 10px;border-radius:10px;cursor:pointer;user-select:none;}
-.chip.active{background:var(--accent);color:#000;transform:scale(1.03);box-shadow:0 6px 18px rgba(0,255,136,0.08);}
-.controls{display:flex;flex-direction:column;gap:12px;}
-.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
-#bilheteContainer{margin-top:18px;display:flex;flex-direction:column;align-items:center;gap:12px;min-height:120px;}
-.card{background:var(--card);border:1px solid rgba(0,255,136,0.08);padding:16px;border-radius:12px;opacity:0;transform:translateY(18px);transition:all .35s cubic-bezier(.2,.9,.3,1);width:88%;max-width:780px;}
-.card.show{opacity:1;transform:none;}
-.card h3{margin:0;font-size:16px;color:#fff;}
+a{color:inherit}
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-width);background:#040504;border-right:1px solid rgba(0,255,102,0.06);
+  padding:18px 12px;display:flex;flex-direction:column;gap:14px;
+}
+.brand{display:flex;align-items:center;gap:10px}
+.brand h2{margin:0;color:var(--accent);font-size:16px}
+.menu{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.menu button{display:flex;gap:8px;align-items:center;padding:10px;border-radius:10px;border:none;background:transparent;color:var(--muted);cursor:pointer;text-align:left}
+.menu button.active{background:linear-gradient(90deg, rgba(0,255,102,0.06), rgba(0,255,102,0.02));color:#000;background-color:var(--accent);font-weight:700}
+.menu .sep{height:1px;background:rgba(255,255,255,0.02);margin:8px 0}
+.logout{margin-top:auto}
+.wrap{margin-left:var(--sidebar-width);padding:22px;min-height:100vh}
+.header{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.header h1{margin:0;color:var(--accent);font-size:20px}
+.controls{margin-top:18px;background:var(--panel);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+label.small{font-size:13px;color:var(--muted);display:flex;flex-direction:column;align-items:flex-start;}
+input[type=number], input[type=text], select {background:#0b0b0b;border:1px solid #171717;color:#f2f2f2;padding:8px;border-radius:8px;width:120px}
+.btn{background:var(--accent);color:#000;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+.ghost{background:transparent;border:1px solid #222;color:var(--muted);padding:8px 12px;border-radius:8px}
+.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:#101010;border:1px solid #161616;color:#ddd;padding:8px 12px;border-radius:12px;cursor:pointer;user-select:none}
+.chip.active{background:var(--accent);color:#000;transform:scale(1.02);box-shadow:0 6px 18px rgba(0,255,102,0.06)}
+#bilheteContainer{margin-top:18px;display:flex;flex-direction:column;gap:12px;min-height:140px;align-items:center}
+
+/* card / bilhete */
+.card{background:var(--card);border:1px solid rgba(0,255,102,0.06);padding:16px;border-radius:12px;opacity:0;transform:translateY(20px) scale(.98);transition:all .38s cubic-bezier(.2,.9,.3,1);width:100%;max-width:820px}
+.card.show{opacity:1;transform:none}
+.card h3{margin:0;color:#fff;font-size:16px}
 .meta{font-size:13px;color:var(--muted);margin-top:6px}
-.stats-line{margin-top:8px;font-size:14px;color:var(--accent)}
-.legend{margin-top:10px;color:var(--muted);font-size:13px;text-align:center}
-.foot{margin-top:18px;color:#7a7a7a;font-size:13px;text-align:center}
+.stats-line{margin-top:10px;font-size:14px;color:var(--accent)}
+.small{font-size:13px;color:var(--muted)}
 
-/* login overlay */
-#loginOverlay{position:fixed;inset:0;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;z-index:9999;}
-#loginBox{background:#0b0b0b;padding:22px;border-radius:12px;max-width:460px;width:96%;text-align:center;border:1px solid rgba(255,255,255,0.02);}
-#loginBox input{padding:10px;border-radius:8px;border:1px solid #222;width:100%;margin-bottom:12px;background:#111;color:#fff;}
+/* modal destaque */
+#bilheteModal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);z-index:9999}
+#bilheteModal.show{display:flex}
+.modalCard{width:92%;max-width:760px;background:linear-gradient(180deg,#0d0d0d,#090909);padding:18px;border-radius:12px;border:1px solid rgba(0,255,102,0.06);transform:scale(.9);opacity:0;transition:all .28s}
+#bilheteModal.show .modalCard{transform:scale(1);opacity:1}
 
-/* days chips */
-#daysWrap{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
-
-/* bilhete modal destaque */
-#bilheteModal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);z-index:10000;}
-#bilheteModal .modalCard{width:92%;max-width:720px;background:linear-gradient(180deg,#0f0f0f,#0b0b0b);padding:20px;border-radius:12px;border:1px solid rgba(0,255,136,0.08);transform:scale(.9);opacity:0;transition:all .35s;}
-#bilheteModal.show{display:flex;}
-#bilheteModal.show .modalCard{transform:scale(1);opacity:1;}
-
-/* estat modal */
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:60;padding:28px;overflow:auto;}
+/* modal estat */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:60;padding:28px;overflow:auto}
 .modal .panel{max-width:900px;margin:20px auto;background:#070707;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
-.modal h2{margin:0 0 8px;color:var(--accent)}
 table.stats{width:100%;border-collapse:collapse;margin-top:10px;color:var(--muted);font-size:14px}
 table.stats th, table.stats td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.02);text-align:left}
 
-@media(max-width:720px){ .row{flex-direction:column;align-items:stretch} .card{width:94%} }
+/* responsive */
+@media(max-width:900px){ .sidebar{display:none} .wrap{margin-left:0;padding:14px} }
 </style>
 </head>
 <body>
 
-<!-- LOGIN OVERLAY -->
-<div id="loginOverlay" aria-hidden="false">
-  <div id="loginBox" role="dialog" aria-labelledby="loginTitle">
-    <h2 id="loginTitle">🎯 Gerador de Bilhete 🎟️ Beta</h2>
-    <input id="loginCode" placeholder="Digite seu código (ex: 174325)" autocomplete="off">
-    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:6px">
-      <button id="loginBtn" class="btn">Entrar</button>
-      <button id="loginShowCodes" class="ghost" title="Mostrar códigos (apenas dev)">Mostrar (dev)</button>
+<!-- SIDEBAR -->
+<nav class="sidebar" aria-label="Menu principal">
+  <div class="brand">
+    <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#07150b,#001a0d);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:800">🎯</div>
+    <div>
+      <h2>Gerador de Bilhete</h2>
+      <div class="small" style="color:var(--muted)">Beta</div>
     </div>
-    <div id="loginMsg" style="color:#f33;margin-top:6px;font-size:13px"></div>
-    <div style="margin-top:10px;font-size:13px;color:var(--muted)">Códigos são uso único (exceto admin) — controlados localmente.</div>
   </div>
-</div>
 
-<header>
-  <h1>🎯 Gerador de Bilhete 🎟️ <small style="font-size:12px;color:#aaa;">Beta</small></h1>
-</header>
+  <div class="menu" role="menu" aria-hidden="false">
+    <button id="menuBilhetes" class="active">⚽ Palpites / Gerar</button>
+    <button id="menuEstat">📊 Estatísticas</button>
+    <button id="menuPix">💰 Pix</button>
+    <div class="sep"></div>
+    <button id="menuCopiar">📋 Copiar</button>
+    <button id="menuPdf">💾 PDF</button>
+    <div class="sep"></div>
+    <button id="menuLogout" class="ghost">🔐 Logout</button>
+  </div>
 
-<main class="wrap" role="main">
-  <section class="controls">
-    <div class="row">
-      <label class="small">Quantidade de jogos
-        <input id="qtd" type="number" min="1" value="3">
-      </label>
-      <label class="small">Odd mínima
-        <input id="minOdd" type="number" step="0.01" value="1.20">
-      </label>
-      <label class="small">Odd máxima
-        <input id="maxOdd" type="number" step="0.01" value="2.50">
-      </label>
-      <label class="small">% mínimo de acerto
-        <input id="minPercent" type="number" step="1" value="50">
-      </label>
+  <div class="logout">
+    <div class="small" style="color:var(--muted);margin-bottom:8px">Códigos:</div>
+    <div class="small" style="color:var(--muted)">Admin: <strong>082111</strong></div>
+    <div class="small" style="color:var(--muted)">25x 24h • 24x 30d</div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="wrap" role="main">
+  <div class="header">
+    <h1>🎯 Gerador de Bilhete 🎟️</h1>
+    <div class="small">Tema escuro • Neon</div>
+  </div>
+
+  <!-- login overlay (center) -->
+  <div id="loginOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;z-index:9998">
+    <div id="loginBox" style="background:#0b0b0b;padding:22px;border-radius:12px;width:96%;max-width:420px;border:1px solid rgba(255,255,255,0.02);text-align:center">
+      <h2 style="margin:0 0 8px;color:var(--accent)">🎯 Gerador de Bilhete</h2>
+      <input id="loginCode" placeholder="Digite seu código (ex: 174325)" style="padding:10px;border-radius:8px;border:1px solid #222;width:100%;margin-bottom:10px;background:#111;color:#fff" autocomplete="off">
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button id="loginBtn" class="btn">Entrar</button>
+        <button id="loginShowCodes" class="ghost">Mostrar (dev)</button>
+      </div>
+      <div id="loginMsg" style="color:#f33;margin-top:8px;font-size:13px"></div>
+      <div style="margin-top:10px;font-size:13px;color:var(--muted)">Códigos são de uso único (exceto admin). Estado salvo localmente.</div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <section class="controls" aria-labelledby="controlsTitle">
+    <div class="row" style="justify-content:space-between">
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <label class="small">Quantidade de jogos
+          <input id="qtd" type="number" min="1" value="3">
+        </label>
+        <label class="small">Odd mínima
+          <input id="minOdd" type="number" step="0.01" value="1.20">
+        </label>
+        <label class="small">Odd máxima
+          <input id="maxOdd" type="number" step="0.01" value="2.50">
+        </label>
+        <label class="small">% mínimo de acerto
+          <input id="minPercent" type="number" step="1" value="50">
+        </label>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="generateBtn" class="btn" style="font-size:15px;padding:10px 18px;">🎲 Gerar Bilhete</button>
+      </div>
     </div>
 
-    <div style="margin-top:12px;text-align:center;">
-      <button id="generateBtn" class="btn" style="font-size:16px;padding:12px 20px;">🎲 Gerar Bilhete</button>
+    <div style="margin-top:12px" class="small">Filtros</div>
+
+    <div style="margin-top:8px" class="row">
+      <div>
+        <div class="small" style="margin-bottom:6px">Esportes</div>
+        <div id="sportsWrap" class="chips"></div>
+      </div>
+
+      <div>
+        <div class="small" style="margin-bottom:6px">Mercados</div>
+        <div id="marketsWrap" class="chips" style="max-width:520px"></div>
+      </div>
+
+      <div>
+        <div class="small" style="margin-bottom:6px">Data</div>
+        <div id="daysWrap" class="chips"></div>
+      </div>
     </div>
 
-    <div class="actions" style="margin-top:12px;">
+    <div class="actions">
       <button id="estatBtn" class="btn">📊 Estatísticas</button>
       <button id="copiarBtn" class="btn">📋 Copiar</button>
       <button id="pdfBtn" class="btn">💾 PDF</button>
     </div>
 
-    <div style="margin-top:14px;text-align:center;">
-      <div style="color:var(--muted);margin-bottom:6px">Escolher esporte</div>
-      <div id="sportsWrap" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"></div>
-    </div>
-
-    <div style="margin-top:12px;text-align:center;">
-      <div style="color:var(--muted);margin-bottom:6px">Escolher mercados</div>
-      <div id="marketsWrap" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"></div>
-    </div>
-
-    <div style="margin-top:12px;text-align:center;">
-      <div style="color:var(--muted);margin-bottom:6px">Escolher data</div>
-      <div id="daysWrap"></div>
-    </div>
-
-    <div style="margin-top:12px;">
+    <div style="margin-top:12px">
       <button id="pixBtn" class="btn" style="background:#ffcc00;color:#000;width:100%;">Pix e-mail: geradordebilhete@gmail.com — Clique para copiar (ajude um pobre)</button>
     </div>
-    <div class="legend">Se escolher um dia sem palpites, o app avisará.</div>
   </section>
 
+  <!-- bilhetes area -->
   <div id="bilheteContainer" aria-live="polite"></div>
-</main>
 
-<!-- Bilhete modal destaque -->
-<div id="bilheteModal" role="dialog" aria-hidden="true">
+</div>
+
+<!-- BILHETE MODAL -->
+<div id="bilheteModal" aria-hidden="true">
   <div class="modalCard" role="document">
     <div id="modalBilheteInner"></div>
     <div style="text-align:right;margin-top:12px;">
@@ -139,7 +188,7 @@ table.stats th, table.stats td{padding:8px;border-bottom:1px solid rgba(255,255,
   </div>
 </div>
 
-<!-- Estatísticas Modal -->
+<!-- ESTAT MODAL -->
 <div id="estatModal" class="modal" aria-hidden="true">
   <div class="panel">
     <button id="closeEstat" style="float:right;background:var(--accent);border:none;padding:8px 10px;border-radius:8px;cursor:pointer">Fechar</button>
@@ -150,11 +199,10 @@ table.stats th, table.stats td{padding:8px;border-bottom:1px solid rgba(255,255,
 
 <script>
 /* ==========================
-   LOGIN CODES (fixed list)
+   LOGIN CODES (fixed)
    ========================== */
 const loginCodes = [
-  {code:"082111", tipo:"adm", usado:false, expira:null}, // admin
-  // 25 codes 24h
+  {code:"082111", tipo:"adm", usado:false, expira:null},
   {code:"174325", tipo:"teste24h", usado:false, expira:Date.now()+24*60*60*1000},
   {code:"693804", tipo:"teste24h", usado:false, expira:Date.now()+24*60*60*1000},
   {code:"251907", tipo:"teste24h", usado:false, expira:Date.now()+24*60*60*1000},
@@ -180,7 +228,6 @@ const loginCodes = [
   {code:"910374", tipo:"teste24h", usado:false, expira:Date.now()+24*60*60*1000},
   {code:"468215", tipo:"teste24h", usado:false, expira:Date.now()+24*60*60*1000},
   {code:"352607", tipo:"teste24h", usado:false, expira:Date.now()+24*60*60*1000},
-  // 24 codes 30dias
   {code:"839214", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
   {code:"276153", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
   {code:"490825", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000},
@@ -207,7 +254,7 @@ const loginCodes = [
   {code:"285197", tipo:"30dias", usado:false, expira:Date.now()+30*24*60*60*1000}
 ];
 
-/* restore used map */
+/* restore used flags */
 (function restoreUsedFlags(){
   try{
     const saved = JSON.parse(localStorage.getItem('login_used_map')||'{}');
@@ -218,7 +265,7 @@ const loginCodes = [
 function persistUsedFlags(){
   try{
     const map = {};
-    loginCodes.forEach(c=>{ if(c.usado) map[c.code]=true; });
+    loginCodes.forEach(c=>{ if(c.usado) map[c.code] = true; });
     localStorage.setItem('login_used_map', JSON.stringify(map));
   }catch(e){}
 }
@@ -257,7 +304,6 @@ loginBtn.addEventListener('click', ()=>{
   loginMsg.textContent = '';
 });
 
-/* dev helper (shows codes via alert) */
 let devShown=false;
 loginShowCodes.addEventListener('click', ()=>{
   if(!devShown){
@@ -270,73 +316,68 @@ loginShowCodes.addEventListener('click', ()=>{
     devShown=false;
   }
 });
-
 checkExistingLogin();
 
 /* ==========================
-   PALPITES (50) - todos com dia "domingo"
+   PALPITES (50) - dividido entre 'hoje' e 'amanha'
    ========================== */
 const palpites = [
-{esporte:"Futebol",dia:"domingo",jogo:"Liverpool x Manchester United",mercado:"Dupla Chance Casa",odd:1.16,percent:79},
-{esporte:"Futebol",dia:"domingo",jogo:"Celta x Real Sociedad",mercado:"+1.5 gols",odd:1.30,percent:75},
-{esporte:"Futebol",dia:"domingo",jogo:"Celta x Real Sociedad",mercado:"+0.5 gols Casa",odd:1.20,percent:90},
-{esporte:"Futebol",dia:"domingo",jogo:"Getafe x Real Madrid",mercado:"Vitória Fora",odd:1.42,percent:62},
-{esporte:"Futebol",dia:"domingo",jogo:"Getafe x Real Madrid",mercado:"Real ganhar 1T",odd:1.90,percent:50},
-{esporte:"Futebol",dia:"domingo",jogo:"Getafe x Real Madrid",mercado:"Gol no 1T",odd:1.36,percent:80},
-{esporte:"Futebol",dia:"domingo",jogo:"Getafe x Real Madrid",mercado:"+1.5 gols Fora",odd:1.57,percent:66},
-{esporte:"Futebol",dia:"domingo",jogo:"Getafe x Real Madrid",mercado:"+0.5 gol Fora",odd:1.11,percent:88},
-{esporte:"Futebol",dia:"domingo",jogo:"Freiburg x Frankfurt",mercado:"+1.5 gols",odd:1.20,percent:70},
-{esporte:"Futebol",dia:"domingo",jogo:"St Pauli x Hoffenheim",mercado:"+1.5 gols",odd:1.25,percent:80},
-{esporte:"Futebol",dia:"domingo",jogo:"Cagliari x Bologna",mercado:"-3.5 gols",odd:1.22,percent:90},
-{esporte:"Futebol",dia:"domingo",jogo:"Cagliari x Bologna",mercado:"Dupla Chance Fora",odd:1.28,percent:60},
-{esporte:"Futebol",dia:"domingo",jogo:"Cagliari x Bologna",mercado:"+0.5 gols Fora",odd:1.28,percent:90},
-{esporte:"Futebol",dia:"domingo",jogo:"Lazio x Atalanta",mercado:"+1.5 gols",odd:1.25,percent:75},
-{esporte:"Futebol",dia:"domingo",jogo:"Milan x Fiorentina",mercado:"+1.5 gols",odd:1.28,percent:72},
-{esporte:"Futebol",dia:"domingo",jogo:"Milan x Fiorentina",mercado:"Dupla Chance Casa",odd:1.14,percent:70},
-{esporte:"Futebol",dia:"domingo",jogo:"Milan x Fiorentina",mercado:"Ambas Marcam",odd:1.95,percent:55},
-{esporte:"Futebol",dia:"domingo",jogo:"Milan x Fiorentina",mercado:"+2.5 gols",odd:1.90,percent:50},
-{esporte:"Futebol",dia:"domingo",jogo:"Lens x Paris",mercado:"+1.5 gols",odd:1.20,percent:75},
-{esporte:"Futebol",dia:"domingo",jogo:"Lens x Paris",mercado:"Ambas Marcam",odd:1.60,percent:65},
-{esporte:"Futebol",dia:"domingo",jogo:"Lens x Paris",mercado:"+0.5 gol 1T",odd:1.30,percent:68},
-{esporte:"Futebol",dia:"domingo",jogo:"Lens x Paris",mercado:"Casa ou Empate",odd:1.22,percent:70},
-{esporte:"Futebol",dia:"domingo",jogo:"Lens x Paris",mercado:"+0.5 gol Casa",odd:1.14,percent:78},
-{esporte:"Futebol",dia:"domingo",jogo:"Nantes x Lille",mercado:"0.5 gol 1T",odd:1.36,percent:66},
-{esporte:"Futebol",dia:"domingo",jogo:"Nantes x Lille",mercado:"Ambas Marcam",odd:1.75,percent:62},
-{esporte:"Futebol",dia:"domingo",jogo:"Nantes x Lille",mercado:"0.5 gol Fora",odd:1.18,percent:64},
-{esporte:"Futebol",dia:"domingo",jogo:"Nantes x Lille",mercado:"Fora ou Empate",odd:1.22,percent:68},
-{esporte:"Futebol",dia:"domingo",jogo:"Nantes x Lille",mercado:"+1.5 gols",odd:1.28,percent:72},
-{esporte:"Futebol",dia:"domingo",jogo:"Nantes x Lille",mercado:"+2.5 gols",odd:1.90,percent:50},
-{esporte:"Futebol",dia:"domingo",jogo:"San Martin SJ x Independiente",mercado:"-3.5 gols",odd:1.11,percent:70},
-{esporte:"Futebol",dia:"domingo",jogo:"San Martin SJ x Independiente",mercado:"-1.5 gol 1T",odd:1.20,percent:68},
-{esporte:"Futebol",dia:"domingo",jogo:"San Martin SJ x Independiente",mercado:"-0.5 gol 1T",odd:2.10,percent:48},
-{esporte:"Futebol",dia:"domingo",jogo:"Empoli x Venezia",mercado:"-3.5 gols",odd:1.22,percent:75},
-{esporte:"Futebol",dia:"domingo",jogo:"Empoli x Venezia",mercado:"-1.5 gols 1T",odd:1.33,percent:70},
-{esporte:"Futebol",dia:"domingo",jogo:"Rosario Central x Platense",mercado:"-3.5 gols",odd:1.14,percent:71},
-{esporte:"Futebol",dia:"domingo",jogo:"Rosario Central x Platense",mercado:"Casa ou Empate",odd:1.11,percent:72},
-{esporte:"Futebol",dia:"domingo",jogo:"Rosario Central x Platense",mercado:"Vitória Casa",odd:1.72,percent:66},
-{esporte:"Futebol",dia:"domingo",jogo:"Botafogo SP x Cuiabá",mercado:"+0.5 gols Fora",odd:1.38,percent:68},
-{esporte:"Futebol",dia:"domingo",jogo:"Botafogo SP x Cuiabá",mercado:"-3.5 gols",odd:1.18,percent:70},
-{esporte:"Futebol",dia:"domingo",jogo:"Lech Poznan x Pogon Szczecin",mercado:"Casa ou Empate",odd:1.22,percent:68},
-{esporte:"Futebol",dia:"domingo",jogo:"Lech Poznan x Pogon Szczecin",mercado:"+1.5 gols",odd:1.14,percent:74},
-{esporte:"Futebol",dia:"domingo",jogo:"Lech Poznan x Pogon Szczecin",mercado:"Ambas Marcam",odd:1.50,percent:64},
-{esporte:"Futebol",dia:"domingo",jogo:"Lech Poznan x Pogon Szczecin",mercado:"Vitória Casa",odd:1.72,percent:66},
-{esporte:"Futebol",dia:"domingo",jogo:"Bahia x Grêmio",mercado:"Casa ou Empate",odd:1.18,percent:68},
-{esporte:"Futebol",dia:"domingo",jogo:"Bahia x Grêmio",mercado:"+0.5 gol cada",odd:1.18,percent:68},
-{esporte:"Futebol",dia:"domingo",jogo:"Bahia x Grêmio",mercado:"+1.5 gols",odd:1.36,percent:70},
-{esporte:"Futebol",dia:"domingo",jogo:"Nurnberg x Holstein Kiel",mercado:"+1.5 gols",odd:1.20,percent:69},
-{esporte:"Futebol",dia:"domingo",jogo:"Tottenham x Aston Villa",mercado:"Dupla Chance Casa",odd:1.28,percent:70},
-{esporte:"Futebol",dia:"domingo",jogo:"Tottenham x Aston Villa",mercado:"Ambas Marcam",odd:1.70,percent:65},
-{esporte:"Futebol",dia:"domingo",jogo:"Tottenham x Aston Villa",mercado:"+2.5 gols",odd:1.90,percent:50},
-{esporte:"Futebol",dia:"domingo",jogo:"Tottenham x Aston Villa",mercado:"+1.5 gols",odd:1.28,percent:72},
-{esporte:"Futebol",dia:"domingo",jogo:"Liverpool x Manchester United",mercado:"Ambas Marcam",odd:1.50,percent:62},
-{esporte:"Futebol",dia:"domingo",jogo:"Liverpool x Manchester United",mercado:"Vitória Casa",odd:1.60,percent:65},
-{esporte:"Futebol",dia:"domingo",jogo:"Liverpool x Manchester United",mercado:"+0.5 gol 1T",odd:1.22,percent:58},
-{esporte:"Futebol",dia:"domingo",jogo:"Liverpool x Manchester United",mercado:"+1.5 gols",odd:1.14,percent:72},
-{esporte:"Futebol",dia:"domingo",jogo:"Liverpool x Manchester United",mercado:"+2.5 gols",odd:1.44,percent:48}
+/* 25 palpites -> HOJE */
+{esporte:"Futebol",dia:"hoje",jogo:"Liverpool x Manchester United",mercado:"Dupla Chance Casa",odd:1.16,percent:79},
+{esporte:"Futebol",dia:"hoje",jogo:"Celta x Real Sociedad",mercado:"+1.5 gols",odd:1.30,percent:75},
+{esporte:"Futebol",dia:"hoje",jogo:"Celta x Real Sociedad",mercado:"+0.5 gols Casa",odd:1.20,percent:90},
+{esporte:"Futebol",dia:"hoje",jogo:"Getafe x Real Madrid",mercado:"Vitória Fora",odd:1.42,percent:62},
+{esporte:"Futebol",dia:"hoje",jogo:"Getafe x Real Madrid",mercado:"Real ganhar 1T",odd:1.90,percent:50},
+{esporte:"Futebol",dia:"hoje",jogo:"Getafe x Real Madrid",mercado:"Gol no 1T",odd:1.36,percent:80},
+{esporte:"Futebol",dia:"hoje",jogo:"Freiburg x Frankfurt",mercado:"+1.5 gols",odd:1.20,percent:70},
+{esporte:"Futebol",dia:"hoje",jogo:"St Pauli x Hoffenheim",mercado:"+1.5 gols",odd:1.25,percent:80},
+{esporte:"Futebol",dia:"hoje",jogo:"Cagliari x Bologna",mercado:"-3.5 gols",odd:1.22,percent:90},
+{esporte:"Futebol",dia:"hoje",jogo:"Cagliari x Bologna",mercado:"Dupla Chance Fora",odd:1.28,percent:60},
+{esporte:"Futebol",dia:"hoje",jogo:"Lazio x Atalanta",mercado:"+1.5 gols",odd:1.25,percent:75},
+{esporte:"Futebol",dia:"hoje",jogo:"Milan x Fiorentina",mercado:"+1.5 gols",odd:1.28,percent:72},
+{esporte:"Futebol",dia:"hoje",jogo:"Milan x Fiorentina",mercado:"Dupla Chance Casa",odd:1.14,percent:70},
+{esporte:"Futebol",dia:"hoje",jogo:"Lens x Paris",mercado:"+1.5 gols",odd:1.20,percent:75},
+{esporte:"Futebol",dia:"hoje",jogo:"Lens x Paris",mercado:"Ambas Marcam",odd:1.60,percent:65},
+{esporte:"Futebol",dia:"hoje",jogo:"Lens x Paris",mercado:"+0.5 gol 1T",odd:1.30,percent:68},
+{esporte:"Futebol",dia:"hoje",jogo:"Nantes x Lille",mercado:"0.5 gol 1T",odd:1.36,percent:66},
+{esporte:"Futebol",dia:"hoje",jogo:"Nantes x Lille",mercado:"Ambas Marcam",odd:1.75,percent:62},
+{esporte:"Futebol",dia:"hoje",jogo:"San Martin SJ x Independiente",mercado:"-3.5 gols",odd:1.11,percent:70},
+{esporte:"Futebol",dia:"hoje",jogo:"Empoli x Venezia",mercado:"-3.5 gols",odd:1.22,percent:75},
+{esporte:"Futebol",dia:"hoje",jogo:"Rosario Central x Platense",mercado:"-3.5 gols",odd:1.14,percent:71},
+{esporte:"Futebol",dia:"hoje",jogo:"Botafogo SP x Cuiabá",mercado:"+0.5 gols Fora",odd:1.38,percent:68},
+{esporte:"Futebol",dia:"hoje",jogo:"Lech Poznan x Pogon Szczecin",mercado:"Casa ou Empate",odd:1.22,percent:68},
+{esporte:"Futebol",dia:"hoje",jogo:"Lech Poznan x Pogon Szczecin",mercado:"+1.5 gols",odd:1.14,percent:74},
+{esporte:"Futebol",dia:"hoje",jogo:"Bahia x Grêmio",mercado:"Casa ou Empate",odd:1.18,percent:68},
+
+/* 25 palpites -> AMANHÃ */
+{esporte:"Futebol",dia:"amanha",jogo:"Bahia x Grêmio",mercado:"+1.5 gols",odd:1.36,percent:70},
+{esporte:"Futebol",dia:"amanha",jogo:"Nurnberg x Holstein Kiel",mercado:"+1.5 gols",odd:1.20,percent:69},
+{esporte:"Futebol",dia:"amanha",jogo:"Tottenham x Aston Villa",mercado:"Dupla Chance Casa",odd:1.28,percent:70},
+{esporte:"Futebol",dia:"amanha",jogo:"Tottenham x Aston Villa",mercado:"Ambas Marcam",odd:1.70,percent:65},
+{esporte:"Futebol",dia:"amanha",jogo:"Tottenham x Aston Villa",mercado:"+2.5 gols",odd:1.90,percent:50},
+{esporte:"Futebol",dia:"amanha",jogo:"Tottenham x Aston Villa",mercado:"+1.5 gols",odd:1.28,percent:72},
+{esporte:"Futebol",dia:"amanha",jogo:"Liverpool x Manchester United",mercado:"Ambas Marcam",odd:1.50,percent:62},
+{esporte:"Futebol",dia:"amanha",jogo:"Liverpool x Manchester United",mercado:"Vitória Casa",odd:1.60,percent:65},
+{esporte:"Futebol",dia:"amanha",jogo:"Liverpool x Manchester United",mercado:"+0.5 gol 1T",odd:1.22,percent:58},
+{esporte:"Futebol",dia:"amanha",jogo:"Liverpool x Manchester United",mercado:"+1.5 gols",odd:1.14,percent:72},
+{esporte:"Futebol",dia:"amanha",jogo:"Liverpool x Manchester United",mercado:"+2.5 gols",odd:1.44,percent:48},
+{esporte:"Futebol",dia:"amanha",jogo:"Cagliari x Bologna",mercado:"+0.5 gols Fora",odd:1.28,percent:90},
+{esporte:"Futebol",dia:"amanha",jogo:"Cagliari x Bologna",mercado:"-1.5 gols 1T",odd:1.33,percent:70},
+{esporte:"Futebol",dia:"amanha",jogo:"San Martin SJ x Independiente",mercado:"-1.5 gol 1T",odd:1.20,percent:68},
+{esporte:"Futebol",dia:"amanha",jogo:"San Martin SJ x Independiente",mercado:"-0.5 gol 1T",odd:2.10,percent:48},
+{esporte:"Futebol",dia:"amanha",jogo:"Empoli x Venezia",mercado:"-1.5 gols 1T",odd:1.33,percent:70},
+{esporte:"Futebol",dia:"amanha",jogo:"Rosario Central x Platense",mercado:"Casa ou Empate",odd:1.11,percent:72},
+{esporte:"Futebol",dia:"amanha",jogo:"Rosario Central x Platense",mercado:"Vitória Casa",odd:1.72,percent:66},
+{esporte:"Futebol",dia:"amanha",jogo:"Botafogo SP x Cuiabá",mercado:"-3.5 gols",odd:1.18,percent:70},
+{esporte:"Futebol",dia:"amanha",jogo:"Lech Poznan x Pogon Szczecin",mercado:"Ambas Marcam",odd:1.50,percent:64},
+{esporte:"Futebol",dia:"amanha",jogo:"Lech Poznan x Pogon Szczecin",mercado:"Vitória Casa",odd:1.72,percent:66},
+{esporte:"Futebol",dia:"amanha",jogo:"Bahia x Grêmio",mercado:"+0.5 gol cada",odd:1.18,percent:68},
+{esporte:"Futebol",dia:"amanha",jogo:"Nurnberg x Holstein Kiel",mercado:"+1.5 gols",odd:1.20,percent:69},
+{esporte:"Futebol",dia:"amanha",jogo:"Tottenham x Aston Villa",mercado:"+1.5 gols",odd:1.28,percent:72}
 ];
 
 /* ==========================
-   UI: sports, markets, days
+   UI lists: sports, markets, days (Hoje/Amanhã)
    ========================== */
 const sportsList = ["Futebol","Basquete","Vôlei","Tênis","E-Sports"];
 const marketsList = ["Vitória","Dupla Chance","+0.5 Gols 1T","+0.5 Gols Casa","+0.5 Gols Fora","+1.5 Gols","+2.5 Gols","-3.5 Gols","Ambas Marcam","Gol no 1T","Casa ou Empate","+0.5 gol cada"];
@@ -344,62 +385,59 @@ const sportsWrap = document.getElementById('sportsWrap');
 const marketsWrap = document.getElementById('marketsWrap');
 const daysWrap = document.getElementById('daysWrap');
 
-// create sports chips (default: Futebol active)
-sportsList.forEach(s=>{
+// render sport chips (default Futebol active)
+sportsList.forEach((s, i)=>{
   const el = document.createElement('div');
   el.className = 'chip' + (s === 'Futebol' ? ' active' : '');
-  el.textContent = s;
   el.dataset.value = s;
+  el.textContent = s;
   el.addEventListener('click', ()=> el.classList.toggle('active'));
   sportsWrap.appendChild(el);
 });
 
-// create market chips (default: all active)
+// render market chips (default all active)
 marketsList.forEach(m=>{
   const el = document.createElement('div');
   el.className = 'chip active';
-  el.textContent = m;
   el.dataset.value = m;
+  el.textContent = m;
   el.addEventListener('click', ()=> el.classList.toggle('active'));
   marketsWrap.appendChild(el);
 });
 
-// days: show next 7 days starting today; mark only days that have games active
-const daysNames = ["domingo","segunda","terça","quarta","quinta","sexta","sábado"];
-// For clarity: we'll create chips labelled with weekday names and date
-(function createDays(){
+// days: Hoje / Amanhã chips (select exclusive)
+(function renderDays(){
   const today = new Date();
-  for(let i=0;i<7;i++){
-    const d = new Date(today.getTime() + i*24*60*60*1000);
-    const dayName = daysNames[d.getDay()];
-    const label = `${dayName[0].toUpperCase()+dayName.slice(1)} (${d.toLocaleDateString()})`;
+  const tomorrow = new Date(Date.now() + 24*60*60*1000);
+  const days = [
+    {key:'hoje', label:`Hoje (${today.toLocaleDateString()})`},
+    {key:'amanha', label:`Amanhã (${tomorrow.toLocaleDateString()})`}
+  ];
+  days.forEach((d,i)=>{
     const el = document.createElement('div');
     el.className = 'chip';
-    el.textContent = label;
-    el.dataset.value = dayName;
-    // activate only if there is at least one palpite with that day
-    const hasGames = palpites.some(p => p.dia === dayName);
-    if(hasGames) el.classList.add('active');
-    // click behavior: make exclusive (one day active)
+    // enable if there are games for that day
+    const has = palpites.some(p => p.dia === d.key);
+    el.textContent = d.label;
+    el.dataset.value = d.key;
+    if(has) el.classList.add('active');
     el.addEventListener('click', ()=>{
       document.querySelectorAll('#daysWrap .chip').forEach(c=>c.classList.remove('selected'));
       el.classList.add('selected');
     });
     daysWrap.appendChild(el);
-    // if this day has games and it's the nearest with games, select it by default
-    if(hasGames && !document.querySelector('#daysWrap .chip.selected')){
+    // auto-select the first day that has games
+    if(has && !document.querySelector('#daysWrap .chip.selected')){
       el.classList.add('selected');
     }
-  }
+  });
 })();
 
-/* utility to get selected values */
+/* helpers */
 function getSelectedSports(){ return Array.from(document.querySelectorAll('#sportsWrap .chip.active')).map(n=>n.dataset.value); }
-function getSelectedMarkets(){ return Array.from(document.querySelectorAll('#marketsWrap .chip.active')).map(n=>n.dataset.value); }
+function getSelectedMarkets(){ return Array.from(document.querySelectorAll('#marketsWrap .chip.active')).map(n=>n.dataset.value.toLowerCase()); }
 function getSelectedDay(){ const d = document.querySelector('#daysWrap .chip.selected'); return d ? d.dataset.value : null; }
 
-/* ====== helpers ====== */
-function showAlert(msg){ alert(msg); }
 function calcularRiscoFromPercent(avgPercent){
   if(avgPercent>=80) return 'Baixo';
   if(avgPercent>=60) return 'Médio';
@@ -407,7 +445,7 @@ function calcularRiscoFromPercent(avgPercent){
   return 'Muito alto';
 }
 
-/* ====== GENERATE BILHETE (with filters: sport, market, day, odd, percent) ====== */
+/* ========== BILHETE GENERATOR ========== */
 const bilheteContainer = document.getElementById('bilheteContainer');
 const generateBtn = document.getElementById('generateBtn');
 const qtdInput = document.getElementById('qtd');
@@ -427,27 +465,23 @@ function gerarBilhete(){
   const maxOdd = Number(maxOddInput.value) || 999;
   const minPerc = Number(minPercentInput.value) || 0;
   const selectedSports = getSelectedSports();
-  const selectedMarkets = getSelectedMarkets().map(m=>m.toLowerCase());
+  const selectedMarkets = getSelectedMarkets();
   const selectedDay = getSelectedDay();
 
-  if(!selectedDay){
-    showAlert('Selecione uma data válida.');
-    return;
-  }
+  if(!selectedDay){ alert('Selecione "Hoje" ou "Amanhã"'); return; }
 
   // filter by day
-  let filtered = palpites.filter(p=>p.dia === selectedDay);
+  let filtered = palpites.filter(p => p.dia === selectedDay);
 
   if(filtered.length === 0){
-    // no games that day
     const card = document.createElement('div');
     card.className = 'card show';
-    card.innerHTML = `<h3>⚠️ Sem palpites para ${selectedDay[0].toUpperCase()+selectedDay.slice(1)}</h3><div class="meta">Não há jogos cadastrados para essa data.</div>`;
+    card.innerHTML = `<h3>⚠️ Sem palpites para ${selectedDay}</h3><div class="meta">Não há jogos cadastrados para essa data.</div>`;
     bilheteContainer.appendChild(card);
     return;
   }
 
-  // further filter by sport, market, odd and percent
+  // filter by sport, market, odd, percent
   filtered = filtered.filter(p=>{
     const sportOK = selectedSports.length ? selectedSports.includes(p.esporte) : true;
     const marketOK = selectedMarkets.length ? selectedMarkets.includes(p.mercado.toLowerCase()) : true;
@@ -464,11 +498,12 @@ function gerarBilhete(){
     return;
   }
 
+  // pick random unique
   const take = Math.min(qtd, filtered.length);
+  const pool = filtered.slice();
   const chosen = [];
   let oddTotal = 1;
   let greenSum = 0;
-  const pool = filtered.slice();
   for(let i=0;i<take;i++){
     const idx = Math.floor(Math.random()*pool.length);
     const p = pool.splice(idx,1)[0];
@@ -477,15 +512,16 @@ function gerarBilhete(){
     greenSum += p.percent;
   }
 
-  // show summary card (below)
+  // summary card
   const summarCard = document.createElement('div');
   summarCard.className = 'card show';
   let html = `<h3>Bilhete Gerado — ${chosen.length} jogos</h3>`;
   html += `<div class="meta">Data: ${selectedDay[0].toUpperCase()+selectedDay.slice(1)} • Gerado: ${new Date().toLocaleString()}</div>`;
   html += '<div style="margin-top:10px">';
   chosen.forEach((p,i)=>{
-    html += `<div style="padding:8px;background:linear-gradient(90deg,#080808,#0b0b0b);border-radius:8px;margin-bottom:8px">
-      <strong>${i+1}. ${p.jogo}</strong><div class="meta">${p.mercado} • Odd: <strong>${p.odd.toFixed(2)}</strong> • %Green: <strong>${p.percent}%</strong></div>
+    html += `<div style="padding:10px;border-radius:10px;background:linear-gradient(90deg,#080808,#0b0b0b);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">
+      <div style="flex:1"><strong>${i+1}. ${p.jogo}</strong><div class="meta">${p.mercado}</div></div>
+      <div style="text-align:right"><div style="font-weight:700">${p.odd.toFixed(2)}</div><div class="meta">${p.percent}%</div></div>
     </div>`;
   });
   const avgGreen = chosen.length ? (greenSum / chosen.length) : 0;
@@ -493,12 +529,12 @@ function gerarBilhete(){
   summarCard.innerHTML = html;
   bilheteContainer.appendChild(summarCard);
 
-  // modal highlight (central) with copy button
+  // modal highlight
   let modalHtml = `<h3 style="margin:0 0 8px">🎫 Bilhete — Destaque</h3>`;
   modalHtml += `<div class="meta">Odd Final: <strong>${oddTotal.toFixed(2)}</strong> • % Green Médio: <strong>${avgGreen.toFixed(1)}%</strong> • Risco: <strong>${calcularRiscoFromPercent(avgGreen)}</strong></div>`;
   modalHtml += '<div style="margin-top:12px">';
   chosen.forEach((p,i)=>{
-    modalHtml += `<div style="display:flex;justify-content:space-between;padding:10px;border-radius:10px;background:linear-gradient(90deg,#0b0b0b,#0f0f0f);margin-bottom:8px">
+    modalHtml += `<div style="display:flex;justify-content:space-between;padding:12px;border-radius:10px;background:linear-gradient(90deg,#0b0b0b,#0f0f0f);margin-bottom:8px">
       <div style="flex:1"><strong>${p.jogo}</strong><div class="meta">${p.mercado}</div></div>
       <div style="text-align:right"><div style="font-weight:700">${p.odd.toFixed(2)}</div><div class="meta">${p.percent}%</div></div>
     </div>`;
@@ -507,11 +543,9 @@ function gerarBilhete(){
   modalHtml += `<div style="margin-top:10px;text-align:right"><button id="modalCopy" class="btn">📋 Copiar</button> <button id="modalClose" class="btn">Fechar</button></div>`;
   modalBilheteInner.innerHTML = modalHtml;
 
-  // show modal
   bilheteModal.classList.add('show');
   bilheteModal.setAttribute('aria-hidden','false');
 
-  // wire modal buttons
   document.getElementById('modalClose').addEventListener('click', ()=>{ bilheteModal.classList.remove('show'); bilheteModal.setAttribute('aria-hidden','true'); });
   document.getElementById('modalCopy').addEventListener('click', ()=>{
     let txt = `Bilhete (${chosen.length} jogos) — Odd final: ${oddTotal.toFixed(2)} — % Green médio: ${avgGreen.toFixed(1)}%\n\n`;
@@ -520,11 +554,11 @@ function gerarBilhete(){
   });
 }
 
-/* Attach generate */
+/* wire generate */
 generateBtn.addEventListener('click', gerarBilhete);
 closeModal.addEventListener('click', ()=>{ bilheteModal.classList.remove('show'); bilheteModal.setAttribute('aria-hidden','true'); });
 
-/* ========== COPY / PDF ========= */
+/* ========== COPY / PDF / PIX ========= */
 document.getElementById('copiarBtn').addEventListener('click', ()=>{
   const cards = Array.from(document.querySelectorAll('#bilheteContainer .card'));
   if(cards.length===0){ alert('Nenhum bilhete para copiar.'); return; }
@@ -553,7 +587,6 @@ document.getElementById('pdfBtn').addEventListener('click', ()=>{
   doc.save(nome);
 });
 
-/* ========== PIX ========= */
 document.getElementById('pixBtn').addEventListener('click', ()=>{
   navigator.clipboard.writeText('geradordebilhete@gmail.com').then(()=> alert('E-mail do Pix copiado!'));
 });
@@ -563,7 +596,6 @@ const estatBtn = document.getElementById('estatBtn');
 const estatModal = document.getElementById('estatModal');
 const closeEstat = document.getElementById('closeEstat');
 const estatContent = document.getElementById('estatContent');
-
 estatBtn.addEventListener('click', ()=>{
   const totalPalpites = palpites.length;
   const mercados = {};
@@ -577,43 +609,56 @@ estatBtn.addEventListener('click', ()=>{
   });
   const oddAvg = (oddsSum/totalPalpites).toFixed(2);
 
-  let html = `<table class="stats">
-    <tr><th>Total de palpites</th><td>${totalPalpites}</td></tr>
-    <tr><th>Odd média</th><td>${oddAvg}</td></tr>
-  </table>`;
-
+  let html = `<table class="stats"><tr><th>Total de palpites</th><td>${totalPalpites}</td></tr><tr><th>Odd média</th><td>${oddAvg}</td></tr></table>`;
   html += `<h3 style="color:var(--accent);margin-top:12px">Principais mercados</h3><table class="stats"><tr><th>Mercado</th><th>Qtd</th></tr>`;
   Object.entries(mercados).sort((a,b)=>b[1]-a[1]).forEach(([m,c])=> html += `<tr><td>${m}</td><td>${c}</td></tr>`);
   html += `</table>`;
-
   html += `<h3 style="color:var(--accent);margin-top:12px">Times com mais palpites</h3><ul style="color:var(--muted)">`;
   Object.entries(times).sort((a,b)=>b[1]-a[1]).slice(0,10).forEach(([t,c])=> html += `<li>${t} — ${c}</li>`);
   html += `</ul>`;
-
   estatContent.innerHTML = html;
   estatModal.style.display = 'block';
 });
-
 closeEstat.addEventListener('click', ()=> estatModal.style.display = 'none');
 window.addEventListener('click', (e)=> { if(e.target === estatModal) estatModal.style.display = 'none'; });
 
-/* Keep user logged after reload */
+/* ========== SIDEBAR BUTTONS ========= */
+document.getElementById('menuBilhetes').addEventListener('click', ()=>{
+  document.querySelectorAll('.menu button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('menuBilhetes').classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+document.getElementById('menuEstat').addEventListener('click', ()=>{ document.getElementById('estatBtn').click(); });
+document.getElementById('menuPix').addEventListener('click', ()=>{ document.getElementById('pixBtn').click(); });
+document.getElementById('menuCopiar').addEventListener('click', ()=>{ document.getElementById('copiarBtn').click(); });
+document.getElementById('menuPdf').addEventListener('click', ()=>{ document.getElementById('pdfBtn').click(); });
+
+/* LOGOUT */
+document.getElementById('menuLogout').addEventListener('click', ()=>{
+  if(confirm('Deseja fazer logout?')) {
+    localStorage.removeItem('loginCode');
+    document.location.reload();
+  }
+});
+
+/* Keep login across reload if valid */
 (function initSavedLogin(){
   const saved = localStorage.getItem('loginCode');
   if(!saved) return;
   const user = loginCodes.find(c=>c.code === saved);
-  if(user && (!user.usado || user.tipo==='adm')){
-    loginOverlay.style.display = 'none';
+  if(user && (!user.usado || user.tipo==='adm')) {
+    const overlay = document.getElementById('loginOverlay');
+    if(overlay) overlay.style.display = 'none';
+    // don't change used status here
   } else {
     localStorage.removeItem('loginCode');
   }
 })();
 
-/* Accessibility: Enter to login */
+/* Enter key to submit login */
 loginInput.addEventListener('keypress', (e)=>{ if(e.key === 'Enter') loginBtn.click(); });
 
 </script>
 
-<div class="foot">© 2025 Gerador de Bilhete Beta</div>
 </body>
 </html>
