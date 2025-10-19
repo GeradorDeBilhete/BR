@@ -1,10 +1,20 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>🎯 Gerador de Bilhete 🎟️ Beta</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>🎯 Gerador de Bilhete 🎟️ Beta</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#00ff88">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+  <!-- seu CSS aqui -->
+</head>
 
 <style>
 :root{
@@ -271,6 +281,13 @@ function mostrarPalpitesPorMercado(mercadoSelecionado) {
     div.textContent = `${p.jogo} — ${p.mercado} | Odd: ${p.odd} | % Green: ${p.percent}%`;
     filteredPalpitesContainer.appendChild(div);
   });
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js')
+  .then(() => console.log('Service Worker registrado com sucesso!'))
+  .catch(err => console.log('Falha ao registrar Service Worker:', err));
+}
+</script>
 }
 </script>
 </body>
