@@ -11,37 +11,33 @@
   --panel:#0b0b0b;
   --muted:#bfbfbf;
   --accent:#00ff88;
-  --accent-2:#00cc66;
   --card:#0f0f0f;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:"Montserrat",system-ui,Arial,sans-serif;background:var(--bg);color:#f2f2f2;-webkit-font-smoothing:antialiased;}
-header{text-align:center;padding:20px 16px;}
-h1{margin:0;color:var(--accent);font-size:28px;font-weight:700;letter-spacing:1px;}
-.wrap{max-width:900px;margin:18px auto;padding:18px;background:var(--panel);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
-.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;}
-label.ch{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px;}
+header{position:fixed;top:0;width:100%;background:var(--panel);z-index:10;padding:12px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,0.6);}
+h1{margin:0;color:var(--accent);font-size:26px;font-weight:700;letter-spacing:1px;text-align:center;}
+.wrap{max-width:900px;margin:120px auto 18px;padding:18px;background:var(--panel);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
 .controls{padding:8px 0 6px;display:flex;flex-direction:column;gap:10px;}
-.field{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;}
-select,input[type=number]{background:#0c0c0c;border:1px solid #171717;color:#f2f2f2;padding:10px;border-radius:8px;min-width:100px;}
-.markets, .sports, .days{display:flex;gap:6px;flex-wrap:wrap;}
-.chip{background:#101010;border:1px solid #161616;color:#ddd;padding:6px 10px;border-radius:10px;cursor:pointer;user-select:none;font-size:13px;}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;}
+label.small{color:var(--muted);}
+input, select{background:#0c0c0c;border:1px solid #171717;color:#f2f2f2;padding:10px;border-radius:8px;min-width:60px;}
+.markets, .sports{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:8px;}
+.chip{background:#101010;border:1px solid #161616;color:#ddd;padding:6px 10px;border-radius:10px;cursor:pointer;font-size:13px;}
 .chip.active{background:var(--accent);color:#000;transform:scale(1.03);box-shadow:0 6px 18px rgba(0,255,136,0.08);}
-.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px;}
-button.btn{background:var(--accent);color:#000;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(0,255,136,0.06);}
+button.btn{background:var(--accent);color:#000;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer;margin:4px;}
 #bilheteContainer{margin-top:14px;display:flex;flex-direction:column;gap:12px;align-items:center;}
 .card{background:var(--card);border:1px solid rgba(0,255,136,0.08);padding:12px;border-radius:10px;opacity:0;transform:translateY(20px);transition:all .35s cubic-bezier(.2,.9,.3,1);}
 .card.show{opacity:1;transform:none;}
 .card h3{margin:0;font-size:16px;color:#fff;}
 .stats-line{margin-top:8px;font-size:13px;color:var(--muted);}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:60;padding:28px;overflow:auto;}
-.modal .panel{max-width:900px;margin:20px auto;background:#070707;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);}
 #loginOverlay{position:fixed;inset:0;background:rgba(0,0,0,0.95);display:flex;justify-content:center;align-items:center;z-index:999;}
 #loginBox{background:#0b0b0b;padding:28px;border-radius:12px;max-width:400px;width:100%;text-align:center;}
 #loginBox input{padding:10px;border-radius:8px;border:1px solid #222;width:100%;margin-bottom:12px;background:#111;color:#fff;}
 #loginBox button{padding:10px 14px;border-radius:8px;border:none;background:var(--accent);color:#000;font-weight:600;cursor:pointer;}
-#pixBtn{margin-top:12px;background:#ffcc00;color:#000;width:100%;font-size:14px;}
-@media(max-width:720px){ .row{flex-direction:column;align-items:stretch} .field{flex-direction:column;align-items:stretch} }
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:60;padding:28px;overflow:auto;}
+.modal .panel{max-width:900px;margin:20px auto;background:#070707;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);}
+@media(max-width:720px){ .row{flex-direction:column;align-items:stretch;} }
 </style>
 </head>
 <body>
@@ -56,44 +52,39 @@ button.btn{background:var(--accent);color:#000;border:none;padding:10px 14px;bor
 </div>
 
 <header>
-  <h1>🎯 Gerador de Bilhete 🎟️ <small style="font-size:12px;color:#aaa;">Beta</small></h1>
+  <h1>🎯 Gerador de Bilhete 🎟️ Beta</h1>
+  <div style="margin-top:8px;">
+    <button id="estatBtn" class="btn">📊 Estatísticas</button>
+    <button id="copiarBtn" class="btn">📋 Copiar</button>
+    <button id="pixBtn" class="btn">Pix: geradordebilhete@gmail.com</button>
+  </div>
 </header>
 
 <div class="wrap">
 
   <div class="controls">
     <div class="row">
-      <label class="small">Quantidade de jogos</label>
-      <input id="qtd" type="number" min="1" value="3" style="width:60px">
+      <label class="small">Qtd jogos</label>
+      <input id="qtd" type="number" min="1" value="3">
       <label class="small">Odd mínima</label>
-      <input id="minOdd" type="number" step="0.01" value="1.20" style="width:60px">
+      <input id="minOdd" type="number" step="0.01" value="1.20">
       <label class="small">Odd máxima</label>
-      <input id="maxOdd" type="number" step="0.01" value="2.50" style="width:60px">
-      <label class="small">% mínimo de acerto</label>
-      <input id="minPercent" type="number" step="1" value="50" style="width:60px">
+      <input id="maxOdd" type="number" step="0.01" value="2.50">
+      <label class="small">% mínimo acerto</label>
+      <input id="minPercent" type="number" step="1" value="50">
     </div>
-    <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
-      <div class="sports" id="sportsWrap"></div>
-    </div>
-    <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
-      <div class="markets" id="marketsWrap"></div>
-    </div>
-    <div id="generateBtnWrapper">
+    <div class="markets" id="marketsWrap"></div>
+    <div class="sports" id="sportsWrap"></div>
+    <div style="margin-top:10px;text-align:center;">
       <button id="generateBtn" class="btn">🎲 Gerar Bilhete</button>
     </div>
-    <div class="actions">
-      <button id="estatBtn" class="btn">📊 Estatísticas</button>
-      <button id="copiarBtn" class="btn">📋 Copiar</button>
-    </div>
-    <button id="pixBtn">Pix e-mail: geradordebilhete@gmail.com — Clique para copiar — Ajude um pobre (dono do app)</button>
   </div>
 
   <div id="bilheteContainer"></div>
-
 </div>
 
 <!-- Estatísticas Modal -->
-<div id="estatModal" class="modal" aria-hidden="true">
+<div id="estatModal" class="modal">
   <div class="panel">
     <button id="closeEstat" style="float:right;background:var(--accent);border:none;padding:8px 10px;border-radius:8px;cursor:pointer">Fechar</button>
     <h2>📊 Estatísticas do Gerador</h2>
@@ -102,48 +93,19 @@ button.btn{background:var(--accent);color:#000;border:none;padding:10px 14px;bor
 </div>
 
 <script>
-// ============ LOGIN CODES ===========
+// LOGIN
 const loginCodes = [
-  {code:"082111", tipo:"adm", usado:false, expira:null}, // admin
+  {code:"082111", tipo:"adm", usado:false, expira:null}
 ];
-// Gerar 25 códigos 24h e 25 códigos 30 dias
 for(let i=0;i<25;i++){
   loginCodes.push({code:Math.floor(Math.random()*900000+100000).toString(),tipo:"teste",usado:false,expira:Date.now()+24*60*60*1000});
   loginCodes.push({code:Math.floor(Math.random()*900000+100000).toString(),tipo:"30dias",usado:false,expira:Date.now()+30*24*60*60*1000});
 }
-
-// ============ PALPITES ===========
-const palpites = [ /* COLE AQUI OS 50 PALPITES QUE ENVIEI ANTERIORMENTE */ ];
-
-// ============ ESPORTES E MERCADOS ===========
-const sports = ["Futebol","Basquete","Vôlei","Tênis"];
-const markets = ["Dupla Chance Casa","Dupla Chance Fora","Casa ou Empate","+1.5 gols","+2.5 gols","+0.5 gols 1T","Vitória Casa","Vitória Fora","Ambas Marcam","+0.5 gol cada"];
-
-const sportsWrap = document.getElementById("sportsWrap");
-sports.forEach(s => {
-  let chip = document.createElement("div");
-  chip.textContent = s;
-  chip.className="chip";
-  chip.onclick = ()=>chip.classList.toggle("active");
-  sportsWrap.appendChild(chip);
-});
-
-const marketsWrap = document.getElementById("marketsWrap");
-markets.forEach(m=>{
-  let chip = document.createElement("div");
-  chip.textContent=m;
-  chip.className="chip";
-  chip.onclick=()=>chip.classList.toggle("active");
-  marketsWrap.appendChild(chip);
-});
-
-// ============ LOGIN ===========
-const loginOverlay = document.getElementById("loginOverlay");
-const loginInput = document.getElementById("loginCode");
-const loginBtn = document.getElementById("loginBtn");
-const loginMsg = document.getElementById("loginMsg");
-
-function saveLogin(code){ localStorage.setItem("loginCode",code); }
+const loginOverlay=document.getElementById("loginOverlay");
+const loginInput=document.getElementById("loginCode");
+const loginBtn=document.getElementById("loginBtn");
+const loginMsg=document.getElementById("loginMsg");
+function saveLogin(code){ localStorage.setItem("loginCode",code);}
 function checkLogin(){
   let code = localStorage.getItem("loginCode");
   if(!code) return;
@@ -161,25 +123,103 @@ loginBtn.onclick=function(){
 }
 checkLogin();
 
-// ============ BILHETE ===========
-const bilheteContainer = document.getElementById("bilheteContainer");
-const generateBtn = document.getElementById("generateBtn");
-const qtdInput = document.getElementById("qtd");
-const minOddInput = document.getElementById("minOdd");
-const maxOddInput = document.getElementById("maxOdd");
-const minPercentInput = document.getElementById("minPercent");
+// PALPITES
+const palpites = [
+  {data:"Hoje",esporte:"Futebol",jogo:"Liverpool x Manchester United",mercado:"Dupla Chance Casa",odd:1.16,percent:79},
+  {data:"Hoje",esporte:"Futebol",jogo:"Celta x Real Sociedad",mercado:"+1.5 gols",odd:1.30,percent:75},
+  {data:"Hoje",esporte:"Futebol",jogo:"Celta x Real Sociedad",mercado:"+0.5 gols Casa",odd:1.20,percent:90},
+  {data:"Hoje",esporte:"Futebol",jogo:"Getafe x Real Madrid",mercado:"Vitória Fora",odd:1.42,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Getafe x Real Madrid",mercado:"+1.5 gols Fora",odd:1.57,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Getafe x Real Madrid",mercado:"+0.5 gol Fora",odd:1.11,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Freiburg x Frankfurt",mercado:"+1.5 gols",odd:1.20,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"St Pauli x Hoffenheim",mercado:"+1.5 gols",odd:1.25,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Cagliari x Bologna",mercado:"-3.5 gols",odd:1.22,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Cagliari x Bologna",mercado:"Dupla Chance Fora",odd:1.28,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Cagliari x Bologna",mercado:"+0.5 gols Fora",odd:1.28,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Lazio x Atalanta",mercado:"+1.5 gols",odd:1.25,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Milan x Fiorentina",mercado:"+1.5 gols",odd:1.28,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Milan x Fiorentina",mercado:"Dupla Chance Casa",odd:1.14,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Milan x Fiorentina",mercado:"Ambas Marcam",odd:1.95,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Milan x Fiorentina",mercado:"+2.5 gols",odd:1.90,percent:62},
+  {data:"Amanhã",esporte:"Futebol",jogo:"Lens x Paris",mercado:"+1.5 gols",odd:1.20,percent:62},
+  {data:"Amanhã",esporte:"Futebol",jogo:"Lens x Paris",mercado:"Ambas Marcam",odd:1.60,percent:62},
+  {data:"Amanhã",esporte:"Futebol",jogo:"Lens x Paris",mercado:"+0.5 gol 1T",odd:1.30,percent:62},
+  {data:"Amanhã",esporte:"Futebol",jogo:"Lens x Paris",mercado:"Casa ou Empate",odd:1.22,percent:62},
+  {data:"Amanhã",esporte:"Futebol",jogo:"Lens x Paris",mercado:"+0.5 gol Casa",odd:1.14,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Nantes x Lille",mercado:"0.5 gol 1T",odd:1.36,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Nantes x Lille",mercado:"Ambas Marcam",odd:1.75,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Nantes x Lille",mercado:"0.5 gol Fora",odd:1.18,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Nantes x Lille",mercado:"Fora ou Empate",odd:1.22,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Nantes x Lille",mercado:"+1.5 gols",odd:1.28,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Nantes x Lille",mercado:"+2.5 gols",odd:1.90,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"San Martin SJ x Independiente",mercado:"-3.5 gols",odd:1.11,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"San Martin SJ x Independiente",mercado:"-1.5 gol 1T",odd:1.20,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"San Martin SJ x Independiente",mercado:"-0.5 gol 1T",odd:2.10,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Empoli x Venezia",mercado:"-3.5 gols",odd:1.22,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Empoli x Venezia",mercado:"-1.5 gols 1T",odd:1.33,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Rosario Central x Platense",mercado:"-3.5 gols",odd:1.14,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Rosario Central x Platense",mercado:"Casa ou Empate",odd:1.11,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Rosario Central x Platense",mercado:"Vitória Casa",odd:1.72,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Botafogo SP x Cuiabá",mercado:"+0.5 gols Fora",odd:1.38,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Botafogo SP x Cuiabá",mercado:"-3.5 gols",odd:1.18,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Lech Poznan x Pogon Szczecin",mercado:"Casa ou Empate",odd:1.22,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Lech Poznan x Pogon Szczecin",mercado:"+1.5 gols",odd:1.14,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Lech Poznan x Pogon Szczecin",mercado:"Ambas Marcam",odd:1.50,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Lech Poznan x Pogon Szczecin",mercado:"Vitória Casa",odd:1.72,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Bahia x Grêmio",mercado:"Casa ou Empate",odd:1.18,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Bahia x Grêmio",mercado:"+0.5 gol cada",odd:1.18,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Bahia x Grêmio",mercado:"+1.5 gols",odd:1.36,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Nurnberg x Holstein Kiel",mercado:"+1.5 gols",odd:1.20,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Tottenham x Aston Villa",mercado:"Dupla Chance Casa",odd:1.28,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Tottenham x Aston Villa",mercado:"Ambas Marcam",odd:1.70,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Tottenham x Aston Villa",mercado:"+2.5 gols",odd:1.90,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Tottenham x Aston Villa",mercado:"+1.5 gols",odd:1.28,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Liverpool x Manchester United",mercado:"Ambas Marcam",odd:1.50,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Liverpool x Manchester United",mercado:"Vitória Casa",odd:1.60,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Liverpool x Manchester United",mercado:"+0.5 gol 1T",odd:1.22,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Liverpool x Manchester United",mercado:"+1.5 gols",odd:1.14,percent:62},
+  {data:"Hoje",esporte:"Futebol",jogo:"Liverpool x Manchester United",mercado:"+2.5 gols",odd:1.44,percent:62}
+];
+
+// ESPORTES E MERCADOS
+const sports=["Futebol","Basquete","Vôlei","Tênis"];
+const markets=["Dupla Chance Casa","Dupla Chance Fora","Casa ou Empate","+1.5 gols","+2.5 gols","+0.5 gols 1T","Vitória Casa","Vitória Fora","Ambas Marcam","+0.5 gol cada"];
+
+const sportsWrap=document.getElementById("sportsWrap");
+sports.forEach(s=>{
+  let chip=document.createElement("div");
+  chip.textContent=s; chip.className="chip";
+  chip.onclick=()=>chip.classList.toggle("active");
+  sportsWrap.appendChild(chip);
+});
+
+const marketsWrap=document.getElementById("marketsWrap");
+markets.forEach(m=>{
+  let chip=document.createElement("div");
+  chip.textContent=m; chip.className="chip";
+  chip.onclick=()=>chip.classList.toggle("active");
+  marketsWrap.appendChild(chip);
+});
+
+// BILHETE
+const bilheteContainer=document.getElementById("bilheteContainer");
+const generateBtn=document.getElementById("generateBtn");
+const qtdInput=document.getElementById("qtd");
+const minOddInput=document.getElementById("minOdd");
+const maxOddInput=document.getElementById("maxOdd");
+const minPercentInput=document.getElementById("minPercent");
 
 function gerarBilhete(){
   bilheteContainer.innerHTML="";
-  let qtd = Number(qtdInput.value);
-  let minOdd = Number(minOddInput.value);
-  let maxOdd = Number(maxOddInput.value);
-  let minPerc = Number(minPercentInput.value);
-  let bilhete = [];
-  let oddTotal = 1;
-  let greenTotal = 0;
-  let filtered = palpites.filter(p=>p.odd>=minOdd && p.odd<=maxOdd && p.percent>=minPerc);
-  if(filtered.length<qtd) qtd = filtered.length;
+  let qtd=Number(qtdInput.value);
+  let minOdd=Number(minOddInput.value);
+  let maxOdd=Number(maxOddInput.value);
+  let minPerc=Number(minPercentInput.value);
+  let bilhete=[];
+  let oddTotal=1;
+  let greenTotal=0;
+  let filtered=palpites.filter(p=>p.odd>=minOdd && p.odd<=maxOdd && p.percent>=minPerc);
+  if(filtered.length<qtd) qtd=filtered.length;
   for(let i=0;i<qtd;i++){
     let idx=Math.floor(Math.random()*filtered.length);
     let p=filtered.splice(idx,1)[0];
@@ -187,9 +227,9 @@ function gerarBilhete(){
     oddTotal*=p.odd;
     greenTotal+=p.percent;
   }
-  let card = document.createElement("div");
+  let card=document.createElement("div");
   card.className="card show";
-  let content = `<h3>Bilhete Gerado (${qtd} jogos)</h3>`;
+  let content=`<h3>Bilhete Gerado (${qtd} jogos)</h3>`;
   bilhete.forEach(p=>{
     content+=`<div>[${p.data}] ${p.jogo} — ${p.mercado} | Odd: ${p.odd} | % Green: ${p.percent}%</div>`;
   });
@@ -199,11 +239,10 @@ function gerarBilhete(){
 }
 generateBtn.onclick=gerarBilhete;
 
-// ============ PIX ===========
-const pixBtn=document.getElementById("pixBtn");
-pixBtn.onclick=()=>navigator.clipboard.writeText("geradordebilhete@gmail.com").then(()=>alert("E-mail copiado!"))
+// PIX
+document.getElementById("pixBtn").onclick=()=>navigator.clipboard.writeText("geradordebilhete@gmail.com").then(()=>alert("E-mail copiado!"));
 
-// ============ ESTATÍSTICAS ===========
+// ESTATÍSTICAS
 const estatBtn=document.getElementById("estatBtn");
 const estatModal=document.getElementById("estatModal");
 const closeEstat=document.getElementById("closeEstat");
@@ -213,17 +252,15 @@ estatBtn.onclick=function(){
   let totalJogos=palpites.length;
   let oddSum = palpites.reduce((s,p)=>s+p.odd,0);
   let avgOdd=(oddSum/totalJogos).toFixed(2);
-  estatContent.innerHTML=`<table class="stats">
-  <tr><th>Total de Palpites</th><td>${totalJogos}</td></tr>
-  <tr><th>Odd Média</th><td>${avgOdd}</td></tr>
+  estatContent.innerHTML=`<table style="width:100%;color:var(--muted);font-size:14px">
+    <tr><th>Total de Palpites</th><td>${totalJogos}</td></tr>
+    <tr><th>Odd Média</th><td>${avgOdd}</td></tr>
   </table>`;
   estatModal.style.display="block";
 }
 closeEstat.onclick=()=>estatModal.style.display="none";
 window.onclick=function(e){if(e.target===estatModal)estatModal.style.display="none";}
 </script>
-
-<div class="foot" style="text-align:center;margin-top:20px;color:#7a7a7a;font-size:13px">© 2025 Gerador de Bilhete Beta</div>
 
 </body>
 </html>
