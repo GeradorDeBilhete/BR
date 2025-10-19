@@ -6,98 +6,36 @@
 <title>🎯 Gerador de Bilhete 🎟️ Beta</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <style>
 :root{
   --bg:#000;
-  --panel:#0b0b0b;
-  --muted:#bfbfbf;
+  --panel:#111;
   --accent:#00ff88;
   --accent-2:#00cc66;
-  --card:#0f0f0f;
+  --card:#1a1a1a;
+  --muted:#bbb;
 }
-body{
-  margin:0;
-  font-family:"Montserrat",system-ui,Arial,sans-serif;
-  background:var(--bg);
-  color:#f2f2f2;
-}
-header{
-  text-align:center;
-  padding:20px;
-}
-h1{
-  margin:0;
-  font-size:24px;
-  font-weight:700;
-  color:var(--accent);
-  letter-spacing:0.5px;
-}
-.wrap{
-  max-width:900px;
-  margin:18px auto;
-  padding:18px;
-  background:var(--panel);
-  border-radius:12px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.6);
-}
-.controls{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-.row{
-  display:flex;
-  flex-wrap:wrap;
-  gap:12px;
-  align-items:center;
-  justify-content:center;
-}
-input[type=number]{padding:10px;border-radius:8px;border:1px solid #171717;background:#0c0c0c;color:#fff;width:90px;}
-button.btn{background:var(--accent);color:#000;border:none;padding:12px 16px;border-radius:10px;cursor:pointer;font-weight:600;transition:all .2s;}
-button.btn:hover{transform:scale(1.03);}
-.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px;}
-#bilheteContainer{margin-top:20px;display:flex;flex-direction:column;align-items:center;position:relative;}
-.card{
-  background:var(--card);
-  border:1px solid rgba(0,255,136,0.08);
-  border-radius:12px;
-  padding:16px;
-  margin:10px 0;
-  width:90%;
-  max-width:600px;
-  opacity:0;
-  transform:scale(0.8);
-  transition:all .4s cubic-bezier(.2,.9,.3,1);
-}
-.card.show{
-  opacity:1;
-  transform:scale(1);
-}
-.card h3{margin:0;font-size:16px;color:#fff;}
-.stats-line{margin-top:10px;font-size:14px;color:var(--accent);}
-.foot{text-align:center;color:#7a7a7a;margin-top:18px;font-size:13px;}
-.toggle-section{margin-top:12px;}
-.toggle-section .title{
-  cursor:pointer;
-  font-weight:600;
-  color:var(--accent);
-  margin-bottom:6px;
-}
-.toggle-section .content{
-  display:none;
-  gap:8px;
-  flex-wrap:wrap;
-}
-.chip{
-  background:#101010;
-  border:1px solid #161616;
-  padding:8px 10px;
-  border-radius:10px;
-  cursor:pointer;
-  color:#ddd;
-}
-.chip.active{background:var(--accent);color:#000;transform:scale(1.05);}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Montserrat",sans-serif;background:var(--bg);color:#f2f2f2;}
+header{text-align:center;padding:20px;}
+h1{margin:0;color:var(--accent);font-weight:700;font-size:24px;letter-spacing:0.6px;}
+.wrap{max-width:900px;margin:0 auto;padding:18px;background:var(--panel);border-radius:12px;}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between;}
+label.small{font-size:14px;color:var(--muted);}
+input[type=number]{background:#0c0c0c;border:1px solid #171717;color:#fff;padding:8px;border-radius:6px;width:80px;}
+button.btn{background:var(--accent);color:#000;border:none;padding:10px 14px;border-radius:8px;font-weight:600;cursor:pointer;transition:0.2s;}
+button.btn:hover{opacity:0.85;}
+.actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;justify-content:center;}
+#bilheteContainer{margin-top:16px;display:flex;flex-direction:column;align-items:center;gap:12px;}
+.card{background:var(--card);border:1px solid rgba(0,255,136,0.08);padding:14px;border-radius:10px;opacity:0;transform:translateY(20px);transition:all .4s ease;}
+.card.show{opacity:1;transform:none;}
+.card h3{margin:0;font-size:16px;color:#fff;text-align:center;}
+.stats-line{margin-top:8px;font-size:14px;color:var(--accent);text-align:center;font-weight:600;}
+footer{margin-top:24px;color:#7a7a7a;font-size:13px;text-align:center;}
+.sports-markets{display:none;margin-top:12px;}
+.chip{background:#111;border:1px solid #222;color:#fff;padding:6px 10px;border-radius:8px;cursor:pointer;}
+.chip.active{background:var(--accent);color:#000;}
+#pixBtn{background:#ffcc00;color:#000;margin-top:20px;width:100%;padding:12px;border-radius:8px;font-weight:600;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -107,55 +45,53 @@ button.btn:hover{transform:scale(1.03);}
 </header>
 
 <div class="wrap">
+  <div class="row">
+    <label class="small">Quantidade de jogos</label>
+    <input id="qtd" type="number" min="1" value="3">
+    <label class="small">Odd mínima</label>
+    <input id="minOdd" type="number" step="0.01" value="1.20">
+    <label class="small">Odd máxima</label>
+    <input id="maxOdd" type="number" step="0.01" value="2.50">
+    <label class="small">% mínimo de acerto</label>
+    <input id="minPercent" type="number" step="1" value="50">
+  </div>
 
-  <div class="controls">
-    <div class="row">
-      <label>Quantidade de jogos</label>
-      <input id="qtd" type="number" min="1" value="3">
-      <label>Odd mínima</label>
-      <input id="minOdd" type="number" step="0.01" value="1.20">
-      <label>Odd máxima</label>
-      <input id="maxOdd" type="number" step="0.01" value="2.50">
-      <label>% mínimo de acerto</label>
-      <input id="minPercent" type="number" step="1" value="50">
+  <div style="margin-top:12px;">
+    <button id="toggleFilters" class="btn" style="width:100%;">🎯 Mostrar/Ocultar Esportes e Mercados</button>
+    <div class="sports-markets" id="filtersPanel">
+      <div style="margin-top:8px;">Esportes:</div>
+      <div id="sportsWrap" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+      <div style="margin-top:8px;">Mercados:</div>
+      <div id="marketsWrap" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
     </div>
+  </div>
 
-    <div id="generateBtnWrapper" style="display:flex;justify-content:center;margin-top:12px;">
-      <button id="generateBtn" class="btn">🎲 Gerar Bilhete</button>
-    </div>
+  <div style="margin-top:12px;text-align:center;">
+    <button id="generateBtn" class="btn" style="width:100%;">🎲 Gerar Bilhete</button>
+  </div>
 
-    <div class="actions">
-      <button id="estatBtn" class="btn">📊 Estatísticas</button>
-      <button id="copiarBtn" class="btn">📋 Copiar</button>
-      <button id="pdfBtn" class="btn">💾 PDF</button>
-      <button id="pixBtn" class="btn" style="background:#ffcc00;color:#000;">Pix e-mail: geradordebilhete@gmail.com — Clique para copiar</button>
-    </div>
-
-    <div class="toggle-section">
-      <div class="title" onclick="document.getElementById('sportsWrap').style.display=document.getElementById('sportsWrap').style.display==='flex'?'none':'flex';">Escolher Esporte</div>
-      <div class="content" id="sportsWrap" style="display:none;"></div>
-    </div>
-    <div class="toggle-section">
-      <div class="title" onclick="document.getElementById('marketsWrap').style.display=document.getElementById('marketsWrap').style.display==='flex'?'none':'flex';">Escolher Mercado</div>
-      <div class="content" id="marketsWrap" style="display:none;"></div>
-    </div>
+  <div class="actions">
+    <button id="copiarBtn" class="btn">📋 Copiar</button>
+    <button id="pdfBtn" class="btn">💾 PDF</button>
+    <button id="estatBtn" class="btn">📊 Estatísticas</button>
   </div>
 
   <div id="bilheteContainer"></div>
 
+  <button id="pixBtn">💛 Doação Pix</button>
 </div>
 
-<!-- Estatísticas Modal -->
-<div id="estatModal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:60;padding:28px;overflow:auto;">
-  <div style="max-width:900px;margin:20px auto;background:#070707;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)">
-    <button id="closeEstat" style="float:right;background:var(--accent);border:none;padding:8px 10px;border-radius:8px;cursor:pointer">Fechar</button>
-    <h2>📊 Estatísticas do Gerador</h2>
-    <div id="estatContent" style="margin-top:8px"></div>
+<!-- Modal Estatísticas -->
+<div id="estatModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:1000;padding:28px;overflow:auto;">
+  <div style="max-width:900px;margin:20px auto;background:#070707;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);">
+    <button id="closeEstat" style="float:right;background:var(--accent);border:none;padding:8px 10px;border-radius:8px;cursor:pointer;">Fechar</button>
+    <h2 style="color:var(--accent);margin-top:0;">📊 Estatísticas do Gerador</h2>
+    <div id="estatContent" style="margin-top:8px;"></div>
   </div>
 </div>
 
 <script>
-// ============ PALPITES ===========
+// === PALPITES ===
 const palpites = [
   {esporte:"Futebol",jogo:"Liverpool x Manchester United",mercado:"Dupla Chance Casa",odd:1.16,percent:79},
   {esporte:"Futebol",jogo:"Celta x Real Sociedad",mercado:"+1.5 gols",odd:1.30,percent:75},
@@ -213,89 +149,76 @@ const palpites = [
   {esporte:"Futebol",jogo:"Liverpool x Manchester United",mercado:"+2.5 gols",odd:1.44,percent:62},
 ];
 
-// ============ ESPORTES E MERCADOS ===========
-const sports = ["Futebol","Basquete","Vôlei","Tênis"];
-const markets = ["Dupla Chance Casa","Dupla Chance Fora","Casa ou Empate","+1.5 gols","+2.5 gols","+0.5 gols 1T","Vitória Casa","Vitória Fora","Ambas Marcam","+0.5 gol cada"];
+// === ESPORTES E MERCADOS ===
+const sports=["Futebol","Basquete","Vôlei","Tênis"];
+const markets=["Dupla Chance Casa","Dupla Chance Fora","Casa ou Empate","+1.5 gols","+2.5 gols","+0.5 gols 1T","Vitória Casa","Vitória Fora","Ambas Marcam","+0.5 gol cada"];
+
+// Render chips
 const sportsWrap = document.getElementById("sportsWrap");
-sports.forEach(s => {
-  let chip = document.createElement("div");
-  chip.textContent = s;
-  chip.className="chip";
-  chip.onclick = ()=>chip.classList.toggle("active");
+sports.forEach(s=>{
+  let chip=document.createElement("div"); chip.className="chip"; chip.textContent=s;
+  chip.onclick=()=>chip.classList.toggle("active");
   sportsWrap.appendChild(chip);
 });
 const marketsWrap = document.getElementById("marketsWrap");
 markets.forEach(m=>{
-  let chip = document.createElement("div");
-  chip.textContent=m;
-  chip.className="chip";
+  let chip=document.createElement("div"); chip.className="chip"; chip.textContent=m;
   chip.onclick=()=>chip.classList.toggle("active");
   marketsWrap.appendChild(chip);
 });
 
-// ============ GERAR BILHETE ===========
-const bilheteContainer = document.getElementById("bilheteContainer");
-const generateBtn = document.getElementById("generateBtn");
-const qtdInput = document.getElementById("qtd");
-const minOddInput = document.getElementById("minOdd");
-const maxOddInput = document.getElementById("maxOdd");
-const minPercentInput = document.getElementById("minPercent");
+// Toggle filtros
+document.getElementById("toggleFilters").onclick=()=>{
+  const panel=document.getElementById("filtersPanel");
+  panel.style.display=panel.style.display==="flex"?"none":"flex";
+  panel.style.flexDirection="column";
+}
 
-function gerarBilhete(){
+// === BILHETE ===
+const bilheteContainer=document.getElementById("bilheteContainer");
+document.getElementById("generateBtn").onclick=()=>{
   bilheteContainer.innerHTML="";
-  let qtd = Number(qtdInput.value);
-  let minOdd = Number(minOddInput.value);
-  let maxOdd = Number(maxOddInput.value);
-  let minPerc = Number(minPercentInput.value);
-  let bilhete = [];
-  let oddTotal = 1;
-  let greenTotal = 0;
-  let filtered = palpites.filter(p=>p.odd>=minOdd && p.odd<=maxOdd && p.percent>=minPerc);
-  if(filtered.length<qtd) qtd = filtered.length;
-  for(let i=0;i<qtd;i++){
-    let idx=Math.floor(Math.random()*filtered.length);
-    let p=filtered.splice(idx,1)[0];
+  const qtd=Number(document.getElementById("qtd").value);
+  const minOdd=Number(document.getElementById("minOdd").value);
+  const maxOdd=Number(document.getElementById("maxOdd").value);
+  const minPerc=Number(document.getElementById("minPercent").value);
+
+  let filtered=palpites.filter(p=>p.odd>=minOdd && p.odd<=maxOdd && p.percent>=minPerc);
+  const selectQtd=Math.min(qtd,filtered.length);
+  let bilhete=[],oddTotal=1,greenTotal=0;
+  for(let i=0;i<selectQtd;i++){
+    const idx=Math.floor(Math.random()*filtered.length);
+    const p=filtered.splice(idx,1)[0];
     bilhete.push(p);
     oddTotal*=p.odd;
     greenTotal+=p.percent;
   }
-  let card = document.createElement("div");
-  card.className="card show";
-  let content = `<h3>Bilhete Gerado (${qtd} jogos)</h3>`;
-  bilhete.forEach(p=>{
-    content+=`<div>${p.jogo} — ${p.mercado} | Odd: ${p.odd} | % Green: ${p.percent}%</div>`;
-  });
-  content+=`<div class="stats-line">Odd Final: ${oddTotal.toFixed(2)} | % Green Médio: ${(greenTotal/qtd).toFixed(1)}%</div>`;
+
+  const card=document.createElement("div"); card.className="card show";
+  let content=`<h3>🎟️ Bilhete Gerado (${selectQtd} jogos)</h3>`;
+  bilhete.forEach(p=>content+=`<div>⚽ ${p.jogo} — ${p.mercado} | Odd: ${p.odd} | ✅ ${p.percent}%</div>`);
+  content+=`<div class="stats-line">💰 Odd Final: ${oddTotal.toFixed(2)} | 🌟 % Chance Média: ${(greenTotal/selectQtd).toFixed(1)}%</div>`;
   card.innerHTML=content;
   bilheteContainer.appendChild(card);
 }
-generateBtn.onclick=gerarBilhete;
 
-// ============ PIX ===========
-const pixBtn=document.getElementById("pixBtn");
-pixBtn.onclick=()=>navigator.clipboard.writeText("geradordebilhete@gmail.com").then(()=>alert("E-mail copiado!"));
+// === PIX ===
+document.getElementById("pixBtn").onclick=()=>navigator.clipboard.writeText("geradordebilhete@gmail.com").then(()=>alert("E-mail doação Pix copiado!"));
 
-// ============ ESTATÍSTICAS ===========
+// === ESTATÍSTICAS ===
 const estatBtn=document.getElementById("estatBtn");
 const estatModal=document.getElementById("estatModal");
 const closeEstat=document.getElementById("closeEstat");
-const estatContent=document.getElementById("estatContent");
-
 estatBtn.onclick=function(){
-  let totalJogos=palpites.length;
-  let oddSum = palpites.reduce((s,p)=>s+p.odd,0);
-  let avgOdd=(oddSum/totalJogos).toFixed(2);
-  estatContent.innerHTML=`<table style="width:100%;border-collapse:collapse;color:#ddd;font-size:14px;">
-  <tr><th style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.02);text-align:left">Total de Palpites</th><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.02);text-align:left">${totalJogos}</td></tr>
-  <tr><th style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.02);text-align:left">Odd Média</th><td style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.02);text-align:left">${avgOdd}</td></tr>
-  </table>`;
+  let total=palpites.length;
+  let avgOdd=(palpites.reduce((s,p)=>s+p.odd,0)/total).toFixed(2);
+  estatContent.innerHTML=`<table style="width:100%;color:#fff;"><tr><th>Total Palpites</th><td>${total}</td></tr><tr><th>Odd Média</th><td>${avgOdd}</td></tr></table>`;
   estatModal.style.display="block";
 }
 closeEstat.onclick=()=>estatModal.style.display="none";
 window.onclick=function(e){if(e.target===estatModal)estatModal.style.display="none";}
 </script>
 
-<div class="foot">© 2025 Gerador de Bilhete Beta</div>
-
+<footer>© 2025 Gerador de Bilhete Beta</footer>
 </body>
 </html>
