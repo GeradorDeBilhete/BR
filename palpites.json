@@ -1,0 +1,218 @@
+[
+  {
+    "esporte": "Futebol",
+    "jogo": "San Martin SJ x Independiente",
+    "mercado": "-3.5 gols",
+    "odd": 1.11,
+    "percent": 90,
+    "horario": "19/12/2025 16:00"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "San Martin SJ x Independiente",
+    "mercado": "-1.5 gol 1T",
+    "odd": 1.20,
+    "percent": 80,
+    "horario": "19/12/2025 16:00"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "San Martin SJ x Independiente",
+    "mercado": "-0.5 gol 1T",
+    "odd": 2.10,
+    "percent": 55,
+    "horario": "19/12/2025 16:00"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Empoli x Venezia",
+    "mercado": "-3.5 gols",
+    "odd": 1.22,
+    "percent": 70,
+    "horario": "19/12/2025 16:30"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Empoli x Venezia",
+    "mercado": "-1.5 gols 1T",
+    "odd": 1.33,
+    "percent": 60,
+    "horario": "19/12/2025 16:30"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Rosario Central x Platense",
+    "mercado": "-3.5 gols",
+    "odd": 1.14,
+    "percent": 95,
+    "horario": "19/12/2025 17:00"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Rosario Central x Platense",
+    "mercado": "Casa ou Empate",
+    "odd": 1.11,
+    "percent": 92,
+    "horario": "19/12/2025 17:00"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Rosario Central x Platense",
+    "mercado": "Vitória Casa",
+    "odd": 1.72,
+    "percent": 65,
+    "horario": "19/12/2025 17:00"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Botafogo SP x Cuiabá",
+    "mercado": "+0.5 gols Fora",
+    "odd": 1.38,
+    "percent": 60,
+    "horario": "19/12/2025 18:00"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Botafogo SP x Cuiabá",
+    "mercado": "-3.5 gols",
+    "odd": 1.18,
+    "percent": 70,
+    "horario": "19/12/2025 18:00"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Lech Poznan x Pogon Szczecin",
+    "mercado": "Casa ou Empate",
+    "odd": 1.22,
+    "percent": 80,
+    "horario": "19/12/2025 18:30"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Lech Poznan x Pogon Szczecin",
+    "mercado": "+1.5 gols",
+    "odd": 1.14,
+    "percent": 85,
+    "horario": "19/12/2025 18:30"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Lech Poznan x Pogon Szczecin",
+    "mercado": "Ambas Marcam",
+    "odd": 1.50,
+    "percent": 75,
+    "horario": "19/12/2025 18:30"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Lech Poznan x Pogon Szczecin",
+    "mercado": "Vitória Casa",
+    "odd": 1.72,
+    "percent": 60,
+    "horario": "19/12/2025 18:30"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Bahia x Grêmio",
+    "mercado": "Casa ou Empate",
+    "odd": 1.18,
+    "percent": 80,
+    "horario": "19/12/2025 19:00"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Bahia x Grêmio",
+    "mercado": "+0.5 gol cada",
+    "odd": 1.18,
+    "percent": 78,
+    "horario": "19/12/2025 19:00"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Bahia x Grêmio",
+    "mercado": "+1.5 gols",
+    "odd": 1.36,
+    "percent": 68,
+    "horario": "19/12/2025 19:00"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Nurnberg x Holstein Kiel",
+    "mercado": "+1.5 gols",
+    "odd": 1.20,
+    "percent": 75,
+    "horario": "19/12/2025 19:30"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Tottenham x Aston Villa",
+    "mercado": "Dupla Chance Casa",
+    "odd": 1.28,
+    "percent": 65,
+    "horario": "19/12/2025 20:00"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Tottenham x Aston Villa",
+    "mercado": "Ambas Marcam",
+    "odd": 1.70,
+    "percent": 60,
+    "horario": "19/12/2025 20:00"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Tottenham x Aston Villa",
+    "mercado": "+2.5 gols",
+    "odd": 1.90,
+    "percent": 55,
+    "horario": "19/12/2025 20:00"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Tottenham x Aston Villa",
+    "mercado": "+1.5 gols",
+    "odd": 1.28,
+    "percent": 70,
+    "horario": "19/12/2025 20:00"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Liverpool x Manchester United",
+    "mercado": "Ambas Marcam",
+    "odd": 1.50,
+    "percent": 60,
+    "horario": "19/12/2025 20:30"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Liverpool x Manchester United",
+    "mercado": "Vitória Casa",
+    "odd": 1.60,
+    "percent": 50,
+    "horario": "19/12/2025 20:30"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Liverpool x Manchester United",
+    "mercado": "+0.5 gol 1T",
+    "odd": 1.22,
+    "percent": 55,
+    "horario": "19/12/2025 20:30"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Liverpool x Manchester United",
+    "mercado": "+1.5 gols",
+    "odd": 1.14,
+    "percent": 60,
+    "horario": "19/12/2025 20:30"
+  },
+  {
+    "esporte": "Futebol",
+    "jogo": "Liverpool x Manchester United",
+    "mercado": "+2.5 gols",
+    "odd": 1.44,
+    "percent": 52,
+    "horario": "19/12/2025 20:30"
+  }
+]
