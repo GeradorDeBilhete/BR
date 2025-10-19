@@ -1,200 +1,145 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>🎯 Gerador de Bilhete 🎟️</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎯 Gerador de Bilhete Profissional</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #000000;
-  --panel: #0b0b0b;
-  --accent: #00ff88;
-  --accent-dark: #00cc66;
-  --muted: #bfbfbf;
-  --card: #0f0f0f;
-}
-body {
-  margin:0;
-  font-family: "Montserrat", sans-serif;
-  background: var(--bg);
-  color: #f2f2f2;
-}
-header {
-  text-align:center;
-  padding:20px;
-}
-h1 {
-  margin:0;
-  color: var(--accent);
-  font-size:26px;
-  font-weight:700;
-}
-.wrap {
-  max-width: 900px;
-  margin: 20px auto;
-  padding: 18px;
-  background: var(--panel);
-  border-radius: 12px;
-}
-.row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-label, input, select {
-  font-size:14px;
-  color:#f2f2f2;
-}
-input[type=number], select {
-  padding:8px;
-  border-radius:6px;
-  border:1px solid #222;
-  background:#111;
-  color:#fff;
-}
-button {
-  padding:10px 14px;
-  border-radius:8px;
-  border:none;
-  background: var(--accent);
-  color:#000;
-  font-weight:600;
-  cursor:pointer;
-}
-.card {
-  background: var(--card);
-  border: 1px solid rgba(0,255,136,0.08);
-  padding:12px;
-  border-radius:10px;
-  margin-top:12px;
-  text-align:center;
-}
-#bilheteContainer {
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-#filters {
-  margin-top:12px;
-  background: #111;
-  padding:10px;
-  border-radius:8px;
-  cursor:pointer;
-  user-select:none;
-}
-#filtersContent {
-  display:none;
-  margin-top:10px;
-}
-.chip {
-  display:inline-block;
-  padding:6px 10px;
-  margin:2px;
-  border-radius:8px;
-  background:#101010;
-  border:1px solid #161616;
-  cursor:pointer;
-}
-.chip.active {
-  background: var(--accent);
-  color:#000;
-}
-#estatModal {
-  display:none;
-  position:fixed;
-  inset:0;
-  background: rgba(0,0,0,0.9);
-  padding: 20px;
-  overflow:auto;
-  z-index:50;
-}
-#estatContent {
-  margin-top:10px;
-}
-#pixBtn {
-  margin-top:20px;
-  display:block;
-  width:100%;
-  text-align:center;
-  background:#ffcc00;
-  color:#000;
-}
+body{margin:0;font-family:"Montserrat",sans-serif;background:#000;color:#f2f2f2;}
+header{text-align:center;padding:20px;}
+h1{color:#00ff88;font-size:28px;}
+.wrap{max-width:1000px;margin:20px auto;padding:20px;background:#0b0b0b;border-radius:12px;}
+button{background:#00ff88;color:#000;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:600;margin:4px;}
+#bilheteContainer{margin-top:20px;display:flex;flex-direction:column;align-items:center;}
+.card{background:#0f0f0f;padding:14px;border-radius:12px;border:2px solid rgba(0,255,136,0.3);margin-top:10px;width:80%;text-align:center;transition:all 0.5s ease;position:relative;opacity:0;transform:scale(0.8);}
+.card.show{opacity:1;transform:scale(1.05);}
+.stats-line{margin-top:8px;font-size:14px;color:#ccc;}
+.chip{padding:6px 10px;border-radius:8px;border:1px solid #222;margin:3px;display:inline-block;cursor:pointer;}
+.chip.active{background:#00ff88;color:#000;}
+#filters{display:none;margin-top:10px;}
+#stats{display:none;margin-top:20px;font-size:14px;color:#ccc;}
 </style>
 </head>
 <body>
 
 <header>
-  <h1>🎯 Gerador de Bilhete 🎟️</h1>
+  <h1>🎯 Gerador de Bilhete Profissional</h1>
 </header>
 
 <div class="wrap">
-  <div class="row">
-    <label>Quantidade de jogos:</label>
-    <input type="number" id="qtd" min="1" value="3">
-    <label>Odd mínima:</label>
-    <input type="number" step="0.01" id="minOdd" value="1.2">
-    <label>Odd máxima:</label>
-    <input type="number" step="0.01" id="maxOdd" value="2.5">
-    <label>% mínimo de acerto:</label>
-    <input type="number" step="1" id="minPercent" value="50">
+  <div>
+    <button id="toggleFilters">📂 Mostrar/Ocultar Filtros</button>
+    <div id="filters">
+      <div id="sportsWrap"></div>
+      <div id="marketsWrap" style="margin-top:6px;"></div>
+    </div>
   </div>
 
-  <div style="margin-top:10px;text-align:center;">
+  <div style="margin-top:14px;">
     <button id="generateBtn">🎲 Gerar Bilhete</button>
   </div>
 
-<div id="filters">
-  ⚙️ Mostrar Filtros (Esporte e Mercado)
-</div>
-<div id="filtersContent" style="display:none; padding:10px; background:#111; border-radius:8px; margin-top:10px;">
-  <div>
-    <strong>Escolher Esporte:</strong>
-    <div id="sportsWrap" style="margin-top:6px; display:flex; flex-wrap:wrap; gap:6px;">
-      <!-- chips de esportes geradas pelo script.js -->
-    </div>
-  </div>
-  <div style="margin-top:12px;">
-    <strong>Escolher Mercado:</strong>
-    <div id="marketsWrap" style="margin-top:6px; display:flex; flex-wrap:wrap; gap:6px;">
-      <!-- chips de mercados geradas pelo script.js -->
-    </div>
-  </div>
-</div>
-
-<script>
-const filtersBtn = document.getElementById("filters");
-const filtersContent = document.getElementById("filtersContent");
-filtersBtn.addEventListener("click", () => {
-  filtersContent.style.display = filtersContent.style.display === "block" ? "none" : "block";
-});
-</script>
-
   <div id="bilheteContainer"></div>
 
-  <div style="text-align:center;">
-    <button id="estatBtn">📊 Estatísticas</button>
+  <div id="stats"></div>
+
+  <div style="margin-top:20px;text-align:center;">
+    <button id="pixBtn" style="background:#ffcc00;">💰 Doação Pix</button>
   </div>
-
-  <button id="pixBtn">💰 Doação Pix: geradordebilhete@gmail.com</button>
 </div>
 
-<div id="estatModal">
-  <button id="closeEstat" style="float:right;background:var(--accent);border:none;padding:6px 10px;border-radius:6px;cursor:pointer;">Fechar</button>
-  <h2>📊 Estatísticas do Gerador</h2>
-  <div id="estatContent"></div>
-</div>
-
-<script src="script.js"></script>
 <script>
-const filtersBtn = document.getElementById("filters");
-const filtersContent = document.getElementById("filtersContent");
-filtersBtn.onclick = () => {
-  filtersContent.style.display = filtersContent.style.display === "block" ? "none" : "block";
+// ====== Configurações ======
+let palpites = []; // carregado do JSON
+const sportsList = ["Futebol","Basquete","Vôlei","Tênis"];
+const marketsList = ["Dupla Chance Casa","Dupla Chance Fora","Casa ou Empate","+0.5 gol casa","+1.5 gols","+2.5 gols","Vitória Casa","Vitória Fora","Ambas Marcam"];
+let selectedSports = [];
+let selectedMarkets = [];
+
+// ====== Carregar palpites JSON ======
+fetch('palpites.json')
+  .then(res => res.json())
+  .then(data=>{
+    palpites = data;
+    criarChips();
+  })
+  .catch(err=>console.error("Erro ao carregar palpites:", err));
+
+// ====== Criar Chips de filtros ======
+function criarChips(){
+  const sportsWrap = document.getElementById('sportsWrap');
+  sportsList.forEach(s=>{
+    const chip = document.createElement('div');
+    chip.textContent=s;
+    chip.className='chip';
+    chip.onclick=()=>{chip.classList.toggle('active'); atualizarFiltros();};
+    sportsWrap.appendChild(chip);
+  });
+
+  const marketsWrap = document.getElementById('marketsWrap');
+  marketsList.forEach(m=>{
+    const chip = document.createElement('div');
+    chip.textContent=m;
+    chip.className='chip';
+    chip.onclick=()=>{chip.classList.toggle('active'); atualizarFiltros();};
+    marketsWrap.appendChild(chip);
+  });
 }
-</script>
+
+function atualizarFiltros(){
+  selectedSports = Array.from(document.querySelectorAll('#sportsWrap .chip.active')).map(c=>c.textContent);
+  selectedMarkets = Array.from(document.querySelectorAll('#marketsWrap .chip.active')).map(c=>c.textContent);
+}
+
+// ====== Gerar Bilhete ======
+document.getElementById('generateBtn').onclick = ()=>{
+  const container = document.getElementById('bilheteContainer');
+  container.innerHTML='';
+  let filtered = palpites.filter(p=>{
+    let sportCheck = selectedSports.length ? selectedSports.includes(p.esporte) : true;
+    let marketCheck = selectedMarkets.length ? selectedMarkets.includes(p.mercado) : true;
+    return sportCheck && marketCheck;
+  });
+  if(filtered.length==0){alert("Nenhum palpite disponível com os filtros."); return;}
+
+  let oddTotal=1;
+  let greenTotal=0;
+  filtered.forEach((p,index)=>{
+    oddTotal*=p.odd;
+    greenTotal+=p.percent;
+    const card = document.createElement('div');
+    card.className='card';
+    card.style.transitionDelay = `${index*0.1}s`;
+    card.innerHTML=`<h3>🎫 ${p.jogo}</h3><div>${p.mercado} | Odd: ${p.odd} | % Green: ${p.percent}%</div>`;
+    container.appendChild(card);
+    setTimeout(()=>{card.classList.add('show');},50);
+  });
+
+  // Resumo com destaque
+  const summary = document.createElement('div');
+  summary.className='card';
+  summary.style.border='2px solid #ff00ff';
+  summary.innerHTML=`<h3>📊 Resumo do Bilhete</h3>
+                     <div class="stats-line">Odd Total: ${oddTotal.toFixed(2)}</div>
+                     <div class="stats-line">% Chance Média: ${(greenTotal/filtered.length).toFixed(1)}%</div>
+                     <div class="stats-line">Risco Estimado: ${(100-(greenTotal/filtered.length)).toFixed(1)}%</div>`;
+  container.appendChild(summary);
+  setTimeout(()=>{summary.classList.add('show');},50);
+};
+
+// ====== Toggle Filtros ======
+document.getElementById('toggleFilters').onclick = ()=>{
+  const f = document.getElementById('filters');
+  f.style.display = f.style.display==='none'?'block':'none';
+};
+
+// ====== Pix ======
+document.getElementById('pixBtn').onclick = ()=>{
+  navigator.clipboard.writeText("geradordebilhete@gmail.com");
+  alert("E-mail do Pix copiado!");
+};
+
 <script src="script.js"></script>
 </body>
 </html>

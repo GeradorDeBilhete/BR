@@ -1,99 +1,85 @@
-// ================== Carregar palpites ==================
 let palpites = [];
+let resultados = [];
 
-fetch('palpites.json')
+// Carregar JSON de palpites pendentes
+fetch("palpites.json")
   .then(res => res.json())
-  .then(data => {
-    palpites = data;
-    criarChips(); // criar chips após carregar palpites
-  })
-  .catch(err => console.error("Erro ao carregar palpites:", err));
+  .then(data => palpites = data);
 
-// ================== Criar chips de esportes e mercados ==================
+// Carregar resultados passados
+fetch("resultados.json")
+  .then(res => res.json())
+  .then(data => resultados = data);
+
+const bilheteContainer = document.getElementById("bilheteContainer");
+const generateBtn = document.getElementById("generateBtn");
+const qtdInput = document.getElementById("qtd");
 const sportsWrap = document.getElementById("sportsWrap");
 const marketsWrap = document.getElementById("marketsWrap");
 
-function criarChips() {
-  const sports = [...new Set(palpites.map(p => p.esporte))];
-  const markets = [...new Set(palpites.map(p => p.mercado))];
+// Filtros escondidos
+const sports = ["Futebol","Basquete","Vôlei","Tênis"];
+const markets = ["Dupla Chance Casa","Dupla Chance Fora","Casa ou Empate","+1.5 gols","+2.5 gols","+0.5 gol 1T","Vitória Casa","Vitória Fora","Ambas Marcam","+0.5 gol Casa","-1.5 ht"];
 
-  sportsWrap.innerHTML = '';
-  marketsWrap.innerHTML = '';
-
-  sports.forEach(s => {
+function criarFiltros(){
+  sports.forEach(s=>{
     let chip = document.createElement("div");
-    chip.textContent = s;
     chip.className="chip";
-    chip.onclick = () => chip.classList.toggle("active");
+    chip.textContent=s;
+    chip.onclick = ()=>chip.classList.toggle("active");
     sportsWrap.appendChild(chip);
   });
-
-  markets.forEach(m => {
+  markets.forEach(m=>{
     let chip = document.createElement("div");
-    chip.textContent = m;
     chip.className="chip";
-    chip.onclick = () => chip.classList.toggle("active");
+    chip.textContent=m;
+    chip.onclick = ()=>chip.classList.toggle("active");
     marketsWrap.appendChild(chip);
   });
 }
+criarFiltros();
 
-// ================== Gerar Bilhete ==================
-const bilheteContainer = document.getElementById("bilheteContainer");
-const generateBtn = document.getElementById("generateBtn");
+// Gerar bilhete
+function gerarBilhete(){
+  bilheteContainer.innerHTML="";
+  let qtd = Number(qtdInput.value);
+  let filtrosSports = Array.from(sportsWrap.getElementsByClassName("active")).map(c=>c.textContent);
+  let filtrosMarkets = Array.from(marketsWrap.getElementsByClassName("active")).map(c=>c.textContent);
 
-generateBtn.onclick = gerarBilhete;
-
-function gerarBilhete() {
-  const selectedSports = Array.from(document.querySelectorAll('#sportsWrap .chip.active')).map(c => c.textContent);
-  const selectedMarkets = Array.from(document.querySelectorAll('#marketsWrap .chip.active')).map(c => c.textContent);
-
-  let filtered = palpites.filter(p => 
-    (selectedSports.length === 0 || selectedSports.includes(p.esporte)) &&
-    (selectedMarkets.length === 0 || selectedMarkets.includes(p.mercado))
-  );
-
-  if(filtered.length === 0){
-    alert("Nenhum palpite disponível com esses filtros");
-    return;
-  }
-
-  montarBilhete(filtered);
-}
-
-// ================== Montar Bilhete ==================
-function montarBilhete(jogos) {
-  bilheteContainer.innerHTML = "";
-  let oddTotal = 1;
-  let greenTotal = 0;
-
-  jogos.forEach((p, idx) => {
-    oddTotal *= p.odd;
-    greenTotal += p.percent;
-
-    const card = document.createElement("div");
-    card.className = "card show";
-    card.style.animation = `popIn 0.3s ease forwards`;
-    card.innerHTML = `🎯 ${p.jogo} — ${p.mercado} | Odd: ${p.odd.toFixed(2)} | % Green: ${p.percent}%`;
-    bilheteContainer.appendChild(card);
+  let filtered = palpites.filter(p=>{
+    let fS = filtrosSports.length===0 || filtrosSports.includes(p.esporte);
+    let fM = filtrosMarkets.length===0 || filtrosMarkets.includes(p.mercado);
+    return fS && fM;
   });
 
-  const stats = document.createElement("div");
-  stats.className = "stats-line";
-  stats.style.textAlign = "center";
-  stats.style.marginTop = "12px";
-  stats.innerHTML = `💰 Odd Total: ${oddTotal.toFixed(2)} | ✅ % Green Médio: ${(greenTotal/jogos.length).toFixed(1)}%`;
-  bilheteContainer.appendChild(stats);
+  if(filtered.length<qtd) qtd=filtered.length;
 
-  // Centralizar o bilhete
-  bilheteContainer.scrollIntoView({behavior: "smooth", block: "center"});
+  let bilhete = [];
+  let oddTotal=1;
+  for(let i=0;i<qtd;i++){
+    let idx = Math.floor(Math.random()*filtered.length);
+    let p = filtered.splice(idx,1)[0];
+    bilhete.push(p);
+    oddTotal *= p.odd;
+  }
+
+  let card = document.createElement("div");
+  card.className="card show";
+  let content = `<h3>🎟️ Bilhete Gerado (${qtd} jogos)</h3>`;
+  bilhete.forEach(p=>{
+    content+=`<div>⚽ ${p.jogo} — ${p.mercado} | Odd: ${p.odd}</div>`;
+  });
+  content+=`<div class="stats-line">Odd Total: ${oddTotal.toFixed(2)} | % Chance Média: ${(100/oddTotal).toFixed(1)}%</div>`;
+  bilheteContainer.appendChild(card);
 }
 
-// ================== Animação ==================
-const style = document.createElement('style');
-style.innerHTML = `
-@keyframes popIn {
-  0% {transform: scale(0.5); opacity: 0;}
-  70% {transform: scale(1.05); opacity: 1;}
-  100% {transform: scale(1);}
-}`;
-document.head.appendChild(style);
+generateBtn.onclick=gerarBilhete;
+
+// Estatísticas
+function calcularEstatisticas(){
+  let total = resultados.length;
+  let green = resultados.filter(r=>r.resultado==="green").length;
+  let red = resultados.filter(r=>r.resultado==="red").length;
+  let percGreen = ((green/total)*100).toFixed(1);
+  return {total, green, red, percGreen};
+}
